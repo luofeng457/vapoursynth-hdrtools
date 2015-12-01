@@ -86,7 +86,7 @@ private:
   
 public:
   // Construct/Deconstruct
-  DistortionMetricBlockinessJ341(double maxSampleValue, int distortionMethod);
+  DistortionMetricBlockinessJ341(double maxSampleValue, DistortionFunction distortionMethod);
   virtual ~DistortionMetricBlockinessJ341();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

@@ -86,6 +86,7 @@ private:
   bool                m_useFloatPrecision;
   
   int                 m_mode;
+  int                 m_invMode;
   int                 m_modeRGB2XYZ;
   
   SampleRange         m_range;
@@ -96,8 +97,11 @@ private:
   int                 m_upMethod;
   int                 m_maxIterations;
   ChromaFormat        m_oChromaFormat;
+  
+  
   ColorSpace          m_oColorSpace;
   ColorPrimaries      m_oColorPrimaries;
+  ChromaLocation      m_oChromaLocation[FP_TOTAL];
   
   Convert            *m_fwdConvertProcess; 
   Convert            *m_invConvertProcess;
@@ -112,6 +116,8 @@ private:
   double              m_chromaOffset;
   TransferFunction   *m_transferFunction;
   TransferFunctions   m_transferFunctions;
+  bool                m_useAdaptiveDownsampler;
+  bool                m_useAdaptiveUpsampler;
   
 
   void                allocateMemory(Frame* out, const Frame *inp);
@@ -127,14 +133,18 @@ public:
                          ColorPrimaries    iColorPrimaries, 
                          ColorSpace        oColorSpace, 
                          ColorPrimaries    oColorPrimaries, 
+                         int               useHighPrecision,
                          TransferFunctions transferFunction = TF_PQ,
                          int               downMethod = 2,
                          int               upMethod = 4,
+                         bool              useAdaptiveDownsampler = FALSE,
+                         bool              useAdaptiveUpsampler = FALSE,
                          int               useMinMax = 3,
                          int               bitDepth = 10, 
                          SampleRange       range = SR_FULL, 
                          int               maxIterations = 20,
                          ChromaFormat      oChromaFormat = CF_420,
+                         ChromaLocation    *oChromaLocationType = NULL,
                          bool              useFloatPrecision = TRUE
                          );
                         

@@ -64,7 +64,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision) {
+ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int useHighPrecision) {
   
   m_mode = CTF_IDENTITY; 
   m_isForward = TRUE;
@@ -72,6 +72,7 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
   m_cbDivider = 1.0;
   m_transformPrecision = FALSE;
   m_sClip = 0;
+  m_useHighPrecision = useHighPrecision;
      
   if (iColorSpace == CM_XYZ && oColorSpace == CM_YDZDX ) {
     m_mode = CTF_XYZ_2_DZDX;  // SMPTE 2085
@@ -107,7 +108,10 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
       m_transformPrecision = transformPrecision;
     }
     else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-      m_mode = CTF_RGB2020_2_YUV2020;
+      if (m_useHighPrecision == 1)
+        m_mode = CTF_RGB2020_2_YUV2020_HP;
+      else
+        m_mode = CTF_RGB2020_2_YUV2020;
       m_crDivider = 1.4746;
       m_cbDivider = 1.8814;
       m_transformPrecision = transformPrecision;
@@ -134,7 +138,10 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
       m_mode = CTF_RGB709_2_YUV709;
     }
     else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-      m_mode = CTF_RGB2020_2_YUV2020;
+      if (m_useHighPrecision == 2)
+        m_mode = CTF_RGB2020_2_YUV2020_HP;
+      else    
+        m_mode = CTF_RGB2020_2_YUV2020;
     }
     else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;

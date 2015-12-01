@@ -99,7 +99,7 @@ HDRConvertEXR::HDRConvertEXR(ProjectParameters *inputParams) {
   
   m_linearDownConversion     = inputParams->m_linearDownConversion;
   if (m_linearDownConversion == TRUE)
-    inputParams->m_closedLoopConversion = 0;
+    inputParams->m_closedLoopConversion = CLT_NULL;
     
   m_rgbDownConversion        = inputParams->m_rgbDownConversion;
   m_bUseWienerFiltering      = inputParams->m_bUseWienerFiltering;
@@ -331,19 +331,19 @@ void HDRConvertEXR::allocateFrameStores(ProjectParameters *inputParams, FrameFor
   // initiate the color transform process. Maybe we can move this in the process section though
   
   if (m_iFrameStore->m_colorSpace == CM_XYZ && m_oFrameStore->m_colorSpace != CM_XYZ && m_oFrameStore->m_colorPrimaries != CP_NONE) {
-    m_colorSpaceConvert = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, CM_RGB, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, 0, 0, 0);
-    m_colorTransform = ColorTransform::create(CM_RGB, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
+    m_colorSpaceConvert = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, CM_RGB, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, 0, 0);
+    m_colorTransform = ColorTransform::create(CM_RGB, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
   }
   else {
-    m_colorSpaceConvert = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_iFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, 0, input->m_iConstantLuminance, 0);
-    m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance, output->m_transferFunction, output->m_bitDepthComp[Y_COMP], output->m_sampleRange, inputParams->m_chromaDownsampleFilter, inputParams->m_chromaUpsampleFilter, inputParams->m_useMinMax, inputParams->m_closedLoopIterations, output->m_chromaFormat, inputParams->m_filterInFloat);
+    m_colorSpaceConvert = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_iFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, input->m_iConstantLuminance, 0);
+    m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance, output->m_transferFunction, output->m_bitDepthComp[Y_COMP], output->m_sampleRange, inputParams->m_chromaDownsampleFilter, inputParams->m_chromaUpsampleFilter, inputParams->m_useAdaptiveDownsampling, inputParams->m_useAdaptiveUpsampling, inputParams->m_useMinMax, inputParams->m_closedLoopIterations, output->m_chromaFormat, output->m_chromaLocation, inputParams->m_filterInFloat);
   }
   
   
   // Chroma subsampling
   // We may wish to create a single convert class that uses as inputs the output resolution as well the input and output chroma format, and the downsampling/upsampling method. That would make the code easier to handle.
   // To be done later.
-    m_convertTo420 = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter,  m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveFiltering, inputParams->m_useMinMax);
+    m_convertTo420 = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter,  m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveDownsampling, inputParams->m_useMinMax);
     
   if (output->m_chromaFormat != CF_420) {
     m_linearDownConversion = FALSE;
@@ -375,8 +375,10 @@ void HDRConvertEXR::allocateFrameStores(ProjectParameters *inputParams, FrameFor
     m_pDFrameStore[0]  = new Frame(dWidth, dHeight, TRUE, output->m_colorSpace, output->m_colorPrimaries, CF_444, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, 1.0);
   }  
   
-  if (m_bUseWienerFiltering == TRUE)
-    m_frameFilterNoise0 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_WIENER2D);
+  if (m_bUseWienerFiltering == TRUE) {
+    m_frameFilterNoise0 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_WIENER2DD);
+    
+  }
   
   if (m_bUse2DSepFiltering == TRUE)
     m_frameFilterNoise1 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_2DSEP, m_b2DSepMode);
@@ -414,7 +416,7 @@ void HDRConvertEXR::init (ProjectParameters *inputParams) {
   m_addNoise = AddNoise::create(inputParams->m_addNoise, inputParams->m_noiseVariance, inputParams->m_noiseMean);
   m_inputTransferFunction  = TransferFunction::create(input->m_transferFunction, TRUE, inputParams->m_srcNormalScale, input->m_systemGamma, inputParams->m_srcMinValue, inputParams->m_srcMaxValue);
 
-  if ( output->m_iConstantLuminance !=0 || (output->m_transferFunction != TF_NULL && output->m_transferFunction != TF_POWER && ( inputParams->m_useSingleTransferStep == FALSE || (output->m_transferFunction != TF_PQ && output->m_transferFunction != TF_APQ && output->m_transferFunction != TF_APQS && output->m_transferFunction != TF_MPQ && output->m_transferFunction != TF_AMPQ  && output->m_transferFunction != TF_PH  && output->m_transferFunction != TF_APH && output->m_transferFunction != TF_HLG && output->m_transferFunction != TF_NORMAL)) )) {
+  if ( output->m_iConstantLuminance !=0 || (output->m_transferFunction != TF_NULL && output->m_transferFunction != TF_POWER && ( inputParams->m_useSingleTransferStep == FALSE || (output->m_transferFunction != TF_PQ && output->m_transferFunction != TF_HPQ && output->m_transferFunction != TF_HPQ2 && output->m_transferFunction != TF_APQ && output->m_transferFunction != TF_APQS && output->m_transferFunction != TF_MPQ && output->m_transferFunction != TF_AMPQ  && output->m_transferFunction != TF_PH  && output->m_transferFunction != TF_APH && output->m_transferFunction != TF_HLG && output->m_transferFunction != TF_NORMAL)) )) {
     m_useSingleTransferStep = FALSE;
     m_normalizeFunction = TransferFunction::create(TF_NORMAL, FALSE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);
     m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, FALSE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);

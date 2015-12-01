@@ -63,25 +63,31 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionTransferFunction *DistortionTransferFunction::create(int method) {
+DistortionTransferFunction *DistortionTransferFunction::create(DistortionFunction method) {
   DistortionTransferFunction *result = NULL;
   
   switch (method){
     default:
-    case 0:
+    case DIF_PQPH10K:
       result = new DistortionTransferFunctionCombo();
       break;
-    case 1:
+    case DIF_PQ:
       result = new DistortionTransferFunctionPQ();
       break;
-    case 2:
+    case DIF_DE2K:
       result = new DistortionTransferFunctionDE();
       break;
-    case 3:
+    case DIF_PQNS:
       result = new DistortionTransferFunctionPQNoise();
       break;
-    case 4:
+    case DIF_NULL:
       result = new DistortionTransferFunctionNull();
+      break;
+    case DIF_HPQ:
+      result = new DistortionTransferFunctionHPQ();
+      break;
+    case DIF_HPQ2:
+      result = new DistortionTransferFunctionHPQ2();
       break;
   }
   return result;
@@ -98,14 +104,66 @@ double DistortionTransferFunction::computeDE(double value) {
 }
 
 double DistortionTransferFunction::computePQ(double value) {
-  static const double m1 = (2610.0        ) / 16384.0;
-  static const double m2 = (2523.0 * 128.0) /  4096.0;
-  static const double c1 = (3424.0        ) /  4096.0;
-  static const double c2 = (2413.0 *  32.0) /  4096.0;
-  static const double c3 = (2392.0 *  32.0) /  4096.0;
+  static const double m1 = 2610.0 / 16384.0;
+  static const double m2 = 2523.0 /    32.0;
+  static const double c1 = 3424.0 /  4096.0;
+  static const double c2 = 2413.0 /   128.0;
+  static const double c3 = 2392.0 /   128.0;
   
   double tempValue = pow(dMax(0.0, dMin(value, 1.0)), m1);
-  return (pow(((c2 *(tempValue) + c1)/(1 + c3 *(tempValue))), m2));
+  return (pow(((c2 * (tempValue) + c1)/(1.0 + c3 * (tempValue))), m2));
+}
+
+double DistortionTransferFunction::computeHPQ(double value) {
+  static const double m1 = 2610.0 / 16384.0;
+  static const double m2 = 2523.0 /    32.0;
+  static const double c1 = 3424.0 /  4096.0;
+  static const double c2 = 2413.0 /   128.0;
+  static const double c3 = 2392.0 /   128.0;
+  
+  static const double linear = 4.5;
+  static const double weight = 1.099;
+  static const double offset = 0.099;
+  static const double iGamma = 0.45;
+  //static const double gamma = 1.0 / 0.45;
+  static const double value0 = 0.00018;
+  static const double value1 = 0.01;
+  static const double scale = computePQ(value1);
+  
+  //printf(" Value %10.8f %10.8f\n", scale, value);
+  value = dMax(0.0, dMin(value, 1.0));
+  if (value < value0) {
+    return ((linear * value * 100.0) * scale);
+  }
+  else if (value < value1) {
+    //return ((pow(value * 100.0, iGamma)) * scale);
+    return ((weight * pow(value * 100.0, iGamma) - offset) * scale);
+  }
+  else {
+    double tempValue = pow(value, m1);
+    return (pow(((c2 * (tempValue) + c1)/(1.0 + c3 * (tempValue))), m2));
+  }
+}
+
+double DistortionTransferFunction::computeHPQ2(double value) {
+  static const double m1 = 2610.0 / 16384.0;
+  static const double m2 = 2523.0 /    32.0;
+  static const double c1 = 3424.0 /  4096.0;
+  static const double c2 = 2413.0 /   128.0;
+  static const double c3 = 2392.0 /   128.0;
+  
+  static const double iGamma = 1.0 / 2.4;
+  static const double scale = computePQ(0.01);
+  
+  //printf(" Value %10.8f %10.8f\n", scale, value);
+  value = dMax(0.0, dMin(value, 1.0));
+  if (value < 0.01) {
+    return ((pow(value * 100.0, iGamma)) * scale);
+  }
+  else {
+    double tempValue = pow(value, m1);
+    return (pow(((c2 * (tempValue) + c1)/(1.0 + c3 * (tempValue))), m2));
+  }
 }
 
 double DistortionTransferFunction::computePQNoise(double value) {  
@@ -150,6 +208,20 @@ double DistortionTransferFunctionPQ::compute(double value) {
   double clippedValue = dMax(0.0, dMin(value, 1.0));
   
   return computePQ(clippedValue);
+}
+
+double DistortionTransferFunctionHPQ::compute(double value) {
+  
+  double clippedValue = dMax(0.0, dMin(value, 1.0));
+  
+  return computeHPQ(clippedValue);
+}
+
+double DistortionTransferFunctionHPQ2::compute(double value) {
+  
+  double clippedValue = dMax(0.0, dMin(value, 1.0));
+  
+  return computeHPQ2(clippedValue);
 }
 
 

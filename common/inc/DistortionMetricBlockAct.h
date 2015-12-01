@@ -114,7 +114,7 @@ private:
   
 public:
   // Construct/Deconstruct
-  DistortionMetricBlockAct(double maxSampleValue, int distortionMethod);
+  DistortionMetricBlockAct(double maxSampleValue, DistortionFunction distortionMethod);
   virtual ~DistortionMetricBlockAct();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

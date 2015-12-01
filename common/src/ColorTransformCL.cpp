@@ -65,7 +65,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, int transferFunctionLuma, int transferFunctionChroma, bool forceRange, float scale, float minValue, float maxValue) {
+ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, int useHighPrecision, int transferFunctionLuma, int transferFunctionChroma, bool forceRange, float scale, float minValue, float maxValue) {
   
   m_mode = CTF_IDENTITY;
   m_closedLoop = FALSE;
@@ -74,6 +74,9 @@ ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColor
     m_mode = CTF_RGB709_2_YUV709;
   }
   else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+    if (useHighPrecision == 1)
+      m_mode = CTF_RGB2020_2_YUV2020_HP;
+    else
     m_mode = CTF_RGB2020_2_YUV2020;
   }
   else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
@@ -89,6 +92,9 @@ ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColor
     m_mode = CTF_RGB709_2_YUV709;
   }
   else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+    if (useHighPrecision == 2)
+      m_mode = CTF_RGB2020_2_YUV2020_HP;
+    else
     m_mode = CTF_RGB2020_2_YUV2020;
   }
   else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {

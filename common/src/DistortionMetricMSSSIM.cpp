@@ -182,15 +182,15 @@ void DistortionMetricMSSSIM::computeComponents (float *lumaCost, float *structCo
 
   lumaDistortion /= dMax(1.0, (double) windowCounter);
   
-  if (lumaDistortion >= 1.0f && lumaDistortion < 1.01f) // avoid float accuracy problem at very low QP(e.g.2)
-    lumaDistortion = 1.0f;
+  if (lumaDistortion >= 1.0 && lumaDistortion < 1.01) // avoid float accuracy problem at very low QP(e.g.2)
+    lumaDistortion = 1.0;
   
   *lumaCost = (float) lumaDistortion;
   
   structDistortion /= dMax(1.0, (double) windowCounter);
   
-  if (structDistortion >= 1.0f && structDistortion < 1.01f) // avoid float accuracy problem at very low QP(e.g.2)
-    structDistortion = 1.0f;
+  if (structDistortion >= 1.0 && structDistortion < 1.01) // avoid float accuracy problem at very low QP(e.g.2)
+    structDistortion = 1.0;
   
   *structCost = (float) structDistortion;
 
@@ -368,10 +368,10 @@ float DistortionMetricMSSSIM::computeStructuralComponents (float *inp0Data, floa
     }
   }
     
-  distortion /= (float) dMax(1, windowCounter);
+  distortion /= dMax(1.0, (double) windowCounter);
     
-  if (distortion >= 1.0f && distortion < 1.01f) // avoid float accuracy problem at very low QP(e.g.2)
-    distortion = 1.0f;
+  if (distortion >= 1.0 && distortion < 1.01) // avoid float accuracy problem at very low QP(e.g.2)
+    distortion = 1.0;
   
   return (float) distortion;
 }

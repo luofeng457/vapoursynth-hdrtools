@@ -4,11 +4,12 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Apple Inc, Ericsson
+ * <ORGANIZATION> = Apple Inc
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Apple Inc, Ericsson
+ * Copyright (c) 2015, Apple Inc
  * All rights reserved.
+ 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,22 +38,20 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustAlt.H
+ * \file ColorTransformClosedLoopCr.H
  *
  * \brief
- *    ColorTransformYAdjustAlt Class Header
+ *    ColorTransformClosedLoopCr Class Header
  *
  * \author
- *     - Jacob Strom                     <jacob.strom@ericsson.com>
- *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustAlt_H__
-#define __ColorTransformYAdjustAlt_H__
+#ifndef __ColorTransformClosedLoopCr_H__
+#define __ColorTransformClosedLoopCr_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +61,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustAlt : public ColorTransform {
+class ColorTransformClosedLoopCr : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -134,7 +133,7 @@ private:
 
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustAlt( ColorSpace        iColorSpace, 
+  ColorTransformClosedLoopCr( ColorSpace        iColorSpace, 
                             ColorPrimaries    iColorPrimaries, 
                             ColorSpace        oColorSpace, 
                             ColorPrimaries    oColorPrimaries, 
@@ -153,7 +152,7 @@ public:
                             bool              useFloatPrecision = TRUE
                            );
                         
-  virtual ~ColorTransformYAdjustAlt();
+  virtual ~ColorTransformClosedLoopCr();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

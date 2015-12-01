@@ -133,7 +133,7 @@ IntegerParameter intParameterList[] = {
   { "SSIMBlockSizeX",         &pParams->m_distortionParameters.m_ssimBlockSizeX,     4,           4,        128,    "Block Width for SSIM computation"     },
   { "SSIMBlockSizeY",         &pParams->m_distortionParameters.m_ssimBlockSizeY,     4,           4,        128,    "Block Height for SSIM computation"    },
   
-  { "TFPSNRDistortion",       &pParams->m_distortionParameters.m_tfPSNRDistortion,   0,           0,          4,    "Transfer function for tPSNR and other related metrics" },
+  { "TFPSNRDistortion",         (int *) &pParams->m_distortionParameters.m_tfPSNRDistortion,   DIF_PQPH10K,  DIF_PQPH10K, DIF_TOTAL - 1,    "Transfer function for tPSNR and other related metrics" },
   { "DeltaEPointsEnable",     &pParams->m_distortionParameters.m_deltaEPointsEnable, 1,           1,          7,    "Delta E points to Enable"             },
   { "RPSNRBlockDistanceX",     &pParams->m_distortionParameters.m_rPSNROverlapX,      4,           1,     65536,    "Block Horizontal Distance for rPSNR computation"  },
   { "RPSNRBlockDistanceY",     &pParams->m_distortionParameters.m_rPSNROverlapY,      4,           1,     65536,    "Block Vertical Distance for rPSNR computation"  },

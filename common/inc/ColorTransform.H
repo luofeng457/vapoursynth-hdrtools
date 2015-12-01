@@ -67,7 +67,8 @@ public:
                                 ColorSpace        oColorTransform, 
                                 ColorPrimaries    oColorPrimaries, 
                                 bool              transformPrecision,
-                                int               closedLoopTransform = 0, 
+                                int               useHighPrecision,
+                                ClosedLoopTrans   closedLoopTransform = CLT_NULL, 
                                 int               iConstantLuminance = 0, 
                                 int               oConstantLuminance = 0,
                                 TransferFunctions transferFunction = TF_PQ,
@@ -75,9 +76,12 @@ public:
                                 SampleRange       range = SR_STANDARD,
                                 int               downMethod = 2,
                                 int               upMethod = 1,
+                                bool              useAdaptiveDownsampler = FALSE,
+                                bool              useAdaptiveUpsampler = FALSE,
                                 int               useMinMax = 0,
                                 int               maxIterations = 20,
                                 ChromaFormat      oChromaFormat = CF_420,
+                                ChromaLocation    *oChromaLocationType = NULL,
                                 bool              useFloatPrecision = TRUE
                                 );
   

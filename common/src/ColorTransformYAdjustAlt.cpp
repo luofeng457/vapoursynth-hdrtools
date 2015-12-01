@@ -4,10 +4,10 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Ericsson, Apple Inc
+ * <ORGANIZATION> = Apple Inc, Ericsson
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Ericsson, Apple Inc
+ * Copyright (c) 2015, Apple Inc, Ericsson
  * All rights reserved.
  
  *
@@ -44,9 +44,9 @@
  *    ColorTransformYAdjustAlt Class
  *
  * \author
+ *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
- *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
@@ -71,17 +71,22 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
                                               ColorPrimaries    iColorPrimaries, 
                                               ColorSpace        oColorSpace, 
                                               ColorPrimaries    oColorPrimaries, 
+                                              int               useHighPrecision,
                                               TransferFunctions transferFunctions,
                                               int               downMethod,
                                               int               upMethod,
+                                              bool              useAdaptiveDownsampler,
+                                              bool              useAdaptiveUpsampler,
                                               int               useMinMax,
                                               int               bitDepth, 
                                               SampleRange       range, 
                                               int               maxIterations,
                                               ChromaFormat      oChromaFormat, 
+                                              ChromaLocation    *oChromaLocationType,
                                               bool              useFloatPrecision) {
   
   m_mode = CTF_IDENTITY; 
+  m_invMode = m_mode;
   m_range = range;
   m_bitDepth = bitDepth;
   m_transferFunctions = transferFunctions;
@@ -89,11 +94,16 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
   m_floatData = NULL;
   m_size = 0;
   m_maxIterations = maxIterations;
-  m_tfDistance = TRUE;
+  m_tfDistance = FALSE;
   m_useFloatPrecision = useFloatPrecision;
   m_oColorSpace = oColorSpace;
   m_oColorPrimaries = oColorPrimaries;
+  m_oChromaLocation[0] = oChromaLocationType[0];
+  m_oChromaLocation[1] = oChromaLocationType[1];
   
+  m_useAdaptiveDownsampler = useAdaptiveDownsampler;
+  m_useAdaptiveUpsampler   = useAdaptiveUpsampler;
+
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
     
@@ -109,26 +119,42 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
   if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
     if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
+      m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGB709_2_XYZ;
     }
     else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-      m_mode = CTF_RGB2020_2_YUV2020;
+      if (useHighPrecision == 0) {
+        m_mode = CTF_RGB2020_2_YUV2020;
+        m_invMode = m_mode;
+      }
+      else if (useHighPrecision == 1) {
+        m_mode = CTF_RGB2020_2_YUV2020;
+        m_invMode = CTF_RGB2020_2_YUV2020_HP;
+      }
+      else {
+        m_mode = CTF_RGB2020_2_YUV2020_HP;
+        m_invMode = CTF_RGB2020_2_YUV2020;
+      }
       m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;
     }
     else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;
+      m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;
     }
     else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_YUVP3D60;
+      m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;
     }
     else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_YUVEXT;
+      m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBEXT_2_XYZ;
     }
     else if (oColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
+      m_invMode = m_mode;
       if (iColorPrimaries == CP_709) {
         m_modeRGB2XYZ = CTF_RGB709_2_XYZ;        
       }
@@ -144,6 +170,7 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
     }
     else if ( oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
+      m_invMode = m_mode;
       if (iColorPrimaries == CP_709) {
         m_modeRGB2XYZ = CTF_RGB709_2_XYZ;        
       }
@@ -160,6 +187,7 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
   }
   else {
     m_mode = CTF_IDENTITY;
+    m_invMode = m_mode;
   }
   
   // Forward Transform coefficients 
@@ -168,9 +196,9 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
   m_transform2 = FWD_TRANSFORM[m_mode][V_COMP];
 
   // Inverse Transform coefficients 
-  m_invTransform0 = INV_TRANSFORM[m_mode][Y_COMP];
-  m_invTransform1 = INV_TRANSFORM[m_mode][U_COMP];
-  m_invTransform2 = INV_TRANSFORM[m_mode][V_COMP];
+  m_invTransform0 = INV_TRANSFORM[m_invMode][Y_COMP];
+  m_invTransform1 = INV_TRANSFORM[m_invMode][U_COMP];
+  m_invTransform2 = INV_TRANSFORM[m_invMode][V_COMP];
   
   // Transform coefficients for conversion to Y in XYZ
   m_transformRGBtoY = FWD_TRANSFORM[m_modeRGB2XYZ][1];
@@ -292,9 +320,9 @@ void ColorTransformYAdjustAlt::allocateMemory(Frame* out, const Frame *inp) {
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[U_COMP];
   
-  m_fwdColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], inp->m_chromaFormat, m_oChromaFormat, m_downMethod, (ChromaLocation *) &(inp->m_format.m_chromaLocation[0]), (ChromaLocation *)  &(out->m_format.m_chromaLocation[0]), FALSE, m_useMinMax);
+  m_fwdColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], inp->m_chromaFormat, m_oChromaFormat, m_downMethod, (ChromaLocation *) &(inp->m_format.m_chromaLocation[0]), (ChromaLocation *)  &(m_oChromaLocation[0]), m_useAdaptiveDownsampler, m_useMinMax);
   
-  m_invColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], m_oChromaFormat, inp->m_chromaFormat, m_upMethod, (ChromaLocation *) &(out->m_format.m_chromaLocation[0]), (ChromaLocation *)  &(inp->m_format.m_chromaLocation[0]), FALSE);
+  m_invColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], m_oChromaFormat, inp->m_chromaFormat, m_upMethod, (ChromaLocation *) &(m_oChromaLocation[0]), (ChromaLocation *)  &(inp->m_format.m_chromaLocation[0]), m_useAdaptiveUpsampler);
   
   if (m_useFloatPrecision == FALSE) {
     // Format conversion process
@@ -310,11 +338,11 @@ void ColorTransformYAdjustAlt::allocateMemory(Frame* out, const Frame *inp) {
     m_fwdConvertProcess = Convert::create(&inFormat, &outFormat);
     m_invConvertProcess = Convert::create(&outFormat, &inFormat);
     
-    m_fwdFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], FALSE, m_oColorSpace, out->m_colorPrimaries, m_oChromaFormat, out->m_sampleRange, m_bitDepth, FALSE, TF_PQ, 1.0);      
-    m_fwdFrameStore2  = new Frame(m_width[Y_COMP], m_height[Y_COMP], FALSE, m_oColorSpace, out->m_colorPrimaries, inp->m_chromaFormat, m_range, m_bitDepth, FALSE, TF_PQ, 1.0);      
+    m_fwdFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], FALSE, m_oColorSpace, out->m_colorPrimaries, m_oChromaFormat, out->m_sampleRange, m_bitDepth, FALSE, m_transferFunctions, 1.0);      
+    m_fwdFrameStore2  = new Frame(m_width[Y_COMP], m_height[Y_COMP], FALSE, m_oColorSpace, out->m_colorPrimaries, inp->m_chromaFormat, m_range, m_bitDepth, FALSE, m_transferFunctions, 1.0);      
     
-    m_invFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, inp->m_colorSpace, inp->m_colorPrimaries, inp->m_chromaFormat, m_range, inp->m_bitDepthComp[Y_COMP], FALSE, TF_PQ, 1.0);      
-    m_invFrameStore2  = new Frame(m_width[Y_COMP], m_height[Y_COMP], FALSE, m_oColorSpace, inp->m_colorPrimaries, inp->m_chromaFormat, m_range, m_bitDepth, FALSE, TF_PQ, 1.0);      
+    m_invFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, inp->m_colorSpace, inp->m_colorPrimaries, inp->m_chromaFormat, m_range, inp->m_bitDepthComp[Y_COMP], FALSE, m_transferFunctions, 1.0);      
+    m_invFrameStore2  = new Frame(m_width[Y_COMP], m_height[Y_COMP], FALSE, m_oColorSpace, inp->m_colorPrimaries, inp->m_chromaFormat, m_range, m_bitDepth, FALSE, m_transferFunctions, 1.0);      
   }
   else {
     m_fwdFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, out->m_colorSpace, out->m_colorPrimaries, m_oChromaFormat, out->m_sampleRange, out->m_bitDepthComp[Y_COMP], FALSE, m_transferFunctions, 1.0);      
@@ -491,6 +519,14 @@ void ColorTransformYAdjustAlt::process ( Frame* out, const Frame *inp) {
       else {   // Floating conversion
                // Downconvert if needed
         m_fwdColorFormat->process (m_fwdFrameStore, out);
+        
+        // Luma only if adaptive upsampler is enabled
+        if (m_useAdaptiveUpsampler == TRUE) {
+          for (int i = 0; i < m_fwdFrameStore->m_compSize[0]; i++) {
+            m_fwdFrameStore->m_floatComp[0][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[0][i] * m_lumaWeight) / m_lumaWeight);
+          }          
+        }
+
         
         // Quantize/DeQuantize Chroma components
         for (int i = 0; i < m_fwdFrameStore->m_compSize[1]; i++) {

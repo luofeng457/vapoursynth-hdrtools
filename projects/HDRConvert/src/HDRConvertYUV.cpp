@@ -302,14 +302,14 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   // This does not currently handle YCbCr to YCbCr conversion cleanly (goes first to RGB which is not correct). Needs to be fixed.
   if (m_iFrameStore->m_colorSpace == CM_YCbCr) { // If YCbCr we need to first go to RGB
     if (m_oFrameStore->m_colorSpace == CM_YCbCr && m_iFrameStore->m_colorPrimaries == m_oFrameStore->m_colorPrimaries && input->m_iConstantLuminance == output->m_iConstantLuminance) {
-      m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, 0, input->m_iConstantLuminance, output->m_iConstantLuminance);
+      m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, input->m_iConstantLuminance, output->m_iConstantLuminance);
       m_changeColorPrimaries = FALSE;
     }
     else {
-      m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, CM_RGB, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, 0, input->m_iConstantLuminance, 0);
+      m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, CM_RGB, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, input->m_iConstantLuminance, 0);
       m_changeColorPrimaries = TRUE;
     }
-    m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
+    m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
     
     // frame store for color format conversion
     //m_pFrameStore[2]  = new Frame(m_width, m_height, output->m_isFloat, CM_RGB, m_iFrameStore->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
@@ -323,8 +323,8 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
     
   }
   else {
-    m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, 0);
-    m_colorSpaceConvert = ColorTransform::create(m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_closedLoopConversion);
+    m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL);
+    m_colorSpaceConvert = ColorTransform::create(m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion);
     
     // frame store for color format conversion
     m_pFrameStore[2]  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
@@ -343,10 +343,10 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
     m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, 0, m_inputFrame->m_chromaLocation, output->m_chromaLocation);
   }
   else if (input->m_chromaFormat == CF_444 && output->m_chromaFormat == CF_420) {
-    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveFiltering, inputParams->m_useMinMax);
+    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveDownsampling, inputParams->m_useMinMax);
   }
   else if (input->m_chromaFormat == CF_420 && output->m_chromaFormat == CF_444) {
-    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaUpsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveFiltering, inputParams->m_useMinMax);
+    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaUpsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveUpsampling, inputParams->m_useMinMax);
   }
   
   if ( (input->m_colorSpace == output->m_colorSpace) && (input->m_colorPrimaries == output->m_colorPrimaries) && (input->m_transferFunction == output->m_transferFunction)) {
@@ -359,7 +359,7 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   else 
   {
     
-    if ( (input->m_iConstantLuminance != 0 || output->m_iConstantLuminance != 0 )|| ( input->m_transferFunction != TF_NULL && input->m_transferFunction != TF_POWER && ( inputParams->m_useSingleTransferStep == FALSE || (input->m_transferFunction != TF_PQ && input->m_transferFunction != TF_APQ && input->m_transferFunction != TF_APQS && input->m_transferFunction != TF_MPQ && input->m_transferFunction != TF_AMPQ && input->m_transferFunction != TF_PH && input->m_transferFunction != TF_APH && input->m_transferFunction != TF_HLG) ))) {
+    if ( (input->m_iConstantLuminance != 0 || output->m_iConstantLuminance != 0 )|| ( input->m_transferFunction != TF_NULL && input->m_transferFunction != TF_POWER && ( inputParams->m_useSingleTransferStep == FALSE || (input->m_transferFunction != TF_PQ && input->m_transferFunction != TF_HPQ && input->m_transferFunction != TF_HPQ2 && input->m_transferFunction != TF_APQ && input->m_transferFunction != TF_APQS && input->m_transferFunction != TF_MPQ && input->m_transferFunction != TF_AMPQ && input->m_transferFunction != TF_PH && input->m_transferFunction != TF_APH && input->m_transferFunction != TF_HLG) ))) {
       m_useSingleTransferStep = FALSE;
       m_normalizeFunction = TransferFunction::create(TF_NORMAL, FALSE, inputParams->m_srcNormalScale, input->m_systemGamma, inputParams->m_srcMinValue, inputParams->m_srcMaxValue);
       m_inputTransferFunction  = TransferFunction::create(input->m_transferFunction, FALSE, inputParams->m_srcNormalScale, input->m_systemGamma, inputParams->m_srcMinValue, inputParams->m_srcMaxValue);

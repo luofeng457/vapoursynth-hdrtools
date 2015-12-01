@@ -76,50 +76,57 @@ DisplayGammaAdjustHLG::~DisplayGammaAdjustHLG()
 
 void DisplayGammaAdjustHLG::forward(Frame *frame)
 {
-  if (frame->m_isFloat == TRUE && frame->m_compSize[Y_COMP] == frame->m_compSize[Cb_COMP])  {
-    double vComp[3];
-    const double *transformY = NULL;
-    
+  if (frame->m_isFloat == TRUE && frame->m_compSize[Y_COMP] == frame->m_compSize[Cb_COMP])  {    
     if (frame->m_colorSpace == CM_RGB) {
+      double vComp[3];
+      const double *transformY = NULL;
+
       ColorTransformGeneric::setYConversion(frame->m_colorPrimaries, &transformY);
-    }
-
-    for (int index = 0; index < frame->m_compSize[Y_COMP]; index++) {
-      for(int component = 0; component < 3; component++)  {
-        vComp[component] = frame->m_floatComp[component][index] / m_tfScale;
+      
+      for (int index = 0; index < frame->m_compSize[Y_COMP]; index++) {
+        for(int component = 0; component < 3; component++)  {
+          vComp[component] = frame->m_floatComp[component][index] / m_tfScale;
+        }
+        
+        double ySignal = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
+        double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
+        
+        for(int component = 0; component < 3; component++)  {
+          frame->m_floatComp[component][index] = (float) (vComp[component] * yDisplay) ;
+        }  
       }
-
-      double ySignal = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
-      double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
-
-      for(int component = 0; component < 3; component++)  {
-        frame->m_floatComp[component][index] = (float) (vComp[component] * yDisplay) ;
-      }      
+      // reset the pointer (just for safety
+      transformY = NULL;
     }
   }
 }
 
 void DisplayGammaAdjustHLG::forward(Frame *out, const Frame *inp)
 {
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size && inp->m_compSize[Y_COMP] == inp->m_compSize[Cb_COMP])  {
-    double vComp[3];
-    const double *transformY = NULL;
-    
+  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size && inp->m_compSize[Y_COMP] == inp->m_compSize[Cb_COMP])  {    
     if (inp->m_colorSpace == CM_RGB && out->m_colorSpace == CM_RGB) {
+      double vComp[3];
+      const double *transformY = NULL;
+
       ColorTransformGeneric::setYConversion(inp->m_colorPrimaries, &transformY);
-    }
-    
-    for (int index = 0; index < inp->m_compSize[Y_COMP]; index++) {
-      for(int component = 0; component < 3; component++)  {
-        vComp[component] = inp->m_floatComp[component][index] / m_tfScale;
+      
+      for (int index = 0; index < inp->m_compSize[Y_COMP]; index++) {
+        for(int component = 0; component < 3; component++)  {
+          vComp[component] = inp->m_floatComp[component][index] / m_tfScale;
+        }
+        
+        double ySignal = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
+        double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
+        
+        for(int component = 0; component < 3; component++)  {
+          out->m_floatComp[component][index] = (float) (vComp[component] * yDisplay) ;
+        }      
       }
-      
-      double ySignal = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
-      double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
-      
-      for(int component = 0; component < 3; component++)  {
-        out->m_floatComp[component][index] = (float) (vComp[component] * yDisplay) ;
-      }      
+      // reset the pointer (just for safety
+      transformY = NULL;
+    }
+    else {
+      out->copy((Frame *) inp);      
     }
   }
   else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
@@ -133,26 +140,27 @@ void DisplayGammaAdjustHLG::inverse(Frame *frame)
   // 2. scale RGB signals by a factor of m_tfscale (12 if not using super-white, otherwise 19.68)
   // 3. apply OETF (signals now in the range of 0.0 to 1.00/1.09 (i.e. super white)
   // Step 3 is not performed in this process, but instead it is done as part of the TransferFunction Class.
-  if (frame->m_isFloat == TRUE && frame->m_compSize[Y_COMP] == frame->m_compSize[Cb_COMP])  {
-    double vComp[3];
-    const double *transformY = NULL;
-    
+  if (frame->m_isFloat == TRUE && frame->m_compSize[Y_COMP] == frame->m_compSize[Cb_COMP])  {    
     if (frame->m_colorSpace == CM_RGB) {
+      double vComp[3];
+      const double *transformY = NULL;
+
       ColorTransformGeneric::setYConversion(frame->m_colorPrimaries, &transformY);
-    }
-    
-    for (int index = 0; index < frame->m_compSize[Y_COMP]; index++) {
-      for(int component = 0; component < 3; component++) {
-        vComp[component] = dMax(0.0, (double) frame->m_floatComp[component][index] / m_linScale);
-      }
-      //printf("values %10.5f %10.5f %10.5f {%10.5f %10.5f %10.5f}\n", vComp[0], vComp[1], vComp[2], frame->m_floatComp[0][index], frame->m_floatComp[1][index], frame->m_floatComp[2][index]);
       
-      double yDisplay = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
-      double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
-      
-      for(int component = 0; component < 3; component++)  {
-        frame->m_floatComp[component][index] = (float) (vComp[component] * yDisplayGamma) ;
+      for (int index = 0; index < frame->m_compSize[Y_COMP]; index++) {
+        for(int component = 0; component < 3; component++) {
+          vComp[component] = dMax(0.0, (double) frame->m_floatComp[component][index] / m_linScale);
+        }
+                
+        double yDisplay = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
+        double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+        
+        for(int component = 0; component < 3; component++)  {
+          frame->m_floatComp[component][index] = (float) (vComp[component] * yDisplayGamma) ;
+        }
       }
+      // reset the pointer (just for safety
+      transformY = NULL;
     }
   }
 }
@@ -164,25 +172,26 @@ void DisplayGammaAdjustHLG::inverse(Frame *out, const Frame *inp)
   // 3. apply OETF (signals now in the range of 0.0 to 1.00/1.09 (i.e. super white)
   // Step 3 is not performed in this process, but instead it is done as part of the TransferFunction Class.
   
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size && inp->m_compSize[Y_COMP] == inp->m_compSize[Cb_COMP])  {
-    double vComp[3];
-    const double *transformY = NULL;
-    
+  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size && inp->m_compSize[Y_COMP] == inp->m_compSize[Cb_COMP])  {    
     if (inp->m_colorSpace == CM_RGB && out->m_colorSpace == CM_RGB) {
+      double vComp[3];
+      const double *transformY = NULL;
       ColorTransformGeneric::setYConversion(inp->m_colorPrimaries, &transformY);
-    }
-
-    for (int index = 0; index < inp->m_compSize[Y_COMP]; index++) {
-      for(int component = 0; component < 3; component++) {
-        vComp[component] = dMax(0.0, (double) inp->m_floatComp[component][index] / m_linScale);
-      }
-            
-      double yDisplay = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
-      double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
       
-      for(int component = 0; component < 3; component++)  {
-        out->m_floatComp[component][index] = (float) (vComp[component] * yDisplayGamma) ;
+      for (int index = 0; index < inp->m_compSize[Y_COMP]; index++) {
+        for(int component = 0; component < 3; component++) {
+          vComp[component] = dMax(0.0, (double) inp->m_floatComp[component][index] / m_linScale);
+        }
+        
+        double yDisplay = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
+        double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+        
+        for(int component = 0; component < 3; component++)  {
+          out->m_floatComp[component][index] = (float) (vComp[component] * yDisplayGamma) ;
+        }
       }
+      // reset the pointer (just for safety
+      transformY = NULL;
     }
   }
   else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {

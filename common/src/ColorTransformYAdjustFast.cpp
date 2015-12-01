@@ -4,10 +4,10 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Ericsson, Apple Inc
+ * <ORGANIZATION> = Apple Inc, Ericsson
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Ericsson, Apple Inc
+ * Copyright (c) 2015, Apple Inc, Ericsson
  * All rights reserved.
  
  *
@@ -38,15 +38,15 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjust.cpp
+ * \file ColorTransformYAdjustFast.cpp
  *
  * \brief
- *    ColorTransformYAdjust Class
+ *    ColorTransformYAdjustFast Class
  *
  * \author
+ *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
- *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
@@ -56,7 +56,7 @@
 //-----------------------------------------------------------------------------
 
 #include "Global.H"
-#include "ColorTransformYAdjust.H"
+#include "ColorTransformYAdjustFast.H"
 
 //-----------------------------------------------------------------------------
 // Macros / Constants
@@ -66,7 +66,8 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace, 
+ColorTransformYAdjustFast::ColorTransformYAdjustFast( 
+                                              ColorSpace        iColorSpace, 
                                               ColorPrimaries    iColorPrimaries, 
                                               ColorSpace        oColorSpace, 
                                               ColorPrimaries    oColorPrimaries, 
@@ -80,10 +81,10 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
                                               int               bitDepth, 
                                               SampleRange       range, 
                                               int               maxIterations,
-                                              ChromaFormat      oChromaFormat,
+                                              ChromaFormat      oChromaFormat, 
                                               ChromaLocation    *oChromaLocationType,
-                                              bool              useFloatPrecision) 
-{  
+                                              bool              useFloatPrecision) {
+  
   m_mode = CTF_IDENTITY; 
   m_invMode = m_mode;
   m_range = range;
@@ -99,9 +100,10 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
   m_oColorPrimaries = oColorPrimaries;
   m_oChromaLocation[0] = oChromaLocationType[0];
   m_oChromaLocation[1] = oChromaLocationType[1];
+  
   m_useAdaptiveDownsampler = useAdaptiveDownsampler;
   m_useAdaptiveUpsampler   = useAdaptiveUpsampler;
-  
+
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
     
@@ -122,8 +124,8 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
     }
     else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
       if (useHighPrecision == 0) {
-      m_mode = CTF_RGB2020_2_YUV2020;
-      m_invMode = m_mode;
+        m_mode = CTF_RGB2020_2_YUV2020;
+        m_invMode = m_mode;
       }
       else if (useHighPrecision == 1) {
         m_mode = CTF_RGB2020_2_YUV2020;
@@ -187,7 +189,7 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
     m_mode = CTF_IDENTITY;
     m_invMode = m_mode;
   }
-
+  
   // Forward Transform coefficients 
   m_transform0 = FWD_TRANSFORM[m_mode][Y_COMP];
   m_transform1 = FWD_TRANSFORM[m_mode][U_COMP];
@@ -197,10 +199,10 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
   m_invTransform0 = INV_TRANSFORM[m_invMode][Y_COMP];
   m_invTransform1 = INV_TRANSFORM[m_invMode][U_COMP];
   m_invTransform2 = INV_TRANSFORM[m_invMode][V_COMP];
-
+  
   // Transform coefficients for conversion to Y in XYZ
   m_transformRGBtoY = FWD_TRANSFORM[m_modeRGB2XYZ][1];
-  
+
   m_fwdColorFormat = NULL;
   m_invColorFormat = NULL;
   m_fwdFrameStore  = NULL;
@@ -210,7 +212,7 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
   m_invConvertProcess = NULL; 
   m_fwdFrameStore2  = NULL; 
   m_invFrameStore2  = NULL;
-  
+
   m_downMethod = downMethod;
   m_upMethod   = upMethod;
 
@@ -233,10 +235,13 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
 
+  m_iLumaWeight = (int) m_lumaWeight;
+  m_interval    = iMax(4, (int) dRound(m_lumaWeight / 16));
+
   m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0);
 }
 
-ColorTransformYAdjust::~ColorTransformYAdjust() {
+ColorTransformYAdjustFast::~ColorTransformYAdjustFast() {
   if (m_floatData != NULL) {
     delete[] m_floatData;
     m_floatData = NULL;
@@ -293,7 +298,7 @@ ColorTransformYAdjust::~ColorTransformYAdjust() {
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-void ColorTransformYAdjust::allocateMemory(Frame* out, const Frame *inp) {
+void ColorTransformYAdjustFast::allocateMemory(Frame* out, const Frame *inp) {
   m_width [Y_COMP] = inp->m_width[ Y_COMP];
   m_width [Y_COMP] = inp->m_width[ U_COMP];
   m_width [Y_COMP] = inp->m_width[ V_COMP];
@@ -307,7 +312,7 @@ void ColorTransformYAdjust::allocateMemory(Frame* out, const Frame *inp) {
   
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
   if (NULL == (m_floatData = new float[(int) m_size])) {
-    fprintf(stderr, "ColorTransformYAdjust: Not enough memory to create array m_floatData, of size %d", (int) m_size);
+    fprintf(stderr, "ColorTransformYAdjustFast: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }
   
@@ -318,7 +323,7 @@ void ColorTransformYAdjust::allocateMemory(Frame* out, const Frame *inp) {
   m_fwdColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], inp->m_chromaFormat, m_oChromaFormat, m_downMethod, (ChromaLocation *) &(inp->m_format.m_chromaLocation[0]), (ChromaLocation *)  &(m_oChromaLocation[0]), m_useAdaptiveDownsampler, m_useMinMax);
   
   m_invColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], m_oChromaFormat, inp->m_chromaFormat, m_upMethod, (ChromaLocation *) &(m_oChromaLocation[0]), (ChromaLocation *)  &(inp->m_format.m_chromaLocation[0]), m_useAdaptiveUpsampler);
-    
+  
   if (m_useFloatPrecision == FALSE) {
     // Format conversion process
     FrameFormat inFormat  = out->m_format;
@@ -342,67 +347,154 @@ void ColorTransformYAdjust::allocateMemory(Frame* out, const Frame *inp) {
   else {
     m_fwdFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, out->m_colorSpace, out->m_colorPrimaries, m_oChromaFormat, out->m_sampleRange, out->m_bitDepthComp[Y_COMP], FALSE, m_transferFunctions, 1.0);      
     m_invFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, inp->m_colorSpace, inp->m_colorPrimaries, inp->m_chromaFormat, inp->m_sampleRange, inp->m_bitDepthComp[Y_COMP], FALSE, m_transferFunctions, 1.0);      
-  }
+  }  
 
   m_memoryAllocated = TRUE;
 }
 
-void ColorTransformYAdjust::convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp) {
+void ColorTransformYAdjustFast::convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp) {
   *rComp = dClip((m_invTransform0[0] * yComp + m_invTransform0[1] * uComp + m_invTransform0[2] * vComp), 0.0, 1.0);
   *gComp = dClip((m_invTransform1[0] * yComp + m_invTransform1[1] * uComp + m_invTransform1[2] * vComp), 0.0, 1.0);
   *bComp = dClip((m_invTransform2[0] * yComp + m_invTransform2[1] * uComp + m_invTransform2[2] * vComp), 0.0, 1.0);
 }
 
-double ColorTransformYAdjust::convertToYLinear(const double rComp, const double gComp, const double bComp) {
+void ColorTransformYAdjustFast::computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor) {
+  *rColor = m_invTransform0[1] * uComp + m_invTransform0[2] * vComp;
+  *gColor = m_invTransform1[1] * uComp + m_invTransform1[2] * vComp;
+  *bColor = m_invTransform2[1] * uComp + m_invTransform2[2] * vComp;
+}
+
+void ColorTransformYAdjustFast::computeColorImpactBasic(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor) {
+  // all the values used apart from vComp and uComp are constants and thus we could precompute those (resulting in just 4 multiplies and 1 addition
+  *rColor = 2 * (1 - m_transform0[0]) * vComp;
+  *bColor = 2 * (1 - m_transform0[2]) * uComp;
+  *gColor = ((*bColor * m_transform0[2] +  *rColor * m_transform0[0]) / (1 - m_transform0[0] - m_transform0[2]));
+}
+
+double ColorTransformYAdjustFast::convertToYLinear(const double rComp, const double gComp, const double bComp) {
   return (m_transformRGBtoY[0] * m_transferFunction->forward(rComp) + m_transformRGBtoY[1] * m_transferFunction->forward(gComp) + m_transformRGBtoY[2] * m_transferFunction->forward(bComp));
 }
 
-double ColorTransformYAdjust::convertToY(const double rComp, const double gComp, const double bComp) {
+double ColorTransformYAdjustFast::convertToY(const double rComp, const double gComp, const double bComp) {
   return (m_transformRGBtoY[0] * rComp + m_transformRGBtoY[1] * gComp + m_transformRGBtoY[2] * bComp);
 }
 
-void ColorTransformYAdjust::calcBoundsSloppy(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp)
-{
-  double tfOfYo = m_transferFunction->inverse(yLinear);
-  double boundR = m_invTransform0[0] * tfOfYo - m_invTransform0[1] * uComp - m_invTransform0[2] * vComp;
-  double boundG = m_invTransform1[0] * tfOfYo - m_invTransform1[1] * uComp - m_invTransform1[2] * vComp;
-  double boundB = m_invTransform2[0] * tfOfYo - m_invTransform2[1] * uComp - m_invTransform2[2] * vComp;
-  
-  double ypLowest0To1   = dMin(dMin(boundR, boundG), boundB);
-  int    ypLowestQuant  = iClip(double2IntFloor(m_lumaWeight * ypLowest0To1), 0, (int)m_lumaWeight);
-  double ypLargest0To1  = dMax(dMax(boundR, boundG), boundB);
-  int    ypLargestQuant = iClip(double2IntCeil(m_lumaWeight * ypLargest0To1), 0, (int)m_lumaWeight);
-  
-  // The lowest possible and highest possible value for Yprime
-  ypBufLowPix  = ypLowestQuant;
-  ypBufHighPix = ypLargestQuant;
+
+double ColorTransformYAdjustFast::convertToYLinear(const double yComp, const double rColor, const double gColor, const double bColor) {
+  if (yComp == 0.0)
+    return 0.0;
+  else  {
+    const double rComp = dClip((m_invTransform0[0] * yComp + rColor), 0.0, 1.0);
+    const double gComp = dClip((m_invTransform1[0] * yComp + gColor), 0.0, 1.0);
+    const double bComp = dClip((m_invTransform2[0] * yComp + bColor), 0.0, 1.0);
+    
+    return (m_transformRGBtoY[0] * m_transferFunction->forward(rComp) + m_transformRGBtoY[1] * m_transferFunction->forward(gComp) + m_transformRGBtoY[2] * m_transferFunction->forward(bComp));
+  }
 }
 
-void ColorTransformYAdjust::calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp)
+double ColorTransformYAdjustFast::convertToYLinearBasic(const double yComp, const double rColor, const double gColor, const double bColor) {
+  if (yComp == 0.0)
+    return 0.0;
+  else  {
+    const double rComp = dClip((yComp - rColor), 0.0, 1.0);
+    const double gComp = dClip((yComp + gColor), 0.0, 1.0);
+    const double bComp = dClip((yComp - bColor), 0.0, 1.0);
+    
+    return (m_transformRGBtoY[0] * m_transferFunction->forward(rComp) + m_transformRGBtoY[1] * m_transferFunction->forward(gComp) + m_transformRGBtoY[2] * m_transferFunction->forward(bComp));
+  }
+}
+
+double ColorTransformYAdjustFast::convertToYLinearDirect(const double yComp, const double uComp, const double vComp) {
+  const double rComp = dClip((m_invTransform0[0] * yComp + m_invTransform0[1] * uComp + m_invTransform0[2] * vComp), 0.0, 1.0);
+  const double gComp = dClip((m_invTransform1[0] * yComp + m_invTransform1[1] * uComp + m_invTransform1[2] * vComp), 0.0, 1.0);
+  const double bComp = dClip((m_invTransform2[0] * yComp + m_invTransform2[1] * uComp + m_invTransform2[2] * vComp), 0.0, 1.0);
+
+  return (m_transformRGBtoY[0] * m_transferFunction->forward(rComp) + m_transformRGBtoY[1] * m_transferFunction->forward(gComp) + m_transformRGBtoY[2] * m_transferFunction->forward(bComp));
+}
+
+
+void ColorTransformYAdjustFast::calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp)
 {
-  double tfOfYo = m_transferFunction->inverse(yLinear);
-  double boundR = m_invTransform0[0] * tfOfYo - m_invTransform0[1] * uComp - m_invTransform0[2] * vComp;
-  double boundG = m_invTransform1[0] * tfOfYo - m_invTransform1[1] * uComp - m_invTransform1[2] * vComp;
-  double boundB = m_invTransform2[0] * tfOfYo - m_invTransform2[1] * uComp - m_invTransform2[2] * vComp;
+  double yTF = m_transferFunction->inverse(yLinear);
+  double boundR = m_invTransform0[0] * yTF - m_invTransform0[1] * uComp - m_invTransform0[2] * vComp;
+  double boundG = m_invTransform1[0] * yTF - m_invTransform1[1] * uComp - m_invTransform1[2] * vComp;
+  double boundB = m_invTransform2[0] * yTF - m_invTransform2[1] * uComp - m_invTransform2[2] * vComp;
   
   double ypLowest0To1 = dMin(dMin(boundR, boundG), boundB);
-  int ypLowestQuant = iClip(double2IntFloor(m_lumaWeight * ypLowest0To1), 0, (int)(m_lumaWeight));
+  int ypLowestQuant = iClip(double2IntFloor(m_lumaWeight * ypLowest0To1), 0, m_iLumaWeight);
   
-  // Calculate Yp_highest_0to1 = tf_of_Yo, but we have to go to integer, round up and go back again.
-  int ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * tfOfYo), 0, (int)(m_lumaWeight));
+  // Calculate ypHighest0To1 = yTF, but we have to go to integer, round up and go back again.
+  int ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * yTF), 0, m_iLumaWeight);
   double ypHighest0To1 = (double) ypHighestQuant / m_lumaWeight;
   
   double testYpHighestR = m_invTransform0[0] * ypHighest0To1 - m_invTransform0[1] * uComp - m_invTransform0[2] * vComp;
   double testYpHighestG = m_invTransform1[0] * ypHighest0To1 - m_invTransform1[1] * uComp - m_invTransform1[2] * vComp;
   double testYpHighestB = m_invTransform2[0] * ypHighest0To1 - m_invTransform2[1] * uComp - m_invTransform2[2] * vComp;
   
+  if(testYpHighestR > 1.0 || testYpHighestG > 1.0 || testYpHighestB > 1.0)  {
+    // Instead use a "looser" bound that is safe.
+    double ypLargest0To1 = dMax(dMax(boundR, boundG), boundB);
+    ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * ypLargest0To1), 0, m_iLumaWeight);
+  }
+  
+  // The lowest possible and highest possible value for Yprime
+  ypBufLowPix  = ypLowestQuant;
+  ypBufHighPix = ypHighestQuant;
+}
+
+void ColorTransformYAdjustFast::calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor)
+{
+  double yTF = m_transferFunction->inverse(yLinear);
+  double boundR = m_invTransform0[0] * yTF - rColor;
+  double boundG = m_invTransform1[0] * yTF - gColor;
+  double boundB = m_invTransform2[0] * yTF - bColor;
+  
+  double ypLowest0To1 = dMin(dMin(boundR, boundG), boundB);
+  int ypLowestQuant = iClip(double2IntFloor(m_lumaWeight * ypLowest0To1), 0, m_iLumaWeight);
+  
+  // Calculate ypHighest0To1 = yTF, but we have to go to integer, round up and go back again.
+  int ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * yTF), 0, m_iLumaWeight);
+  double ypHighest0To1 = (double) ypHighestQuant / m_lumaWeight;
+  
+  double testYpHighestR = m_invTransform0[0] * ypHighest0To1 - rColor;
+  double testYpHighestG = m_invTransform1[0] * ypHighest0To1 - gColor;
+  double testYpHighestB = m_invTransform2[0] * ypHighest0To1 - bColor;
   
   if(testYpHighestR > 1.0 || testYpHighestG > 1.0 || testYpHighestB > 1.0)  {
     // Instead use a "looser" bound that is safe.
     double ypLargest0To1 = dMax(dMax(boundR, boundG), boundB);
-    ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * ypLargest0To1), 0, (int)m_lumaWeight);
+    ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * ypLargest0To1), 0, m_iLumaWeight);
   }
-    
+  
+  // The lowest possible and highest possible value for Yprime
+  ypBufLowPix  = ypLowestQuant;
+  ypBufHighPix = ypHighestQuant;
+}
+
+void ColorTransformYAdjustFast::calcBoundsFastBasic(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor)
+{
+  double yTF = m_transferFunction->inverse(yLinear);
+  double boundR = yTF - rColor;
+  double boundG = yTF + gColor;
+  double boundB = yTF - bColor;
+  
+  double ypLowest0To1 = dMin(dMin(boundR, boundG), boundB);
+  int ypLowestQuant = iClip(double2IntFloor(m_lumaWeight * ypLowest0To1), 0, m_iLumaWeight);
+  
+  // Calculate ypHighest0To1 = yTF, but we have to go to integer, round up and go back again.
+  int ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * yTF), 0, m_iLumaWeight);
+  double ypHighest0To1 = (double) ypHighestQuant / m_lumaWeight;
+  
+  double testYpHighestR = ypHighest0To1 - rColor;
+  double testYpHighestG = ypHighest0To1 + gColor;
+  double testYpHighestB = ypHighest0To1 - bColor;
+  
+  if(testYpHighestR > 1.0 || testYpHighestG > 1.0 || testYpHighestB > 1.0)  {
+    // Instead use a "looser" bound that is safe.
+    double ypLargest0To1 = dMax(dMax(boundR, boundG), boundB);
+    ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * ypLargest0To1), 0, m_iLumaWeight);
+  }
+  
   // The lowest possible and highest possible value for Yprime
   ypBufLowPix  = ypLowestQuant;
   ypBufHighPix = ypHighestQuant;
@@ -412,7 +504,7 @@ void ColorTransformYAdjust::calcBounds(int &ypBufLowPix, int &ypBufHighPix, doub
 // Public methods
 //-----------------------------------------------------------------------------
 
-void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
+void ColorTransformYAdjustFast::process ( Frame* out, const Frame *inp) {
   out->m_frameNo = inp->m_frameNo;
   out->m_isAvailable = TRUE;
   
@@ -423,25 +515,30 @@ void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])  {
     if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {
       double yLinear, yConv, yConvMin = 0.0, yConvMax = 0.0;
-      double yComp, uComp, vComp;
-      double rComp, gComp, bComp; 
+      double rColor, gColor, bColor;
+      double uComp, vComp;
+      //double rComp, gComp, bComp;
+      int    iYComp, iYCompMin, iYCompMax; 
       float *floatComp[3];
       double scale = 1.0;
-      double (ColorTransformYAdjust::*pt2Convert)(double, double, double) = NULL;
-      
+      double (ColorTransformYAdjustFast::*pt2Convert)(double, double, double) = NULL;
+      float *red   = inp->m_floatComp[0];
+      float *green = inp->m_floatComp[1];
+      float *blue  = inp->m_floatComp[2];
+
       if (inp->m_hasAlternate == TRUE) {
         floatComp[0] = inp->m_altFrame->m_floatComp[0];
         floatComp[1] = inp->m_altFrame->m_floatComp[1];
         floatComp[2] = inp->m_altFrame->m_floatComp[2];
         scale       = 1.0 / inp->m_altFrameNorm;
-        pt2Convert  = &ColorTransformYAdjust::convertToY;
+        pt2Convert  = &ColorTransformYAdjustFast::convertToY;
       }
       else {
         floatComp[0] = inp->m_floatComp[0];
         floatComp[1] = inp->m_floatComp[1];
-        floatComp[2] = inp->m_floatComp[2];
+        floatComp[2] = inp->m_floatComp[2];   
         scale        = 1.0;        
-        pt2Convert  = &ColorTransformYAdjust::convertToYLinear;
+        pt2Convert  = &ColorTransformYAdjustFast::convertToYLinear;     
       }
 
       // Allocate memory. Note that current code does not permit change of resolution. TBDL
@@ -455,9 +552,9 @@ void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
         out->m_floatComp[1][i] = (float) (m_transform1[0] * (double) inp->m_floatComp[0][i] + m_transform1[1] * (double) inp->m_floatComp[1][i] + m_transform1[2] * (double) inp->m_floatComp[2][i]);
         out->m_floatComp[2][i] = (float) (m_transform2[0] * (double) inp->m_floatComp[0][i] + m_transform2[1] * (double) inp->m_floatComp[1][i] + m_transform2[2] * (double) inp->m_floatComp[2][i]);
       }
- 
+      
       if (m_useFloatPrecision == FALSE) {       // Integer conversion
-        // convert float to fixed
+                                                // convert float to fixed
         // convert bitdepth
         m_fwdConvertProcess->process(m_fwdFrameStore2, out);
         
@@ -471,90 +568,124 @@ void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
         m_invConvertProcess->process(m_invFrameStore, m_invFrameStore2);
       }
       else {   // Floating conversion
-        // Downscale (if needed)
+               // Downconvert if needed
         m_fwdColorFormat->process (m_fwdFrameStore, out);
         
-        // Quantize/DeQuantize components
         // Luma only if adaptive upsampler is enabled
         if (m_useAdaptiveUpsampler == TRUE) {
           for (int i = 0; i < m_fwdFrameStore->m_compSize[0]; i++) {
             m_fwdFrameStore->m_floatComp[0][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[0][i] * m_lumaWeight) / m_lumaWeight);
           }          
         }
-        // /Now also chroma - if m_useAdaptiveUpsampler is false, then we do not need to quantize that
+        
+        // Quantize/DeQuantize Chroma components
         for (int i = 0; i < m_fwdFrameStore->m_compSize[1]; i++) {
           m_fwdFrameStore->m_floatComp[1][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[1][i] * m_chromaWeight) / m_chromaWeight);
           m_fwdFrameStore->m_floatComp[2][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[2][i] * m_chromaWeight) / m_chromaWeight);
         }
         
-        // Now convert back to 4:4:4 (if needed)
+        // Now convert back to 4:4:4
         m_invColorFormat->process (m_invFrameStore, m_fwdFrameStore);
       }
       
+      double uvDenom = 1 / (1 - m_transform0[0] - m_transform0[2]);
+      double uScale  = (2.0 * (1 - m_transform0[2]));
+      double vScale  = (2.0 * (1 - m_transform0[0]));
+      
       for (int i = 0; i < inp->m_compSize[0]; i++) {
-        // First compute the linear value of the target Y (given original data)
-        yLinear = (*this.*pt2Convert)((double)floatComp[0][i] * scale, (double) floatComp[1][i] * scale,(double) floatComp[2][i] * scale);
-
-        // The real reconstructed value will be an integer.
-        int yPrimeMin = (int) 0; 
-        int yPrimeMax = (int) m_lumaWeight;
-        int yPrimeCandidate;
         
-        uComp = (double) m_invFrameStore->m_floatComp[1][i];
-        vComp = (double) m_invFrameStore->m_floatComp[2][i];
+        uComp  = (double) m_invFrameStore->m_floatComp[1][i];
+        vComp  = (double) m_invFrameStore->m_floatComp[2][i];       
         
-        calcBounds(yPrimeMin, yPrimeMax, yLinear, uComp, vComp);
+        double vOffset = vComp * vScale;
+        double uOffset = uComp * uScale;
+        double gOffset = ((uOffset * m_transform0[2] +  vOffset * m_transform0[0]) * uvDenom);
         
-        // Give dummy values. If these values are still left after search, then replace them.
-        yConvMin = -1.0;
-        yConvMax = -1.0;
-        // Given reconstruction convert also inverse data
-        for (int j = 0; (j < m_maxIterations) && (yPrimeMax > yPrimeMin + 1) ; j++) 
-        {
-          yPrimeCandidate = (yPrimeMin + yPrimeMax) / 2;
+        
+        double yValueR = red  [i] - vOffset;
+        double yValueB = blue [i] - uOffset;
+        double yValueG = green[i] + gOffset;
+        
+        int yValueRQ = (int) dRound(yValueR * m_lumaWeight);
+        int yValueBQ = (int) dRound(yValueB * m_lumaWeight);
+        int yValueGQ = (int) dRound(yValueG * m_lumaWeight);
+        
+        // If all values agree, no need to perform a refinement
+        if (yValueRQ == yValueGQ && yValueRQ == yValueBQ) {
+          out->m_floatComp[0][i] = (float) ((double) yValueRQ / m_lumaWeight);
+        }
+        else {          
+          // Compute the linear value of the target Y (given original data)
+          yLinear = (*this.*pt2Convert)((double)floatComp[0][i] * scale, (double) floatComp[1][i] * scale,(double) floatComp[2][i] * scale);
           
-          yComp = (double) yPrimeCandidate / m_lumaWeight;
-          convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
-          yConv = convertToYLinear(rComp, gComp, bComp);
+          int yValueMin = iMin(yValueRQ, iMin(yValueBQ, yValueGQ));
+          int yValueMax = iMax(yValueRQ, iMax(yValueBQ, yValueGQ));
           
-          if (yConv < yLinear) {
-            yPrimeMin = yPrimeCandidate;
-            yConvMin  = yConv;
-            
+          computeColorImpact(uComp, vComp, &rColor, &gColor, &bColor);          
+          
+          calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
+          //calcBounds(iYCompMin, iYCompMax, yLinear, uComp, vComp);
+          iYCompMin = iMax(iYCompMin, yValueMin);
+          iYCompMax = iMin(iYCompMax, yValueMax);
+          if (iYCompMin == iYCompMax) {
+            //yConvMin = convertToYLinear((double) iYCompMin / m_lumaWeight, rColor, gColor, bColor);
+            out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);            
           }
           else {
-            yPrimeMax = yPrimeCandidate;
-            yConvMax  = yConv;
+            // Set initial Y to quantized value
+            iYComp = (iYCompMin + iYCompMax) >> 1; 
+            //iYComp = iYCompMin;
+            
+            yConvMin = -1.0;
+            yConvMax = -1.0;
+            
+            // Given reconstruction convert also inverse data
+            for (int j = 0; j < m_maxIterations; j++) {
+              yConv = convertToYLinear((double) iYComp / m_lumaWeight, rColor, gColor, bColor);
+              //yConv = convertToYLinearDirect((double) iYComp / m_lumaWeight, uComp, vComp);
+              
+              if (yConv < yLinear) { 
+                yConvMin  = yConv;
+                iYCompMin = iYComp;
+              }
+              else {
+                yConvMax  = yConv;
+                iYCompMax = iYComp;
+              }
+              if (iYCompMin + 1 == iYCompMax || iYCompMin == iYCompMax)
+                break;
+              else 
+                iYComp = (iYCompMin + iYCompMax) >> 1;          
+            }
+            
+            if(yConvMin < 0) { 
+              yConvMin = convertToYLinear((double) iYCompMin / m_lumaWeight, rColor, gColor, bColor);
+            }
+            if(yConvMax < 0) { 
+              yConvMax = convertToYLinear((double) iYCompMax / m_lumaWeight, rColor, gColor, bColor);
+            }        
+            
+            if (yConvMin == yConvMax) {
+              out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);            
+            }
+            else {
+              if(m_tfDistance == FALSE) {
+                if (dAbs(yConvMin - yLinear) < dAbs(yConvMax - yLinear))
+                  out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);
+                else
+                  out->m_floatComp[0][i] = (float) ((double) iYCompMax / m_lumaWeight);
+              }
+              else if(m_tfDistance == TRUE) {
+                double yTFMin = m_transferFunction->inverse(yConvMin);
+                double yTFMax = m_transferFunction->inverse(yConvMax);
+                double yTF    = m_transferFunction->inverse(yLinear);
+                if (dAbs(yTFMin - yTF) < dAbs(yTFMax - yTF))
+                  out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);
+                else
+                  out->m_floatComp[0][i] = (float) ((double) iYCompMax / m_lumaWeight);
+              }
+            }
           }
-        }
-        
-        if(yConvMin < 0) { 
-          // if -1.0 we have always taken the lower value -- we must calculate yConvMin
-          yComp = (double) yPrimeMin / m_lumaWeight;
-          convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
-          yConvMin = convertToYLinear(rComp, gComp, bComp);
-        }
-        if(yConvMax < 0) { 
-          // if 1.0 we have always taken the higher value -- we must calcualte yConvMax
-          yComp = (double) yPrimeMax / m_lumaWeight;
-          convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
-          yConvMax = convertToYLinear(rComp, gComp, bComp);
-        }
-        
-        if(m_tfDistance == FALSE) {
-          if (dAbs(yConvMin - yLinear) < dAbs(yConvMax - yLinear))
-            out->m_floatComp[0][i] = (float) ((double) yPrimeMin / m_lumaWeight);
-          else
-            out->m_floatComp[0][i] = (float) ((double) yPrimeMax / m_lumaWeight);
-        }
-        else if(m_tfDistance == TRUE) {
-          double yTFMin = m_transferFunction->inverse(yConvMin);
-          double yTFMax = m_transferFunction->inverse(yConvMax);
-          double yTF    = m_transferFunction->inverse(yLinear);
-          if (dAbs(yTFMin - yTF) < dAbs(yTFMax - yTF))
-            out->m_floatComp[0][i] = (float) ((double) yPrimeMin / m_lumaWeight);
-          else
-            out->m_floatComp[0][i] = (float) ((double) yPrimeMax / m_lumaWeight);
         }
       }
     }

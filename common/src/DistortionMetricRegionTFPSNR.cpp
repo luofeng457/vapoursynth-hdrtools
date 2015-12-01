@@ -63,7 +63,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, int distortionMethod)
+DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod)
  : DistortionMetric()
 {
   m_transferFunction   = DistortionTransferFunction::create(distortionMethod);

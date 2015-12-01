@@ -95,6 +95,18 @@ typedef enum {
 } ColorPrimaries;
 
 typedef enum {
+  DIF_UNKNOWN = -1,
+  DIF_PQPH10K = 0,
+  DIF_PQ      = 1,
+  DIF_DE2K    = 2,
+  DIF_PQNS    = 3,
+  DIF_NULL    = 4,
+  DIF_HPQ     = 5,
+  DIF_HPQ2    = 6,
+  DIF_TOTAL      
+} DistortionFunction;
+
+typedef enum {
   CF_UNKNOWN = -1,     //!< Unknown color format
   CF_400     =  0,     //!< Monochrome
   CF_420     =  1,     //!< 4:2:0
@@ -156,6 +168,8 @@ typedef enum{
   TF_AMPQ      = 10,
   TF_HLG       = 11,
   TF_NORMAL    = 12,
+  TF_HPQ       = 13,
+  TF_HPQ2      = 14,
 #ifdef __SIM2_SUPPORT_ENABLED__
   TF_SIM2,
 #endif
@@ -193,10 +207,11 @@ typedef enum{
 } FieldParity;
 
 typedef enum  { 
-  FT_NULL     = 0,
-  FT_DEBLOCK  = 1,
-  FT_WIENER2D = 2,
-  FT_2DSEP    = 3,
+  FT_NULL      = 0,
+  FT_DEBLOCK   = 1,
+  FT_WIENER2D  = 2,
+  FT_2DSEP     = 3,
+  FT_WIENER2DD = 4,
   FT_TOTAL
 } FilterTypes;
 
@@ -218,7 +233,21 @@ typedef enum {
   F1D_TOTAL
 } FiltersOneD;
 
-
+typedef enum {
+  CLT_NULL    = 0,
+  CLT_BASE    = 1,
+  CLT_BASE2   = 2,
+  CLT_BASE3   = 3,
+  CLT_BASE4   = 4,
+  CLT_YADJ    = 5,
+  CLT_YADJALT = 6,
+  CLT_CHROMA  = 7,
+  CLT_YADJFST = 8,
+  CLT_RGB     = 9,
+  CLT_Y       = 10,
+  CLT_XYZ     = 11,
+  CLT_TOTAL
+} ClosedLoopTrans;
 
 #endif
 

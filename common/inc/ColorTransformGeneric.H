@@ -65,6 +65,7 @@ private:
   const double   *m_transform1;
   const double   *m_transform2;
   bool            m_transformPrecision;
+  int             m_useHighPrecision;
   unsigned short  m_sClip;
   double          m_crDivider;
   double          m_cbDivider;
@@ -74,7 +75,7 @@ private:
    
 public:
   // Construct/Deconstruct
-  ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision);
+  ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int useHighPrecision);
   
   static void setYConversion    (int colorPrimaries, const double **transformY);
   static void setColorConversion(int colorPrimaries, const double **transform0, const double **transform1, const double **transform2);

@@ -4,11 +4,12 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Apple Inc, Ericsson
+ * <ORGANIZATION> = Apple Inc
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Apple Inc, Ericsson
+ * Copyright (c) 2015, Apple Inc
  * All rights reserved.
+ 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,22 +38,20 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustAlt.H
+ * \file ColorTransformClosedLoopRGB.H
  *
  * \brief
- *    ColorTransformYAdjustAlt Class Header
+ *    ColorTransformClosedLoopRGB Class Header
  *
  * \author
- *     - Jacob Strom                     <jacob.strom@ericsson.com>
- *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustAlt_H__
-#define __ColorTransformYAdjustAlt_H__
+#ifndef __ColorTransformClosedLoopRGB_H__
+#define __ColorTransformClosedLoopRGB_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +61,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustAlt : public ColorTransform {
+class ColorTransformClosedLoopRGB : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -132,9 +131,13 @@ private:
   void                convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp);
   void                computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
 
+  double              computeRGBDistortion(const double rComp, const double gComp, const double bComp, const int yValue, const double lumaWeight );
+
+  double              computeYDistortion(const double rYComp, const double gYComp, const double bYComp, const double yValue );
+
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustAlt( ColorSpace        iColorSpace, 
+  ColorTransformClosedLoopRGB( ColorSpace        iColorSpace, 
                             ColorPrimaries    iColorPrimaries, 
                             ColorSpace        oColorSpace, 
                             ColorPrimaries    oColorPrimaries, 
@@ -153,7 +156,7 @@ public:
                             bool              useFloatPrecision = TRUE
                            );
                         
-  virtual ~ColorTransformYAdjustAlt();
+  virtual ~ColorTransformClosedLoopRGB();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

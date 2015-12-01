@@ -62,49 +62,51 @@ class ProjectParameters : public Parameters {
 private:
 public:
   /*input*/
-  IOVideo       m_inputFile;
-  IOVideo       m_outputFile;
-  FrameFormat   m_source;
-  FrameFormat   m_output;
-  int           m_frameSkip;     //! Frame skipping for input
+  IOVideo           m_inputFile;
+  IOVideo           m_outputFile;
+  FrameFormat       m_source;
+  FrameFormat       m_output;
+  int               m_frameSkip;     //! Frame skipping for input
 
 
   
-  float         m_srcNormalScale;
-  float         m_outNormalScale;
-  float         m_srcMinValue;               //!< Brightness range value (min)
-  float         m_srcMaxValue;               //!< Brightness range value (max)
-  float         m_outMinValue;               //!< Brightness range value (min)
-  float         m_outMaxValue;               //!< Brightness range value (max)
+  float             m_srcNormalScale;
+  float             m_outNormalScale;
+  float             m_srcMinValue;               //!< Brightness range value (min)
+  float             m_srcMaxValue;               //!< Brightness range value (max)
+  float             m_outMinValue;               //!< Brightness range value (min)
+  float             m_outMaxValue;               //!< Brightness range value (max)
 
-  bool          m_transformPrecision;
-  bool          m_useSingleTransferStep;   //! Use single or multiple steps (for normalization) when applying PQ
-  bool          m_filterInFloat;           //! Use floating precision for filtering
-  int           m_chromaDownsampleFilter;  //! Chroma downsampling filter
-  int           m_chromaUpsampleFilter;    //! Chroma upsampling filter
-  bool          m_outputSinglePrecision;   //! Set output, for OpenEXR files, to single instead of half precision
-  int           m_useMinMax;
+  bool              m_transformPrecision;
+  bool              m_useSingleTransferStep;     //!< Use single or multiple steps (for normalization) when applying PQ
+  bool              m_filterInFloat;             //!< Use floating precision for filtering
+  int               m_chromaDownsampleFilter;    //!< Chroma downsampling filter
+  int               m_chromaUpsampleFilter;      //!< Chroma upsampling filter
+  bool              m_outputSinglePrecision;     //!< Set output, for OpenEXR files, to single instead of half precision
+  int               m_useMinMax;
+  int               m_useHighPrecisionTransform; //!< High precision transform for BT.2020 (proper inverse)
   
-  int           m_addNoise;                //! Add noise to the input signal
-  double        m_noiseVariance;           //! Noise variance
-  double        m_noiseMean;               //! Noise Mean
-  int           m_closedLoopConversion;
-  int           m_closedLoopIterations;
-  bool          m_linearDownConversion;
-  bool          m_useAdaptiveFiltering;
-  bool          m_rgbDownConversion;
-  bool          m_bUseChromaDeblocking;
-  bool          m_bUseWienerFiltering;
-  bool          m_bUse2DSepFiltering;
-  bool          m_b2DSepMode;
+  int               m_addNoise;                  //! Add noise to the input signal
+  double            m_noiseVariance;             //! Noise variance
+  double            m_noiseMean;                 //! Noise Mean
+  ClosedLoopTrans   m_closedLoopConversion;
+  int               m_closedLoopIterations;
+  bool              m_linearDownConversion;
+  bool              m_useAdaptiveUpsampling;
+  bool              m_useAdaptiveDownsampling;
+  bool              m_rgbDownConversion;
+  bool              m_bUseChromaDeblocking;
+  bool              m_bUseWienerFiltering;
+  bool              m_bUse2DSepFiltering;
+  bool              m_b2DSepMode;
 
   // Cropping parameters
-  int           m_cropOffsetLeft;
-  int           m_cropOffsetTop;
-  int           m_cropOffsetRight;
-  int           m_cropOffsetBottom;
+  int               m_cropOffsetLeft;
+  int               m_cropOffsetTop;
+  int               m_cropOffsetRight;
+  int               m_cropOffsetBottom;
 
-  int           m_toneMapping;
+  int               m_toneMapping;
   // Tone mapping parameters
   ToneMappingParams m_tmParams;
 

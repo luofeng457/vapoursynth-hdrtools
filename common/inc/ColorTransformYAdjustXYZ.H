@@ -37,22 +37,22 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustAlt.H
+ * \file ColorTransformYAdjustXYZ.H
  *
  * \brief
- *    ColorTransformYAdjustAlt Class Header
+ *    ColorTransformYAdjustXYZ Class Header
  *
  * \author
+ *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
- *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustAlt_H__
-#define __ColorTransformYAdjustAlt_H__
+#ifndef __ColorTransformYAdjustXYZ_H__
+#define __ColorTransformYAdjustXYZ_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +62,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustAlt : public ColorTransform {
+class ColorTransformYAdjustXYZ : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -71,7 +71,10 @@ private:
   const double       *m_invTransform0;
   const double       *m_invTransform1;
   const double       *m_invTransform2;
+  const double       *m_transformRGBtoX;  // X in XYZ
   const double       *m_transformRGBtoY;  // Y in XYZ
+  const double       *m_transformRGBtoZ;  // Z in XYZ
+  double              m_xWeight, m_yWeight, m_zWeight;
 
   float              *m_floatData;
   float              *m_floatComp[4];
@@ -95,7 +98,6 @@ private:
   ConvertColorFormat *m_invColorFormat;
   int                 m_downMethod;
   int                 m_upMethod;
-  int                 m_maxIterations;
   ChromaFormat        m_oChromaFormat;
   ChromaLocation      m_oChromaLocation[FP_TOTAL];
   ColorSpace          m_oColorSpace;
@@ -121,20 +123,22 @@ private:
 
   TransferFunctions   m_transferFunctions;
   TransferFunction   *m_transferFunction;
-  void                calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);
+
   void                calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
 
   void                allocateMemory(Frame* out, const Frame *inp);
-  double              convertToYLinear(const double yComp, const double rColor, const double gColor, const double bColor);
-  double              convertToYLinear(const double rComp, const double gComp, const double bComp);
-  double              convertToY      (const double rComp, const double gComp, const double bComp);
-  double              convertToYLinearDirect(const double yComp, const double uComp, const double vComp);
-  void                convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp);
-  void                computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
 
+  void                computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
+  void                computeColorImpactBasic(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
+
+  void                convertToYCbCr(double rComp, double gComp, double bComp, float *yComp,  float *uComp, float *vComp);  
+
+  void                convertToXYZLinear(double rComp, double gComp, double bComp, double *xComp,  double *yComp, double *zComp);  
+  void                convertToXYZ(double rComp, double gComp, double bComp, double *xComp,  double *yComp, double *zComp);  
+  void                convertToXYZLinear(const double yValue, const double rColor, const double gColor, const double bColor, double *xComp,  double *yComp, double *zComp);
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustAlt( ColorSpace        iColorSpace, 
+  ColorTransformYAdjustXYZ( ColorSpace        iColorSpace, 
                             ColorPrimaries    iColorPrimaries, 
                             ColorSpace        oColorSpace, 
                             ColorPrimaries    oColorPrimaries, 
@@ -153,7 +157,7 @@ public:
                             bool              useFloatPrecision = TRUE
                            );
                         
-  virtual ~ColorTransformYAdjustAlt();
+  virtual ~ColorTransformYAdjustXYZ();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

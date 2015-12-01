@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file FrameFilterWiener2D.cpp
+ * \file FrameFilterWiener2DDark.cpp
  *
  * \brief
- *    FrameFilterWiener2D Class (2D Wiener Filtering, as currently done in Matlab)
+ *    FrameFilterWiener2DDark Class (2D Wiener Filtering, as currently done in Matlab)
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -53,7 +53,7 @@
 //-----------------------------------------------------------------------------
 
 #include "Global.H"
-#include "FrameFilterWiener2D.H"
+#include "FrameFilterWiener2DDark.H"
 
 //-----------------------------------------------------------------------------
 // Macros
@@ -63,7 +63,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-FrameFilterWiener2D::FrameFilterWiener2D(int width, int height, int wSizeX, int wSizeY) {  
+FrameFilterWiener2DDark::FrameFilterWiener2DDark(int width, int height, int wSizeX, int wSizeY) {  
   m_wSizeX = wSizeX;
   m_wSizeY = wSizeY;
   m_wArea  = (double) ((2 * wSizeX + 1) * (2 * wSizeY + 1));
@@ -76,13 +76,13 @@ FrameFilterWiener2D::FrameFilterWiener2D(int width, int height, int wSizeX, int 
   m_dImgOutput.resize  ( m_width * m_height );
 }
 
-FrameFilterWiener2D::~FrameFilterWiener2D() {
+FrameFilterWiener2DDark::~FrameFilterWiener2DDark() {
 }
 
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-template<typename ValueType> double FrameFilterWiener2D::windowSum(const ValueType *iData, int iPosX, int iPosY, int iWidth, int iHeight) {
+template<typename ValueType> double FrameFilterWiener2DDark::windowSum(const ValueType *iData, int iPosX, int iPosY, int iWidth, int iHeight) {
   double dValue = 0.0;
   const ValueType *currentLine = NULL;
   
@@ -103,7 +103,7 @@ template<typename ValueType> double FrameFilterWiener2D::windowSum(const ValueTy
  *  Functions computes the Sum value within an NxN window around the
  *  the current sample.
  */
-template<typename ValueType> void FrameFilterWiener2D::computeImgWindowSum(const ValueType *iData, int iWidth, int iHeight) {   
+template<typename ValueType> void FrameFilterWiener2DDark::computeImgWindowSum(const ValueType *iData, int iWidth, int iHeight) {   
   double  *currentSum = &m_dImgSum[0];
   
   for (int j = ZERO;j < iHeight; j++) {    
@@ -117,7 +117,7 @@ template<typename ValueType> void FrameFilterWiener2D::computeImgWindowSum(const
 //-----------------------------------------------------------------------------
 // Compute the sum of all values in a 3x3 arrangement
 //-----------------------------------------------------------------------------
-double FrameFilterWiener2D::computeShortDC(int iWidth, int iHeight) {
+double FrameFilterWiener2DDark::computeShortDC(int iWidth, int iHeight) {
   double value;
   double noise = 0.0;
   double *data = &m_dImgDistance[0];
@@ -137,7 +137,7 @@ double FrameFilterWiener2D::computeShortDC(int iWidth, int iHeight) {
 //-----------------------------------------------------------------------------
 // Absolute distance from 3x3 mean
 //-----------------------------------------------------------------------------
-template<typename ValueType> void FrameFilterWiener2D::computeMeanDist(const ValueType *iData, int iWidth, int iHeight) {
+template<typename ValueType> void FrameFilterWiener2DDark::computeMeanDist(const ValueType *iData, int iWidth, int iHeight) {
   
   double *distImg = &m_dImgDistance[0];
   double *sumImg = &m_dImgSum[0];
@@ -153,7 +153,7 @@ template<typename ValueType> void FrameFilterWiener2D::computeMeanDist(const Val
 //-----------------------------------------------------------------------------
 // Wiener filtering given total noise, local mean and local absolute deviation
 //-----------------------------------------------------------------------------
-template<typename ValueType> void FrameFilterWiener2D::wienerFilter(const ValueType *iData, double noise,  int iWidth, int iHeight) {
+template<typename ValueType> void FrameFilterWiener2DDark::wienerFilter(const ValueType *iData, double noise,  int iWidth, int iHeight) {
   double normValue;
   
   double *pSumImg = &m_dImgSum[0];
@@ -164,39 +164,48 @@ template<typename ValueType> void FrameFilterWiener2D::wienerFilter(const ValueT
   // Compute abs distance from 3x3 mean for each position
   for (int j = ZERO; j < iHeight; j++) {    
     for (int i = ZERO; i < iWidth; i++) {
-      if (*pMdImg > noise) {
-        normValue = (m_wArea * (double) *iData++) - *pSumImg;
-        *pOutImg++ = (normValue * (1.0 - noise / (*pMdImg++)) + (*pSumImg++)) / m_wArea;
+      if (*iData < 1.0) {
+        if (*pMdImg > noise) {
+          normValue = (m_wArea * (double) *iData++) - *pSumImg;
+          *pOutImg++ = (normValue * (1.0 - noise / (*pMdImg++)) + (*pSumImg++)) / m_wArea;
+        }
+        else {
+          // Set output to mean
+          *pOutImg++ = *pSumImg++ / m_wArea;
+          iData++;
+          pMdImg++;        
+        }
       }
       else {
-        // Set output to mean
-        *pOutImg++ = *pSumImg++ / m_wArea;
-        iData++;
-        pMdImg++;        
+        //printf("what is the value here %7.3f\n", *iData);
+        // Set output to input
+        *pOutImg++ = *iData++ ;
+        pMdImg++;  
+        pSumImg++;              
       }
     }
   }
 }
 
-void FrameFilterWiener2D::updateImg(float *out, const double *inp, int size) {
+void FrameFilterWiener2DDark::updateImg(float *out, const double *inp, int size) {
   for (int i = 0; i < size; i++) {
     *out++ = (float) (*inp++);
   }  
 }
 
-void FrameFilterWiener2D::updateImg(uint16 *out, const double *inp, int size) {
+void FrameFilterWiener2DDark::updateImg(uint16 *out, const double *inp, int size) {
   for (int i = 0; i < size; i++) {
     *out++ = (uint16) dRound(*inp++);
   }  
 }
 
-void FrameFilterWiener2D::updateImg(imgpel *out, const double *inp, int size) {
+void FrameFilterWiener2DDark::updateImg(imgpel *out, const double *inp, int size) {
   for (int i = 0; i < size; i++) {
     *out++ = (imgpel) dRound(*inp++);
   }  
 }
 
-template<typename ValueType>  void FrameFilterWiener2D::filter(ValueType *imgData, int width, int height, float minValue, float maxValue)
+template<typename ValueType>  void FrameFilterWiener2DDark::filter(ValueType *imgData, int width, int height, float minValue, float maxValue)
 {
   // Update array size
   if ( width * height > m_width * m_height ) {
@@ -208,7 +217,7 @@ template<typename ValueType>  void FrameFilterWiener2D::filter(ValueType *imgDat
     m_dImgDistance.resize ( m_width * m_height );
     m_dImgOutput.resize   ( m_width * m_height );
   }
-  
+
   computeImgWindowSum(imgData, width, height);
   computeMeanDist    (imgData, width, height);
   
@@ -218,7 +227,7 @@ template<typename ValueType>  void FrameFilterWiener2D::filter(ValueType *imgDat
   updateImg(imgData, &m_dImgOutput[0], width * height);
 }
 
-template<typename ValueType>  void FrameFilterWiener2D::filter(ValueType *out, const ValueType *inp, int width, int height, int minValue, int maxValue)
+template<typename ValueType>  void FrameFilterWiener2DDark::filter(ValueType *out, const ValueType *inp, int width, int height, int minValue, int maxValue)
 {
   // Update array size
   if ( width * height > m_width * m_height ) {
@@ -229,7 +238,7 @@ template<typename ValueType>  void FrameFilterWiener2D::filter(ValueType *out, c
     m_dImgSumDev.resize   ( m_width * m_height );
     m_dImgDistance.resize ( m_width * m_height );
     m_dImgOutput.resize   ( m_width * m_height );
-  }  
+  }
   
   computeImgWindowSum(inp, width, height);
   computeMeanDist    (inp, width, height);
@@ -246,7 +255,7 @@ template<typename ValueType>  void FrameFilterWiener2D::filter(ValueType *out, c
 //-----------------------------------------------------------------------------
 
 
-void FrameFilterWiener2D::process ( Frame* out, const Frame *inp, bool compY, bool compCb, bool compCr) {
+void FrameFilterWiener2DDark::process ( Frame* out, const Frame *inp, bool compY, bool compCb, bool compCr) {
 
   if (out->m_isFloat == TRUE) {    // floating point data
     if (compY == TRUE) {
@@ -286,10 +295,7 @@ void FrameFilterWiener2D::process ( Frame* out, const Frame *inp, bool compY, bo
   }
 }
 
-void FrameFilterWiener2D::process ( Frame* pFrame, bool compY, bool compCb, bool compCr) {
-
-  
-  
+void FrameFilterWiener2DDark::process ( Frame* pFrame, bool compY, bool compCb, bool compCr) {  
   if (pFrame->m_isFloat == TRUE) {    // floating point data
     if (compY == TRUE)
       filter(pFrame->m_floatComp[Y_COMP], pFrame->m_width[Y_COMP], pFrame->m_height[Y_COMP], (float) pFrame->m_minPelValue[Y_COMP], (float) pFrame->m_maxPelValue[Y_COMP] );

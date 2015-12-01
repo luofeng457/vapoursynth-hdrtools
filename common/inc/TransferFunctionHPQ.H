@@ -5,9 +5,9 @@
  *
  * <OWNER> = Apple Inc.
  * <ORGANIZATION> = Apple Inc.
- * <YEAR> = 2015
+ * <YEAR> = 2014
  *
- * Copyright (c) 2015, Apple Inc.
+ * Copyright (c) 2014, Apple Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file DistortionTransferFunction.H
+ * \file TransferFunctionHPQ.H
  *
  * \brief
- *    Distortion Transfer Function class
+ *    TransferFunctionHPQ (Hybrid PQ) class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -49,65 +49,48 @@
  */
 
 
-#ifndef __DistortionTransferFunction_H__
-#define __DistortionTransferFunction_H__
+#ifndef __TransferFunctionHPQ_H__
+#define __TransferFunctionHPQ_H__
 
 #include "Global.H"
-//#include "Frame.H"
-//#include "DistortionMetric.H"
+#include "Frame.H"
+#include "TransferFunction.H"
 
-class DistortionTransferFunction {
-protected:
-  double computeDE      (double value);
-  double computePQ      (double value);
-  double computeHPQ     (double value);
-  double computeHPQ2    (double value);
-  double computePQNoise (double value);
-  double computePH10K   (double value);
-  double computeNull    (double value);
-public:
-  static DistortionTransferFunction *create(DistortionFunction method);
+class TransferFunctionHPQ : public TransferFunction {
+private:
+  double m1;
+  double m2;
+  double c1;
+  double c2;
+  double c3;
+ 
+  double m_value0; 
+  double m_value1; 
+  double m_gamma;
+  double m_linear;
+  double m_weight;
+  double m_offset;
+  double m_inverseGamma;
+  double m_scale;
+  double m_iValue0, m_iValue1;
   
-  virtual double compute(double value) = 0;
-  virtual ~DistortionTransferFunction() {};
+  double forwardPQ(double value);
+  double inversePQ(double value);
 
-};
-
-class DistortionTransferFunctionNull : public DistortionTransferFunction {
+  void  init (float normalFactor);
 public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionPQNoise : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionPQ : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionHPQ : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionHPQ2 : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionCombo : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionDE : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
+  // Construct/Deconstruct
+  TransferFunctionHPQ();
+  TransferFunctionHPQ(float normalFactor);
+  virtual ~TransferFunctionHPQ();
+  
+  virtual double forward(double value);
+  virtual double inverse(double value);
+  
+  virtual void forward(Frame *out,  const Frame *inp);
+  virtual void forward(Frame *out,  const Frame *inp, int component);
+  virtual void inverse(Frame *out,  const Frame *inp);
+  virtual void inverse(Frame *out,  const Frame *inp, int component);  
+ };
 
 #endif
-
-

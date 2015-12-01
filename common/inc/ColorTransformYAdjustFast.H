@@ -9,6 +9,7 @@
  *
  * Copyright (c) 2015, Apple Inc, Ericsson
  * All rights reserved.
+ 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,22 +38,22 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustAlt.H
+ * \file ColorTransformYAdjustFast.H
  *
  * \brief
- *    ColorTransformYAdjustAlt Class Header
+ *    ColorTransformYAdjustFast Class Header
  *
  * \author
+ *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
- *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustAlt_H__
-#define __ColorTransformYAdjustAlt_H__
+#ifndef __ColorTransformYAdjustFast_H__
+#define __ColorTransformYAdjustFast_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +63,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustAlt : public ColorTransform {
+class ColorTransformYAdjustFast : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -123,18 +124,21 @@ private:
   TransferFunction   *m_transferFunction;
   void                calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);
   void                calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
+  void                calcBoundsFastBasic(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
 
   void                allocateMemory(Frame* out, const Frame *inp);
   double              convertToYLinear(const double yComp, const double rColor, const double gColor, const double bColor);
+  double              convertToYLinearBasic(const double yComp, const double rColor, const double gColor, const double bColor);
   double              convertToYLinear(const double rComp, const double gComp, const double bComp);
   double              convertToY      (const double rComp, const double gComp, const double bComp);
   double              convertToYLinearDirect(const double yComp, const double uComp, const double vComp);
   void                convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp);
   void                computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
+  void                computeColorImpactBasic(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
 
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustAlt( ColorSpace        iColorSpace, 
+  ColorTransformYAdjustFast( ColorSpace        iColorSpace, 
                             ColorPrimaries    iColorPrimaries, 
                             ColorSpace        oColorSpace, 
                             ColorPrimaries    oColorPrimaries, 
@@ -153,7 +157,7 @@ public:
                             bool              useFloatPrecision = TRUE
                            );
                         
-  virtual ~ColorTransformYAdjustAlt();
+  virtual ~ColorTransformYAdjustFast();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

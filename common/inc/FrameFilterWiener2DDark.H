@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file DistortionTransferFunction.H
+ * \file FrameFilterWiener2DDark.H
  *
  * \brief
- *    Distortion Transfer Function class
+ *    FrameFilterWiener2DDark class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -49,65 +49,48 @@
  */
 
 
-#ifndef __DistortionTransferFunction_H__
-#define __DistortionTransferFunction_H__
+#ifndef __FrameFilterWiener2DDark_H__
+#define __FrameFilterWiener2DDark_H__
 
 #include "Global.H"
-//#include "Frame.H"
-//#include "DistortionMetric.H"
+#include "Frame.H"
+#include "FrameFilter.H"
+#include <vector>
 
-class DistortionTransferFunction {
-protected:
-  double computeDE      (double value);
-  double computePQ      (double value);
-  double computeHPQ     (double value);
-  double computeHPQ2    (double value);
-  double computePQNoise (double value);
-  double computePH10K   (double value);
-  double computeNull    (double value);
-public:
-  static DistortionTransferFunction *create(DistortionFunction method);
+
+//template <class ImgData>
+class FrameFilterWiener2DDark : public FrameFilter {
+private:
+  std::vector<double> m_dImgSum;
+  std::vector<double> m_dImgSumDev;
+  std::vector<double> m_dImgDistance;
+  std::vector<double> m_dImgOutput;
   
-  virtual double compute(double value) = 0;
-  virtual ~DistortionTransferFunction() {};
+  int     m_width;
+  int     m_height;
+  int     m_wSizeX;
+  int     m_wSizeY;
+  double  m_wArea;
 
-};
+  double computeShortDC (int iWidth, int iHeight);
+  void   updateImg      (float *out,  const double *inp, int size);
+  void   updateImg      (uint16 *out, const double *inp, int size);
+  void   updateImg      (imgpel *out, const double *inp, int size);
+  
+  template<typename ValueType>  void  filter   (ValueType  *imgData, int width, int height, float minValue, float maxValue);
+  template<typename ValueType>  void  filter   (ValueType *out, const ValueType *inp, int width, int height, int   minValue, int   maxValue);
 
-class DistortionTransferFunctionNull : public DistortionTransferFunction {
+  template<typename ValueType>  double windowSum(const ValueType *iData, int iPosX, int iPosY, int iWidth, int iHeight);
+  template<typename ValueType>  void computeImgWindowSum(const ValueType *iData, int iWidth, int iHeight);
+  template<typename ValueType>  void computeMeanDist(const ValueType *iData, int iWidth, int iHeight);
+  template<typename ValueType>  void wienerFilter(const ValueType *iData, double noise,  int iWidth, int iHeight);
 public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionPQNoise : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionPQ : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionHPQ : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionHPQ2 : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionCombo : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
-};
-
-class DistortionTransferFunctionDE : public DistortionTransferFunction {
-public:
-  virtual double compute(double value);
+  // Construct/Deconstruct
+  FrameFilterWiener2DDark(int width, int height, int wSizeX = 1, int wSizeY = 1);
+  virtual ~FrameFilterWiener2DDark();
+   
+  virtual void process ( Frame *out,  const Frame *inp, bool compY, bool compCb, bool compCr );
+  virtual void process ( Frame* pFrame, bool compY, bool compCb, bool compCr );
 };
 
 #endif
-
-

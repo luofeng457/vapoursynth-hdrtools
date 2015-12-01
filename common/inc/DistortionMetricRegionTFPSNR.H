@@ -139,7 +139,7 @@ private:
   uint64 compute(const uint8  *iComp0, const uint8  *iComp1, int size);
 public:
   // Construct/Deconstruct
-  DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, int distortionMethod);
+  DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod);
   virtual ~DistortionMetricRegionTFPSNR();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

@@ -80,14 +80,14 @@ static const double kMsSSIMBeta4 = 0.1333;
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, int blockSizeX, int blockSizeY, int blockDistance, bool useLogSSIM, double K1, double K2, double maxSampleValue, int distortionMethod)
+DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, int blockSizeX, int blockSizeY, int blockDistance, bool useLogSSIM, double K1, double K2, double maxSampleValue, DistortionFunction distortionMethod)
 : DistortionMetric()
 {
   m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
 
   // Metric parameters
-  m_K1 = (double) K1;
-  m_K2 = (double) K2;
+  m_K1 = K1;
+  m_K2 = K2;
   
   m_blockDistance = blockDistance;
   m_blockSizeX    = blockSizeX;
@@ -215,15 +215,15 @@ void DistortionMetricTFMSSSIM::computeComponents (float *lumaCost, float *struct
 
   lumaDistortion /= dMax(1.0, (double) windowCounter);
   
-  if (lumaDistortion >= 1.0f && lumaDistortion < 1.01f) // avoid float accuracy problem at very low QP(e.g.2)
-    lumaDistortion = 1.0f;
+  if (lumaDistortion >= 1.0 && lumaDistortion < 1.01) // avoid float accuracy problem at very low QP(e.g.2)
+    lumaDistortion = 1.0;
   
   *lumaCost = (float) lumaDistortion;
   
   structDistortion /= dMax(1.0, (double) windowCounter);
   
-  if (structDistortion >= 1.0f && structDistortion < 1.01f) // avoid float accuracy problem at very low QP(e.g.2)
-    structDistortion = 1.0f;
+  if (structDistortion >= 1.0 && structDistortion < 1.01) // avoid float accuracy problem at very low QP(e.g.2)
+    structDistortion = 1.0;
   
   *structCost = (float) structDistortion;
 
@@ -248,11 +248,11 @@ float DistortionMetricTFMSSSIM::computeStructuralComponents (float *inp0Data, fl
     for (int i = 0; i <= width - windowWidth; i += m_blockDistance) {
       double blockSSIM = 0.0, meanInp0 = 0.0, meanInp1 = 0.0;
       double varianceInp0 = 0.0, varianceInp1 = 0.0, covariance = 0.0;
-      double sumInp0 = 0.0f;
-      double sumInp1 = 0.0f;
-      double sumSquareInp0  = 0.0f;
-      double sumSquareInp1  = 0.0f;
-      double sumMultiInp0Inp1 = 0.0f;
+      double sumInp0 = 0.0;
+      double sumInp1 = 0.0;
+      double sumSquareInp0  = 0.0;
+      double sumSquareInp1  = 0.0;
+      double sumMultiInp0Inp1 = 0.0;
       
       for ( int n = j; n < j + windowHeight;n++) {
         inp0Line = &inp0Data[n * width + i];
@@ -284,10 +284,10 @@ float DistortionMetricTFMSSSIM::computeStructuralComponents (float *inp0Data, fl
     }
   }
     
-  distortion /= (float) dMax(1, windowCounter);
+  distortion /= dMax(1.0, (double) windowCounter);
     
-  if (distortion >= 1.0f && distortion < 1.01f) // avoid float accuracy problem at very low QP(e.g.2)
-    distortion = 1.0f;
+  if (distortion >= 1.0 && distortion < 1.01) // avoid float accuracy problem at very low QP(e.g.2)
+    distortion = 1.0;
   
   return (float) distortion;
 }

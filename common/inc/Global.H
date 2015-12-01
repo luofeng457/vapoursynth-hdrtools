@@ -66,6 +66,7 @@
 
 #include "Win32.H"
 #include "Defines.H"
+#include "TypeDefs.H"
 #include "IFunctions.H"
 
 

@@ -67,6 +67,8 @@
 #include "TransferFunctionNormalize.H"
 #include "TransferFunctionPower.H"
 #include "TransferFunctionBiasedMPQ.H"
+#include "TransferFunctionHPQ.H"
+#include "TransferFunctionHPQ2.H"
 #ifdef __SIM2_SUPPORT_ENABLED__
 #include "TransferFunctionSim2.H"
 #endif
@@ -108,6 +110,18 @@ TransferFunction *TransferFunction::create(int method, int singleStep, float sca
         result = new TransferFunctionPQ(scale);
       else
         result = new TransferFunctionPQ();
+      break;
+    case TF_HPQ:
+      if (singleStep)
+        result = new TransferFunctionHPQ(scale);
+      else
+        result = new TransferFunctionHPQ();
+      break;
+    case TF_HPQ2:
+      if (singleStep)
+        result = new TransferFunctionHPQ2(scale);
+      else
+        result = new TransferFunctionHPQ2();
       break;
     case TF_PH:
       if (singleStep)

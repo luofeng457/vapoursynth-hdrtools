@@ -401,9 +401,7 @@ void Conv420to444Adaptive::filter(float *out, const float *inp, const float *inp
       
       minCompDouble = (dMax(0, yDouble - (wYG + wYB * (2 * (1 - wYB) * cbDouble + yDouble))) - wYR * yDouble) / denom;
       maxCompDouble = (dMin( wYR, yDouble - wYB * (2 * (1 - wYB) * cbDouble + yDouble)) -wYR * yDouble)/ denom;
-      
-     // printf("values %7.5f %7.5f %7.5f\n", minCompDouble, maxCompDouble, filterVertical(&inp[i], m_verFilter[0], j    , inputWidth, inputHeight - 1, minCompDouble, maxCompDouble));
-      
+            
       m_floatData[ (2 * j    ) * inputWidth + i ] = (float) dClip(filterVertical(&inp[i], m_verFilter[0], j    , inputWidth, inputHeight - 1, minValue, maxValue), minCompDouble, maxCompDouble);
       
       yDouble  = (double) inpY[ (2 * j + 1 ) * width + 2 * i ]; 

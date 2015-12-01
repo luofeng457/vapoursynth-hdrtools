@@ -133,10 +133,10 @@ Conv444to420Adaptive::Conv444to420Adaptive(int width, int height, int method, Ch
 // Downsampling filters
   for (int index = 0; index < 5; index++) {
     m_horFilterDown[index] = new ScaleFilter(DF_GS - index, 0,  0,      0,     0, &offset, &scale, hPhase);
-    m_verFilterDown[index] = new ScaleFilter(DF_GS +     0, 0,  2, offset, scale, &downOffset, &downScale, vPhase);
+    m_verFilterDown[index] = new ScaleFilter(DF_GS - index, 0,  2, offset, scale, &downOffset, &downScale, vPhase);
 
-    m_floatDataTemp[index] = new float[ (width >> 1) ];
-    m_i32DataTemp[index]   = new int32[ (width >> 1) ];
+    m_floatDataTemp[index] = new float[ iMax((width >> 1), (height >> 1)) ];
+    m_i32DataTemp[index]   = new int32[ iMax((width >> 1), (height >> 1)) ];
   }
   
   // Upsampling
@@ -311,6 +311,8 @@ void Conv444to420Adaptive::filter(float *out, const float *inp, int width, int h
   double minDistortion = 0.0;
   int   best = 0;
     
+    
+    // Note that for chroma location type 2, code could be much faster since we would only need to compute one of the upsampling positions
   for (j = 0; j < inputHeight; j++) {
     minDistortion = 1E+37;
     
@@ -341,17 +343,49 @@ void Conv444to420Adaptive::filter(float *out, const float *inp, int width, int h
         best = index;
       }
     }
+    //printf("best horizontal %d\n", best);
+
     for (i = 0; i < width; i++) {
       m_floatData[ j * width + i ] = m_floatDataTemp[best][ i ] ;
     }
-    //printf("best %d %7.3f\n", best, minDistortion);
-
   }
   
-  // Currently we only perform a horizontal decision to reduce complexity  
-  for (j = 0; j < height; j++) {
-    for (i = 0; i < width; i++) {
-      out[ j * width + i ] = filterVertical(&m_floatData[i], m_verFilterDown[0], (2 * j), width, inputHeight - 1, minValue, maxValue);
+  for (i = 0; i < width; i++) {
+    minDistortion = 1E+37;
+    best = 0;
+
+    for (index = 0; index < 5; index ++) {
+      distortion = 0.0;
+      for (j = 0; j < height; j++) {
+        m_floatDataTemp[index][j] = filterVertical(&m_floatData[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+      }
+
+
+      for (j = 0; j < height; j++) {
+        // We use filterHorizontal since m_floatDataTemp is an 1D array
+        dist = (m_floatData[ 2 * j * width + i ] - filterHorizontal(&m_floatDataTemp[index][ 0 ], m_verFilterUp[0], j    , height - 1, -0.5, 0.5));
+        //printf("%d %7.3f %7.3f %7.3f ", index, m_floatData[ 2 * j * width + i    ], filterHorizontal(&m_floatDataTemp[index][ 0 ], m_verFilterUp[0], j    , height - 1, -0.5, 0.5), dist );
+        distortion += dist * dist;
+        if (distortion >= minDistortion) {
+          break;
+        }
+        dist = (m_floatData[ (2 * j + 1) * width + i ] - filterHorizontal(&m_floatDataTemp[index][ 0 ], m_verFilterUp[1], j + 1, height - 1, -0.5, 0.5));
+        //printf("%7.3f %7.3f %7.3f\n", m_floatData[(2 * j + 1) * width + i ], filterHorizontal(&m_floatDataTemp[index][ 0 ], m_verFilterUp[1], j +1   , height - 1, -0.5, 0.5), dist );
+        distortion += dist * dist;
+        if (distortion >= minDistortion) {
+          break;
+        }
+      }
+      //printf("(%d) index %d %7.3f %7.3f\n", j, index, distortion, minDistortion);
+      if (distortion < minDistortion) {
+        minDistortion = distortion;
+        best = index;
+      }
+
+    }
+    //printf("best %d\n", best);
+    for (j = 0; j < height; j++) {
+      out[ j * width + i ] = m_floatDataTemp[best][ j ] ;
     }
   }
 }
@@ -399,12 +433,41 @@ void Conv444to420Adaptive::filter(uint16 *out, const uint16 *inp, int width, int
     }
   }
   
-  // Currently we only perform a horizontal decision to reduce complexity
-  for (j = 0; j < height; j++) {
-    for (i = 0; i < width; i++) {
-      out[ j * width + i ] = filterVertical(&m_i32Data[i], m_verFilterDown[0], (2 * j), width, inputHeight - 1, minValue, maxValue);
+  
+  for (i = 0; i < width; i++) {
+    minDistortion = LLONG_MAX;
+    best = 0;
+    
+    for (index = 0; index < 5; index ++) {
+      distortion = 0;
+      for (j = 0; j < height; j++) {
+        m_i32DataTemp[index][j] = filterVertical(&m_i32Data[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+      }
+      
+      for (j = 0; j < height; j++) {
+        dist = (m_i32Data[ 2 * j * width + i ] - filterHorizontal(&m_i32DataTemp[index][ 0 ], m_verFilterUp[0], j    , height - 1, minValue, maxValue));
+        distortion += dist * dist;
+        if (distortion >= minDistortion) {
+          break;
+        }
+        dist = (m_i32Data[ (2 * j + 1) * width + i ] - filterHorizontal(&m_i32DataTemp[index][ 0 ], m_verFilterUp[1], j + 1, height - 1, minValue, maxValue));
+        distortion += dist * dist;
+        if (distortion >= minDistortion) {
+          break;
+        }
+      }
+      if (distortion < minDistortion) {
+        minDistortion = distortion;
+        best = index;
+      }
+      
+    }
+    //printf("best %d\n", best);
+    for (j = 0; j < height; j++) {
+      out[ j * width + i ] = m_i32DataTemp[best][ j ] ;
     }
   }
+
 }
 
 void Conv444to420Adaptive::filter(imgpel *out, const imgpel *inp, int width, int height, int minValue, int maxValue)
@@ -449,10 +512,37 @@ void Conv444to420Adaptive::filter(imgpel *out, const imgpel *inp, int width, int
     }
   }
 
-  // Currently we only perform a horizontal decision to reduce complexity  
-  for (j = 0; j < height; j++) {
-    for (i = 0; i < width; i++) {
-      out[ j * width + i ] = filterVertical(&m_i32Data[i], m_verFilterDown[0], (2 * j), width, inputHeight - 1, minValue, maxValue);
+  for (i = 0; i < width; i++) {
+    minDistortion = LLONG_MAX;
+    best = 0;
+    
+    for (index = 0; index < 5; index ++) {
+      distortion = 0;
+      for (j = 0; j < height; j++) {
+        m_i32DataTemp[index][j] = filterVertical(&m_i32Data[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+      }
+      
+      for (j = 0; j < height; j++) {
+        dist = (m_i32Data[ 2 * j * width + i ] - filterHorizontal(&m_i32DataTemp[index][ 0 ], m_verFilterUp[0], j    , height - 1, minValue, maxValue));
+        distortion += dist * dist;
+        if (distortion >= minDistortion) {
+          break;
+        }
+        dist = (m_i32Data[ (2 * j + 1) * width + i ] - filterHorizontal(&m_i32DataTemp[index][ 0 ], m_verFilterUp[1], j + 1, height - 1, minValue, maxValue));
+        distortion += dist * dist;
+        if (distortion >= minDistortion) {
+          break;
+        }
+      }
+      if (distortion < minDistortion) {
+        minDistortion = distortion;
+        best = index;
+      }
+      
+    }
+    //printf("best %d\n", best);
+    for (j = 0; j < height; j++) {
+      out[ j * width + i ] = m_i32DataTemp[best][ j ] ;
     }
   }
 }

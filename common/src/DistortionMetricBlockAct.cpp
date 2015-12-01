@@ -62,7 +62,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricBlockAct::DistortionMetricBlockAct(double maxSampleValue, int distortionMethod)
+DistortionMetricBlockAct::DistortionMetricBlockAct(double maxSampleValue, DistortionFunction distortionMethod)
 : DistortionMetric()
 {
   m_transferFunction   = DistortionTransferFunction::create(distortionMethod);

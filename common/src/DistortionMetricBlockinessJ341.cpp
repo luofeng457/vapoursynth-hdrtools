@@ -63,7 +63,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricBlockinessJ341::DistortionMetricBlockinessJ341(double maxSampleValue, int distortionMethod)
+DistortionMetricBlockinessJ341::DistortionMetricBlockinessJ341(double maxSampleValue, DistortionFunction distortionMethod)
 : DistortionMetric()
 {
   m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
@@ -186,9 +186,7 @@ void DistortionMetricBlockinessJ341::computeMetric (Frame* inp0, Frame* inp1)
         edgeMax1 = 0.5 * (dMax(dW0, dW1) + dMax(dH0, dH1));
         edgeMin1 = 0.5 * (dMin(dW0, dW1) + dMin(dH0, dH1));
         deltaEdge1 = edgeMax1 - edgeMin1;
-        
-        //printf("values %7.3f %7.3f %7.3f %7.3f\n", edgeMax0, edgeMax1, edgeMin0, edgeMin1);
-        
+                
         // note that this metric is not symmetric
         // also note that although in the spec only distance of 2 is mentioned, in the provided
         // code a distance of 3 is also tested. If distance of 3 has a larger gap than 2 

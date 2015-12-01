@@ -85,7 +85,7 @@ private:
   void   setColorConversionYCbCr (int colorPrimaries, const double **transform0, const double **transform1, const double **transform2);
 public:
   // Construct/Deconstruct
-  DistortionMetricTFPSNR(const FrameFormat *format, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, int distortionMethod);
+  DistortionMetricTFPSNR(const FrameFormat *format, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod);
   virtual ~DistortionMetricTFPSNR();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

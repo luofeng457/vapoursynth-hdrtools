@@ -57,43 +57,83 @@
 #include "ColorTransform.H"
 
 enum {
-  CTF_IDENTITY            = 0,
-  CTF_RGB709_2_YUV709     = 1,
-  CTF_RGBP3_2_YUVP3       = 2,
-  CTF_RGB2020_2_YUV2020   = 3,
-  CTF_RGBSRGB0_2_XYZ      = 4,
-  CTF_RGBSRGB1_2_XYZ      = 5,
-  CTF_RGBCIE_2_XYZ        = 6,
-  CTF_RGBWG_2_XYZ         = 7,
-  CTF_RGBSMPTEC_2_XYZ     = 8,
-  CTF_RGBSGAMUT_2_XYZ     = 9,
-  CTF_RGBACES_2_XYZ       = 10,
-  CTF_RGBP3D60_2_XYZ      = 11,
-  CTF_RGB2020_2_XYZ       = 12,
-  CTF_RGBP3DCI_2_XYZ      = 13,
-  CTF_RGBP3D65_2_XYZ      = 14,
-  CTF_RGB709_2_XYZ        = 15,
-  CTF_RGB709_2_RGB2020    = 16,
-  CTF_RGBP3D65_2_RGB2020  = 17,
-  CTF_RGB709_2_RGBP3D65   = 18,
-  CTF_XYZ_2_DZDX          = 19, // SMPTE ST 2085  Y' D'z' D'x
-  CTF_RGB2020_2_YUV2020CL = 20,
-  CTF_RGBP3D65_2_YUVP3D65 = 21,
-  CTF_RGBP3D60_2_RGB2020  = 22,
-  CTF_RGB709_2_RGBP3D60   = 23,
-  CTF_RGBP3D60_2_YUVP3D60 = 24,
-  CTF_RGB_2_YCOCG         = 26, // Currently uses YCoCg
-  CTF_RGB_2_AMT           = 30,
-  CTF_RGBEXT_2_YUVEXT     = 31,
-  CTF_RGBEXT_2_XYZ        = 32,
-  CTF_RGB709_2_RGBEXT     = 33,
-  CTF_RGB2020_2_RGBEXT    = 34,
-  CTF_RGBP3D65_2_RGBEXT   = 35,
+  CTF_IDENTITY             = 0,
+  CTF_RGB709_2_YUV709      = 1,
+  CTF_RGBP3_2_YUVP3        = 2,
+  CTF_RGB2020_2_YUV2020    = 3,
+  CTF_RGBSRGB0_2_XYZ       = 4,
+  CTF_RGBSRGB1_2_XYZ       = 5,
+  CTF_RGBCIE_2_XYZ         = 6,
+  CTF_RGBWG_2_XYZ          = 7,
+  CTF_RGBSMPTEC_2_XYZ      = 8,
+  CTF_RGBSGAMUT_2_XYZ      = 9,
+  CTF_RGBACES_2_XYZ        = 10,
+  CTF_RGBP3D60_2_XYZ       = 11,
+  CTF_RGB2020_2_XYZ        = 12,
+  CTF_RGBP3DCI_2_XYZ       = 13,
+  CTF_RGBP3D65_2_XYZ       = 14,
+  CTF_RGB709_2_XYZ         = 15,
+  CTF_RGB709_2_RGB2020     = 16,
+  CTF_RGBP3D65_2_RGB2020   = 17,
+  CTF_RGB709_2_RGBP3D65    = 18,
+  CTF_XYZ_2_DZDX           = 19, // SMPTE ST 2085  Y' D'z' D'x
+  CTF_RGB2020_2_YUV2020CL  = 20,
+  CTF_RGBP3D65_2_YUVP3D65  = 21,
+  CTF_RGBP3D60_2_RGB2020   = 22,
+  CTF_RGB709_2_RGBP3D60    = 23,
+  CTF_RGBP3D60_2_YUVP3D60  = 24,
+  CTF_RGB_2_YCOCG          = 26, // Currently uses YCoCg
+  CTF_RGB_2_AMT            = 30,
+  CTF_RGBEXT_2_YUVEXT      = 31,
+  CTF_RGBEXT_2_XYZ         = 32,
+  CTF_RGB709_2_RGBEXT      = 33,
+  CTF_RGB2020_2_RGBEXT     = 34,
+  CTF_RGBP3D65_2_RGBEXT    = 35,
+  CTF_RGB2020_2_YUV2020_HP = 36,
   CTF_TOTAL
 };
 
+// New enums that would allow better generalization
+// of the conversion process. Ideally, we would like to have
+// conversion from XYZ to primaries, conversion from one 
+// primary space to another, and the "matrix coefficients"/
+// difference conversion matrix.
+enum {
+  CPC_XYZ_IDENTITY       = 0,
+  CPC_XYZ_RGBSRGB0       = 4,
+  CPC_XYZ_RGBSRGB1       = 5,
+  CPC_XYZ_RGBCIE         = 6,
+  CPC_XYZ_RGBWG          = 7,
+  CPC_XYZ_RGBSMPTEC      = 8,
+  CPC_XYZ_RGBSGAMUT      = 9,
+  CPC_XYZ_RGBACES        = 10,
+  CPC_XYZ_RGBP3D60       = 11,
+  CPC_XYZ_RGB2020        = 12,
+  CPC_XYZ_RGBP3DCI       = 13,
+  CPC_XYZ_RGBP3D65       = 14,
+  CPC_XYZ_RGB709         = 15,
+  CPC_XYZ_2_DZDX         = 19, // SMPTE ST 2085  Y' D'z' D'x
+  CPC_XYZ_RGBEXT         = 32,
+  CPC_TOTAL
+};
 
-static const double FWD_TRANSFORM[36][3][3] = {
+enum {
+  CMC_IDENTITY    = 0,
+  CMC_YUV709      = 1,
+  CMC_YUVP3       = 2,
+  CMC_YUV2020     = 3,
+  CMC_YDZDX       = 19, // SMPTE ST 2085  Y' D'z' D'x
+  CMC_YUV2020CL   = 20,
+  CMC_YUVP3D65    = 21,
+  CMC_YUVP3D60    = 24,
+  CMC_YCOCG       = 26, // Currently uses YCoCg
+  CMC_AMT         = 30,
+  CMC_YUVEXT      = 31,
+  CMC_YUV2020_HP  = 36,
+  CMC_TOTAL
+};
+
+static const double FWD_TRANSFORM[37][3][3] = {
   { // Identity transform (0)
     {1.0, 0.0, 0.0},
     {0.0, 1.0, 0.0},
@@ -311,12 +351,17 @@ static const double FWD_TRANSFORM[36][3][3] = {
     {0.743892327224535,   0.231347240210574,   0.011084709036028},
     {0.112507906240620,   0.905655168687551,  -0.011558592742523},
     {0.163869496838724,   0.154198908143321,   0.715395815125253}
+  },
+  { // High precision conversion of YUV 2 RGB BT.2020, i.e. inverse of INV_TRANSFORM 3
+    { 0.262699236013774,   0.678001738734420,   0.059299025251807},
+    {-0.139629656645994,  -0.360370861451270,   0.500000518097265},
+    { 0.500000518097265,  -0.459786883720616,  -0.040213634376649}
   }
 };
 
 
 
-static const double INV_TRANSFORM[36][3][3] = {
+static const double INV_TRANSFORM[37][3][3] = {
   { // Identity transform
     {1.0, 0.0, 0.0},
     {0.0, 1.0, 0.0},
@@ -530,6 +575,11 @@ static const double INV_TRANSFORM[36][3][3] = {
     { 1.403861990395281,  -0.353935649511439,  -0.027470666314414},
     {-0.178013642694086,   1.146023899361818,   0.021274450643752},
     {-0.283200774138676,  -0.165945026066769,   1.399534475933237}
+  },
+  { // High precision YUV to RGB 2020, i.e. inverse of FWD_TRANSFORM 3
+    { 1.000000000000000,  -0.000000891217022,   1.474599751118735},
+    { 1.000000000000000,  -0.164552779831641,  -0.571353009295784},
+    { 1.000000000000000,   1.881399980582877,  -0.000000241422426}
   }
 };
 

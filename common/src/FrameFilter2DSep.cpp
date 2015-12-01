@@ -114,8 +114,6 @@ template<typename ValueType>  double FrameFilter2DSep::edgeAdaptation(ValueType 
   double delta = dAbs(fValue - (double) inpData);
   if  ( delta > m_thres0 ) {
     delta = dClip(delta - m_thres0, 0.0, m_range);
-    //if (m_range - delta == 0.0)
-      //printf("values %7.3f %7.3f %7.3f\n", ((double) inpData  * delta + fValue * (m_range - delta)) / m_range, (double) inpData, fValue);
     return ((double) inpData  * delta + fValue * (m_range - delta)) / m_range;
   }
   else 

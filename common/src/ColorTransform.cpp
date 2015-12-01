@@ -58,8 +58,13 @@
 #include "ColorTransformXYZ2YUpVp.H"
 #include "ColorTransformGeneric.H"
 #include "ColorTransformClosedLoop.H"
+#include "ColorTransformClosedLoopY.H"
+#include "ColorTransformClosedLoopCr.H"
+#include "ColorTransformClosedLoopRGB.H"
 #include "ColorTransformYAdjust.H"
 #include "ColorTransformYAdjustAlt.H"
+#include "ColorTransformYAdjustFast.H"
+#include "ColorTransformYAdjustXYZ.H"
 #include "ColorTransformFVDO.H"
 #include "ColorTransformCL.H"
 
@@ -76,7 +81,8 @@ ColorTransform *ColorTransform::create(
                                        ColorSpace        oColorSpace, 
                                        ColorPrimaries    oColorPrimaries, 
                                        bool              transformPrecision, 
-                                       int               closedLoopTransform, 
+                                       int               useHighPrecision,
+                                       ClosedLoopTrans   closedLoopTransform, 
                                        int               iConstantLuminance, 
                                        int               oConstantLuminance, 
                                        TransferFunctions transferFunction,
@@ -84,9 +90,12 @@ ColorTransform *ColorTransform::create(
                                        SampleRange       range,
                                        int               downMethod,
                                        int               upMethod,
+                                       bool              useAdaptiveDownsampler,
+                                       bool              useAdaptiveUpsampler,
                                        int               useMinMax,
                                        int               maxIterations,
                                        ChromaFormat      oChromaFormat,
+                                       ChromaLocation    *oChromaLocationType,
                                        bool              useFloatPrecision
                                        ) {
   ColorTransform *result = NULL;
@@ -100,21 +109,31 @@ ColorTransform *ColorTransform::create(
   else if ((iColorPrimaries == oColorPrimaries) && 
            (((oColorSpace == CM_YCbCr) && (oConstantLuminance == 1) && (iColorSpace == CM_RGB)) ||
             ((iColorSpace == CM_YCbCr) && (iConstantLuminance == 1) && (oColorSpace == CM_RGB)))){
-             result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transferFunction, transferFunction, TRUE);
+             result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, transferFunction, TRUE);
            }
   else if ((iColorPrimaries == oColorPrimaries) && 
            (((oColorSpace == CM_YCbCr) && (oConstantLuminance == 2) && (iColorSpace == CM_RGB)) ||
             ((iColorSpace == CM_YCbCr) && (iConstantLuminance == 2) && (oColorSpace == CM_RGB)))){
-             result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transferFunction, transferFunction, FALSE);
+             result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, transferFunction, FALSE);
            }
-  else if (closedLoopTransform == 0)
-    result = new ColorTransformGeneric(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision);
-  else if (closedLoopTransform == 5)
-    result = new ColorTransformYAdjust(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transferFunction, downMethod, upMethod, useMinMax, bitDepth, range, maxIterations, oChromaFormat, useFloatPrecision);
-  else if (closedLoopTransform == 6)
-    result = new ColorTransformYAdjustAlt(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transferFunction, downMethod, upMethod, useMinMax, bitDepth, range, maxIterations, oChromaFormat, useFloatPrecision);
+  else if (closedLoopTransform == CLT_NULL)
+    result = new ColorTransformGeneric(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision, useHighPrecision);
+  else if (closedLoopTransform == CLT_YADJ)
+    result = new ColorTransformYAdjust(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_YADJALT)
+    result = new ColorTransformYAdjustAlt(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_CHROMA)
+    result = new ColorTransformClosedLoopCr(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_RGB)
+    result = new ColorTransformClosedLoopRGB(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_Y)
+    result = new ColorTransformClosedLoopY(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_XYZ)
+    result = new ColorTransformYAdjustXYZ(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_YADJFST)
+    result = new ColorTransformYAdjustFast(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
   else
-    result = new ColorTransformClosedLoop(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision, closedLoopTransform, bitDepth, range);
+    result = new ColorTransformClosedLoop(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision, useHighPrecision, closedLoopTransform, bitDepth, range);
   
   return result;
 }

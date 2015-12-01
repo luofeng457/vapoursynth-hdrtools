@@ -63,7 +63,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int closedLoopTransform, int bitDepth, SampleRange range) {
+ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int useHighPrecision, ClosedLoopTrans closedLoopTransform, int bitDepth, SampleRange range) {
   
   m_mode = CTF_IDENTITY; 
   m_isForward = TRUE;
@@ -120,6 +120,9 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
       m_transformPrecision = transformPrecision;
     }
     else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+      if (useHighPrecision == 1)
+        m_mode = CTF_RGB2020_2_YUV2020_HP;
+      else
       m_mode = CTF_RGB2020_2_YUV2020;
       m_crDivider = 1.4746;
       m_cbDivider = 1.8814;
@@ -147,6 +150,9 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
       m_mode = CTF_RGB709_2_YUV709;
     }
     else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+      if (useHighPrecision == 2)
+        m_mode = CTF_RGB2020_2_YUV2020_HP;
+      else
       m_mode = CTF_RGB2020_2_YUV2020;
     }
     else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
@@ -332,7 +338,7 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
               }              
             }
             
-            if (m_closedLoopTransform == 0) {
+            if (m_closedLoopTransform == CLT_NULL) {
               for (int i = 0; i < inp->m_compSize[0]; i++) {
                 out->m_floatComp[0][i] = (float) (m_transform0[0] * (double) inp->m_floatComp[0][i] + m_transform0[1] * (double) inp->m_floatComp[1][i] + m_transform0[2] * (double) inp->m_floatComp[2][i]);
                 out->m_floatComp[1][i] = (float) (m_transform1[0] * (double) inp->m_floatComp[0][i] + m_transform1[1] * (double) inp->m_floatComp[1][i] + m_transform1[2] * inp->m_floatComp[2][i]);
@@ -369,7 +375,7 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                 out->m_floatComp[2][i] = (float) (0.5 * ( (double) inp->m_floatComp[0][i] - (double) inp->m_floatComp[2][i]));
               }
             }
-            else if (m_closedLoopTransform == 1) {
+            else if (m_closedLoopTransform == CLT_BASE) {
               double lumaWeight, lumaOffset;
               double comb_transform1[4];
               //double comb_denom1 = m_transform0[0]; // Should we do the division here or after the sum? 
@@ -408,7 +414,6 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                 out->m_floatComp[0][i] = (float) (m_transform0[0] * (double) inp->m_floatComp[0][i] + m_transform0[1] * (double) inp->m_floatComp[1][i] + m_transform0[2] * (double) inp->m_floatComp[2][i]);
                 
                 m_floatComp[0][i] = (float) (((double) fClip(fRound((float) (lumaWeight * (double) out->m_floatComp[0][i] + lumaOffset)), 0.0f, (float) inp->m_maxPelValue[Y_COMP]) - lumaOffset) / lumaWeight);
-                //printf("values %10.6f %10.6f\n", out->m_floatComp[0][i], m_floatComp[0][i]);
               }
               
               for (int i = 0; i < inp->m_compSize[1]; i++) {
@@ -420,8 +425,6 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                   out->m_floatComp[1][i] = 0.0f;
                 else
                   out->m_floatComp[1][i] = (float) (comb_transform1[2] * (double) inp->m_floatComp[2][i] + comb_transform1[3] * (double) m_floatComp[0][i]);
-                //if (inp->m_floatComp[2][i] == out->m_floatComp[0][i])
-                //printf("gray case blue %10.5f %10.5f\n", out->m_floatComp[1][i], (float) (comb_transform1[2] * inp->m_floatComp[2][i] + comb_transform1[3] * out->m_floatComp[0][i]));
               }
               
               for (int i = 0; i < inp->m_compSize[2]; i++) {
@@ -430,18 +433,14 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                   out->m_floatComp[2][i] = 0.0f;
                 else
                   out->m_floatComp[2][i] = (float) (comb_transform2[0] * (double) inp->m_floatComp[0][i] + comb_transform2[3] * (double) m_floatComp[0][i]);
-                //if (inp->m_floatComp[0][i] == out->m_floatComp[0][i])
-                //printf("gray case red %10.5f %10.5f\n", out->m_floatComp[2][i], (float) (comb_transform2[0] * inp->m_floatComp[0][i] + comb_transform2[3] * out->m_floatComp[0][i]));
               }
             }
-            else if (m_closedLoopTransform == 2) {
+            else if (m_closedLoopTransform == CLT_BASE2) {
               double comb_transform1 = (m_transform0[0] / m_transform1[0]); // Y
               double comb_transform2 = (m_transform0[2] / m_transform2[2]); // Y
               
               double chromaWeight = (1 << (m_bitDepth - 8)) * 224.0;
               double chromaOffset = (1 << (m_bitDepth - 8)) * 128.0;
-              
-              //printf("value %10.6f %10.6f\n", comb_transform1, comb_transform2);
               
               for (int i = 0; i < inp->m_compSize[0]; i++) {
                 // We now convert Cb and Cr first
@@ -475,18 +474,14 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
 
                 //out->m_floatComp[0][i] = (float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i]);
                 out->m_floatComp[0][i] = (float) ((((double) inp->m_floatComp[0][i] + (double) inp->m_floatComp[2][i] + (double) m_floatComp[1][i] * comb_transform1 + (double) m_floatComp[2][i] * comb_transform2) + 2.0 * (m_transform0[0] * (double) inp->m_floatComp[0][i] + m_transform0[1] * (double) inp->m_floatComp[1][i] + m_transform0[2] * (double) inp->m_floatComp[2][i])) * 0.25);
-              
-                //printf("Y value %10.6f (%10.6f)  %10.6f (%10.6f) %10.6f %10.6f \n", m_floatComp[1][i], out->m_floatComp[1][i], m_floatComp[2][i], out->m_floatComp[2][i], out->m_floatComp[0][i], (float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i])); //
               }              
             } 
-            else if (m_closedLoopTransform == 3) {
+            else if (m_closedLoopTransform == CLT_BASE3) {
               double comb_transform1 = (m_transform0[0] / m_transform1[0]); // Y
               double comb_transform2 = (m_transform0[2] / m_transform2[2]); // Y
               
               double chromaWeight = (1 << (m_bitDepth - 8)) * 224.0;
               double chromaOffset = (1 << (m_bitDepth - 8)) * 128.0;
-              
-              //printf("value %10.6f %10.6f\n", comb_transform1, comb_transform2);
               
               for (int i = 0; i < inp->m_compSize[0]; i++) {
                 // We now convert Cb and Cr first
@@ -502,11 +497,9 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
               for (int i = 0; i < inp->m_compSize[0]; i++) {
                 
                 out->m_floatComp[0][i] = (float) ((((double) inp->m_floatComp[0][i] + (double) inp->m_floatComp[2][i] + (double) m_floatComp[1][i] * comb_transform1 + (double) m_floatComp[2][i] * comb_transform2) + 2.0 * (m_transform0[0] * (double) inp->m_floatComp[0][i] + m_transform0[1] * (double) inp->m_floatComp[1][i] + m_transform0[2] * (double) inp->m_floatComp[2][i])) * 0.25);
-                
-                //printf("Y value %10.6f (%10.6f)  %10.6f (%10.6f) %10.6f %10.6f \n", m_floatComp[1][i], out->m_floatComp[1][i], m_floatComp[2][i], out->m_floatComp[2][i], out->m_floatComp[0][i], (float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i])); //
               }              
             }
-            else if (m_closedLoopTransform == 4) {
+            else if (m_closedLoopTransform == CLT_BASE4) {
             // Special luma mode where we only use the closed loop method if Cb or Cr result in smaller absolute values.
             // That works like a filter and may result in easier to encode content.
               double comb_transform1[4];
@@ -536,7 +529,6 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                 out->m_floatComp[0][i] = (float) (m_transform0[0] * (double) inp->m_floatComp[0][i] + m_transform0[1] * (double) inp->m_floatComp[1][i] + m_transform0[2] * (double) inp->m_floatComp[2][i]);
                 
                 m_floatComp[0][i] = (float) (((double) fClip(fRound((float) (lumaWeight * (double) out->m_floatComp[0][i] + lumaOffset)), 0.0f, (float) inp->m_maxPelValue[Y_COMP]) - lumaOffset) / lumaWeight);
-                //printf("values %10.6f %10.6f\n", out->m_floatComp[0][i], m_floatComp[0][i]);
               }
               
               for (int i = 0; i < inp->m_compSize[0]; i++) {
@@ -555,8 +547,6 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                   else
                     out->m_floatComp[1][i] = (float) closedTransform;
                 }
-                //if (inp->m_floatComp[2][i] == out->m_floatComp[0][i])
-                //printf("gray case blue %10.5f %10.5f\n", out->m_floatComp[1][i], (float) (comb_transform1[2] * inp->m_floatComp[2][i] + comb_transform1[3] * out->m_floatComp[0][i]));
               }
               
               for (int i = 0; i < inp->m_compSize[0]; i++) {
@@ -573,8 +563,6 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
                     out->m_floatComp[2][i] = (float) closedTransform;
 
                 }
-                //if (inp->m_floatComp[0][i] == out->m_floatComp[0][i])
-                //printf("gray case red %10.5f %10.5f\n", out->m_floatComp[2][i], (float) (comb_transform2[0] * inp->m_floatComp[0][i] + comb_transform2[3] * out->m_floatComp[0][i]));
               }
             }
           }

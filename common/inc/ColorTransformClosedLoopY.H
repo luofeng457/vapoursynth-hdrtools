@@ -4,11 +4,12 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Apple Inc, Ericsson
+ * <ORGANIZATION> = Apple Inc
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Apple Inc, Ericsson
+ * Copyright (c) 2015, Apple Inc
  * All rights reserved.
+ 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,22 +38,20 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustAlt.H
+ * \file ColorTransformClosedLoopY.H
  *
  * \brief
- *    ColorTransformYAdjustAlt Class Header
+ *    ColorTransformClosedLoopY Class Header
  *
  * \author
- *     - Jacob Strom                     <jacob.strom@ericsson.com>
- *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustAlt_H__
-#define __ColorTransformYAdjustAlt_H__
+#ifndef __ColorTransformClosedLoopY_H__
+#define __ColorTransformClosedLoopY_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +61,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustAlt : public ColorTransform {
+class ColorTransformClosedLoopY : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -72,6 +71,10 @@ private:
   const double       *m_invTransform1;
   const double       *m_invTransform2;
   const double       *m_transformRGBtoY;  // Y in XYZ
+  
+  double              m_weightRed;
+  double              m_weightGreen;
+  double              m_weightBlue;
 
   float              *m_floatData;
   float              *m_floatComp[4];
@@ -121,20 +124,15 @@ private:
 
   TransferFunctions   m_transferFunctions;
   TransferFunction   *m_transferFunction;
-  void                calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);
-  void                calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
-
   void                allocateMemory(Frame* out, const Frame *inp);
-  double              convertToYLinear(const double yComp, const double rColor, const double gColor, const double bColor);
-  double              convertToYLinear(const double rComp, const double gComp, const double bComp);
-  double              convertToY      (const double rComp, const double gComp, const double bComp);
-  double              convertToYLinearDirect(const double yComp, const double uComp, const double vComp);
-  void                convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp);
-  void                computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
+
+  double              computeRGBDistortion(const double rComp, const double gComp, const double bComp, const int yValue, const double lumaWeight );
+
+  double              computeYDistortion(const double rYComp, const double gYComp, const double bYComp, const double yValue );
 
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustAlt( ColorSpace        iColorSpace, 
+  ColorTransformClosedLoopY( ColorSpace        iColorSpace, 
                             ColorPrimaries    iColorPrimaries, 
                             ColorSpace        oColorSpace, 
                             ColorPrimaries    oColorPrimaries, 
@@ -153,7 +151,7 @@ public:
                             bool              useFloatPrecision = TRUE
                            );
                         
-  virtual ~ColorTransformYAdjustAlt();
+  virtual ~ColorTransformClosedLoopY();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

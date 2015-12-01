@@ -132,12 +132,13 @@ IntegerParameter intParameterList[] = {
   { "ChromaDownsampleFilter",  &pParams->m_chromaDownsampleFilter,         DF_F0,       DF_NN,    DF_TOTAL - 1,    "Chroma Downsampling Filter"               },
   { "ChromaUpsampleFilter",    &pParams->m_chromaUpsampleFilter,           UF_NN,       UF_NN,    UF_TOTAL - 1,    "Chroma Upsampling Filter"                 },
   { "AddNoise",                &pParams->m_addNoise,                  NOISE_NULL,  NOISE_NULL, NOISE_TOTAL - 1,    "Add noise to the input signal"            },
-  { "ClosedLoopConversion",    &pParams->m_closedLoopConversion,               0,           0,               6,    "Enable Closed Loop Conversion"            },
+  { "ClosedLoopConversion",    (int *) &pParams->m_closedLoopConversion,CLT_NULL,    CLT_NULL,   CLT_TOTAL - 1,    "Enable Closed Loop Conversion"            },
   { "ClosedLoopIterations",    &pParams->m_closedLoopIterations,              10,           1,              50,    "Number of Closed Loop Iterations"         },
   { "SourceConstantLuminance", &src->m_iConstantLuminance,                     0,           0,               2,    "Constant Luminance Source"                },
   { "OutputConstantLuminance", &out->m_iConstantLuminance,                     0,           0,               2,    "Constant Luminance Output"                },
   { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,               3,    "Use Min/Max Filtering"                    },
-  { "ToneMappingMode",         &pParams->m_toneMapping,                  TM_NULL,     TM_NULL,    TM_TOTAL - 1,    "Tone Mapping Mode "                    },
+  { "ToneMappingMode",         &pParams->m_toneMapping,                  TM_NULL,     TM_NULL,    TM_TOTAL - 1,    "Tone Mapping Mode "                       },
+  { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,               2,    "High Precision Color Mode "               },
   
   { "",                        NULL,                                           0,           0,               0,    "Integer Termination entry"                }
 };
@@ -153,7 +154,8 @@ BoolParameter boolParameterList[] = {
   { "SetOutputEXRRounding",       &out->m_useFloatRound,                      FALSE,       FALSE,         TRUE,    "OpenEXR Output with Rounding Enabled"     },
   { "FilterUsingFloats",          &pParams->m_filterInFloat,                  FALSE,       FALSE,         TRUE,    "Perform Filtering using Floats "          },
   { "LinearDownConversion",       &pParams->m_linearDownConversion,           FALSE,       FALSE,         TRUE,    "Perform linear downconversion to 420"     },
-  { "UseAdaptiveFiltering",       &pParams->m_useAdaptiveFiltering,           FALSE,       FALSE,         TRUE,    "Use Adaptive Filtering"                   },
+  { "UseAdaptiveUpsampling",       &pParams->m_useAdaptiveUpsampling,          FALSE,       FALSE,         TRUE,    "Use Adaptive Upsampler"                   },
+  { "UseAdaptiveDownsampling",     &pParams->m_useAdaptiveDownsampling,        FALSE,       FALSE,         TRUE,    "Use Adaptive Downsampler"                   },
   { "RGBDownConversion",          &pParams->m_rgbDownConversion,              FALSE,       FALSE,         TRUE,    "Perform downconversion in RGB"            },
   { "UseChromaDeblocking",        &pParams->m_bUseChromaDeblocking,           FALSE,       FALSE,         TRUE,    "Deblock Chroma before Upconversion"       },
   { "UseWienerFiltering",         &pParams->m_bUseWienerFiltering,            FALSE,       FALSE,         TRUE,    "Wiener Filtering before conversion"       },

@@ -87,6 +87,7 @@ void ConvFloatToFixed::convertComponent (const float *iComp, imgpel *oComp, int 
   int i;
   for (i = 0; i < compSize; i++) {
     *oComp++ = (imgpel) fClip(fRound((float) (weight * (double) *iComp++ + offset)), 0.0f, (float) maxPelValue);
+
   }
 }
 

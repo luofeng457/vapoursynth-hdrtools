@@ -127,18 +127,18 @@ public:
   double  m_amplitudeFactor;
   bool    m_enableSymmetry;
   
-  int     m_ssimBlockDistance;
-  int     m_ssimBlockSizeX;
-  int     m_ssimBlockSizeY;
-  bool    m_useLogSSIM;
-  double  m_ssimK1;
-  double  m_ssimK2;
-  int     m_tfPSNRDistortion;
-  int     m_deltaEPointsEnable;
-  int     m_rPSNRBlockSizeX;
-  int     m_rPSNRBlockSizeY;
-  int     m_rPSNROverlapX;
-  int     m_rPSNROverlapY;
+  int                m_ssimBlockDistance;
+  int                m_ssimBlockSizeX;
+  int                m_ssimBlockSizeY;
+  bool               m_useLogSSIM;
+  double             m_ssimK1;
+  double             m_ssimK2;
+  DistortionFunction m_tfPSNRDistortion;
+  int                m_deltaEPointsEnable;
+  int                m_rPSNRBlockSizeX;
+  int                m_rPSNRBlockSizeY;
+  int                m_rPSNROverlapX;
+  int                m_rPSNROverlapY;
   
   DistortionParameters() {
     for (int index = 0; index < NB_REF_WHITE; index ++)
@@ -160,7 +160,7 @@ public:
     m_useLogSSIM                = FALSE;
     m_ssimK1                    = 0.01f;
     m_ssimK2                    = 0.03f;
-    m_tfPSNRDistortion          = 0;
+    m_tfPSNRDistortion          = DIF_PQPH10K;
     m_deltaEPointsEnable        = 1;
     m_rPSNRBlockSizeX           = 64;
     m_rPSNRBlockSizeY           = 64;
