@@ -376,7 +376,8 @@ void ColorTransformClosedLoop::process ( Frame* out, const Frame *inp) {
               }
             }
             else if (m_closedLoopTransform == CLT_BASE) {
-              double lumaWeight, lumaOffset;
+              double lumaWeight = (1 << (m_bitDepth - 8)) * 219.0;
+              double lumaOffset = (1 << (m_bitDepth - 8)) * 16.0;
               double comb_transform1[4];
               //double comb_denom1 = m_transform0[0]; // Should we do the division here or after the sum? 
               // Complexity versus precision question. TBD

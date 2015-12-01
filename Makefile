@@ -54,6 +54,7 @@ tags:
 distclean: clean
 	@echo "Cleaning all"
 	@rm -f tags
+	@rm -f lib/*
 	@for i in $(SUBDIRS); do make -C $$i $@; done
 
 

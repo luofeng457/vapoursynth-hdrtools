@@ -133,7 +133,7 @@ tags:
 bin:    $(OBJ)
 	@echo
 	@echo 'creating binary "$(BIN)"'
-	@$(CC) $(FLAGS) $(LDFLAGS) -o $(BIN) $(OBJ) $(LIBS)
+	@$(CC) $(FLAGS) -o $(BIN) $(OBJ) $(LDFLAGS) $(LIBS) 
 	@echo '... done'
 	@echo
 

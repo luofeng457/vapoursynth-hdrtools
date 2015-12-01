@@ -390,24 +390,9 @@ void ColorTransformClosedLoopY::process ( Frame* out, const Frame *inp) {
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])  {
     if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {
       double uComp, vComp;
-      float *floatComp[3];
-      double scale = 1.0;
       float *red   = inp->m_floatComp[0];
       float *green = inp->m_floatComp[1];
       float *blue  = inp->m_floatComp[2];
-
-      if (inp->m_hasAlternate == TRUE) {
-        floatComp[0] = inp->m_altFrame->m_floatComp[0];
-        floatComp[1] = inp->m_altFrame->m_floatComp[1];
-        floatComp[2] = inp->m_altFrame->m_floatComp[2];
-        scale       = 1.0 / inp->m_altFrameNorm;
-      }
-      else {
-        floatComp[0] = inp->m_floatComp[0];
-        floatComp[1] = inp->m_floatComp[1];
-        floatComp[2] = inp->m_floatComp[2];   
-        scale        = 1.0;        
-      }
 
       // Allocate memory. Note that current code does not permit change of resolution. TBDL
       if (m_memoryAllocated == FALSE) { 
