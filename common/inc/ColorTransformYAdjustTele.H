@@ -37,22 +37,20 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustFast.H
+ * \file ColorTransformYAdjustTele.H
  *
  * \brief
- *    ColorTransformYAdjustFast Class Header
+ *    ColorTransformYAdjustTele Class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
- *     - Jacob Strom                     <jacob.strom@ericsson.com>
- *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustFast_H__
-#define __ColorTransformYAdjustFast_H__
+#ifndef __ColorTransformYAdjustTele_H__
+#define __ColorTransformYAdjustTele_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +60,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustFast : public ColorTransform {
+class ColorTransformYAdjustTele : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -137,7 +135,7 @@ private:
 
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustFast( ColorSpace        iColorSpace, 
+  ColorTransformYAdjustTele( ColorSpace        iColorSpace, 
                             ColorPrimaries    iColorPrimaries, 
                             ColorSpace        oColorSpace, 
                             ColorPrimaries    oColorPrimaries, 
@@ -156,7 +154,7 @@ public:
                             bool              useFloatPrecision = TRUE
                            );
                         
-  virtual ~ColorTransformYAdjustFast();
+  virtual ~ColorTransformYAdjustTele();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

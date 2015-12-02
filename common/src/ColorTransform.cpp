@@ -64,6 +64,7 @@
 #include "ColorTransformYAdjust.H"
 #include "ColorTransformYAdjustAlt.H"
 #include "ColorTransformYAdjustFast.H"
+#include "ColorTransformYAdjustTele.H"
 #include "ColorTransformYAdjustXYZ.H"
 #include "ColorTransformFVDO.H"
 #include "ColorTransformCL.H"
@@ -132,6 +133,8 @@ ColorTransform *ColorTransform::create(
     result = new ColorTransformYAdjustXYZ(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
   else if (closedLoopTransform == CLT_YADJFST)
     result = new ColorTransformYAdjustFast(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_YADJTELE)
+    result = new ColorTransformYAdjustTele(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
   else
     result = new ColorTransformClosedLoop(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision, useHighPrecision, closedLoopTransform, bitDepth, range);
   

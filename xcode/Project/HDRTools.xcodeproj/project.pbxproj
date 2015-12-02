@@ -133,6 +133,8 @@
 		C530C3931B7E976D00FD6D7E /* ToneMappingRoll.H in Headers */ = {isa = PBXBuildFile; fileRef = C530C3921B7E976D00FD6D7E /* ToneMappingRoll.H */; };
 		C530C3D91BA2390B00FD6D7E /* DistortionMetricBlockinessJ341.H in Headers */ = {isa = PBXBuildFile; fileRef = C530C3D81BA2390B00FD6D7E /* DistortionMetricBlockinessJ341.H */; };
 		C530C3DB1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C530C3DA1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp */; };
+		C53E9BB91C0EA34200448F69 /* ColorTransformYAdjustTele.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C53E9BB81C0EA34200448F69 /* ColorTransformYAdjustTele.cpp */; };
+		C53E9BBB1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BBA1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H */; };
 		C54BDE0A1ACB236A000A34BE /* ColorTransformClosedLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */; };
 		C54BDE0C1ACB2384000A34BE /* ColorTransformClosedLoop.H in Headers */ = {isa = PBXBuildFile; fileRef = C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */; };
 		C5528B301BE3045300CCADA5 /* TransferFunctionHPQ2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */; };
@@ -385,6 +387,8 @@
 		C530C3921B7E976D00FD6D7E /* ToneMappingRoll.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ToneMappingRoll.H; path = ../common/inc/ToneMappingRoll.H; sourceTree = "<group>"; };
 		C530C3D81BA2390B00FD6D7E /* DistortionMetricBlockinessJ341.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricBlockinessJ341.H; path = ../common/inc/DistortionMetricBlockinessJ341.H; sourceTree = "<group>"; };
 		C530C3DA1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricBlockinessJ341.cpp; path = ../common/src/DistortionMetricBlockinessJ341.cpp; sourceTree = "<group>"; };
+		C53E9BB81C0EA34200448F69 /* ColorTransformYAdjustTele.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYAdjustTele.cpp; path = ../common/src/ColorTransformYAdjustTele.cpp; sourceTree = "<group>"; };
+		C53E9BBA1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYAdjustTele.H; path = ../common/inc/ColorTransformYAdjustTele.H; sourceTree = "<group>"; };
 		C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformClosedLoop.cpp; path = ../common/src/ColorTransformClosedLoop.cpp; sourceTree = "<group>"; };
 		C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformClosedLoop.H; path = ../common/inc/ColorTransformClosedLoop.H; sourceTree = "<group>"; };
 		C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionHPQ2.cpp; path = ../common/src/TransferFunctionHPQ2.cpp; sourceTree = "<group>"; };
@@ -867,6 +871,7 @@
 				C57D22191B4F5C7200DA1E4C /* ColorTransformYAdjust.H */,
 				C5BE37921B58612F00350F6D /* ColorTransformYAdjustAlt.H */,
 				C5528B391BE96C4700CCADA5 /* ColorTransformYAdjustFast.H */,
+				C53E9BBA1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H */,
 				C501510E1BF6CBE600980F49 /* ColorTransformYAdjustXYZ.H */,
 				C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */,
 				C51896311ACF62920021356F /* Conv420to444Adaptive.H */,
@@ -985,6 +990,7 @@
 				C57D22171B4F58C900DA1E4C /* ColorTransformYAdjust.cpp */,
 				C5BE37901B58612300350F6D /* ColorTransformYAdjustAlt.cpp */,
 				C5528B371BE96C2D00CCADA5 /* ColorTransformYAdjustFast.cpp */,
+				C53E9BB81C0EA34200448F69 /* ColorTransformYAdjustTele.cpp */,
 				C501510C1BF6CBCC00980F49 /* ColorTransformYAdjustXYZ.cpp */,
 				C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */,
 				C518962D1ACF62530021356F /* Conv420to444Adaptive.cpp */,
@@ -1250,6 +1256,7 @@
 				C5C2CC381B1906D600AD96EA /* FrameFilter2DSep.H in Headers */,
 				C5133DEA19CCF59B00D64D48 /* Conv444to420NN.H in Headers */,
 				C55438E01AE6CA8C003ABEA0 /* TransferFunctionMPQ.H in Headers */,
+				C53E9BBB1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H in Headers */,
 				C5E384B21AFF1BB900FE5693 /* FrameScale.H in Headers */,
 				C5133DEB19CCF59B00D64D48 /* Convert.H in Headers */,
 				C5133DEC19CCF59B00D64D48 /* ConvertNull.H in Headers */,
@@ -1478,6 +1485,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C53E9BB91C0EA34200448F69 /* ColorTransformYAdjustTele.cpp in Sources */,
 				C5C2CC421B1D41E100AD96EA /* DistortionMetricRegionPSNR.cpp in Sources */,
 				C5133E0E19CCF5B700D64D48 /* AddNoise.cpp in Sources */,
 				C5133E0F19CCF5B700D64D48 /* AddNoiseNull.cpp in Sources */,

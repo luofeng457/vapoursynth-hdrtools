@@ -234,18 +234,19 @@ typedef enum {
 } FiltersOneD;
 
 typedef enum {
-  CLT_NULL    = 0,
-  CLT_BASE    = 1,
-  CLT_BASE2   = 2,
-  CLT_BASE3   = 3,
-  CLT_BASE4   = 4,
-  CLT_YADJ    = 5,
-  CLT_YADJALT = 6,
-  CLT_CHROMA  = 7,
-  CLT_YADJFST = 8,
-  CLT_RGB     = 9,
-  CLT_Y       = 10,
-  CLT_XYZ     = 11,
+  CLT_NULL     = 0,
+  CLT_BASE     = 1,
+  CLT_BASE2    = 2,
+  CLT_BASE3    = 3,
+  CLT_BASE4    = 4,
+  CLT_YADJ     = 5,
+  CLT_YADJALT  = 6,
+  CLT_CHROMA   = 7,
+  CLT_YADJFST  = 8,
+  CLT_RGB      = 9,
+  CLT_Y        = 10,
+  CLT_XYZ      = 11,
+  CLT_YADJTELE = 12,
   CLT_TOTAL
 } ClosedLoopTrans;
 
