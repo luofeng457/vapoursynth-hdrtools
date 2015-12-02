@@ -357,6 +357,9 @@
     <ClInclude Include="inc\TransferFunctionHPQ2.H">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjustTele.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\AddNoise.cpp">
@@ -663,6 +666,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TransferFunctionHPQ2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ColorTransformYAdjustTele.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
