@@ -94,6 +94,7 @@
     <ClInclude Include="inc\ColorTransformYAdjust.H" />
     <ClInclude Include="inc\ColorTransformYAdjustAlt.H" />
     <ClInclude Include="inc\ColorTransformYAdjustFast.H" />
+    <ClInclude Include="inc\ColorTransformYAdjustLFast.H" />
     <ClInclude Include="inc\ColorTransformYAdjustTele.H" />
     <ClInclude Include="inc\ColorTransformYAdjustXYZ.H" />
     <ClInclude Include="inc\Conv420to422Generic.H" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\ColorTransformYAdjust.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustAlt.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustFast.cpp" />
+    <ClCompile Include="src\ColorTransformYAdjustLFast.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustTele.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustXYZ.cpp" />
     <ClCompile Include="src\Conv420to422Generic.cpp" />

@@ -193,6 +193,15 @@ static inline double dRound(double x) {
   return (dSign(x) * floor((dAbs(x) + 0.5)));
 }
 
+static inline float fCeil(float x) {
+  return (fSign(x) * floor((fAbs(x) + 1.0f)));
+}
+
+static inline double dCeil(double x) {
+  return (dSign(x) * floor((dAbs(x) + 1.0)));
+}
+
+
 static inline int ceilingRescale(int val, int b) {
   return ((val + (1 << (b)) - 1) >> b)<<b;
 }
