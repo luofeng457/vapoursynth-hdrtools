@@ -244,7 +244,7 @@ ColorTransformYAdjustLFast::ColorTransformYAdjustLFast(
   m_scaleFactor = (double) m_mapSize;
   // Using double precision LUTs. A bit big, but it should be okay
   m_invTransformMap = new double[m_mapSize + 1];
-  m_fwdTransformMap   = new double[m_mapSize + 1];
+  m_fwdTransformMap = new double[m_mapSize + 1];
 
   for (int i = 0; i < m_mapSize + 1; i++) {
     double value = (double) i / (double) m_mapSize;
@@ -374,32 +374,33 @@ void ColorTransformYAdjustLFast::allocateMemory(Frame* out, const Frame *inp) {
 }
 
 double ColorTransformYAdjustLFast::invTransform(double value) {
-  double satValue = dClip(value, 0.0, 1.0);
-  if (satValue == 0.0)
+  //double satValue = dClip(value, 0.0, 1.0);
+  if (value <= 0.0)
     return m_invTransformMap[0];
-  else if (satValue == 1.0)
+  else if (value >= 1.0)
     return m_invTransformMap[m_mapSize];
   else {
-    //return (m_invTransformMap[(int) dRound(satValue * m_scaleFactor)]);
+    double satValue = value * m_scaleFactor;
+    //return (m_invTransformMap[(int) dRound(satValue)]);
+    int    valuePlus     = (int) dCeil(satValue) ;
+    double distancePlus  = (double) valuePlus - satValue;
     
-    int    valuePlus     = (int) dCeil(satValue * m_scaleFactor) ;
-    double distancePlus  = (double) valuePlus - satValue * m_scaleFactor;
-    double distanceMinus = 1.0 - distancePlus; 
-    
-    return (m_invTransformMap[valuePlus - 1] * distancePlus + m_invTransformMap[valuePlus] * distanceMinus);
+    return (m_invTransformMap[valuePlus - 1] * distancePlus + m_invTransformMap[valuePlus] * (1.0 - distancePlus));
   }
 }
 
 double ColorTransformYAdjustLFast::fwdTransform(double value) {
-  double satValue = dClip(value, 0.0, 1.0);
-  if (satValue == 0.0)
-    return m_invTransformMap[0];
+  if (value <= 0.0)
+    return m_fwdTransformMap[0];
+  else if (value >= 1.0  )
+    return m_fwdTransformMap[m_mapSize];
   else {
-    int    valuePlus     = (int) dCeil(satValue * m_scaleFactor) ;
-    double distancePlus  = (double) valuePlus - satValue * m_scaleFactor;
-    double distanceMinus = 1.0 - distancePlus; 
+    double satValue = value * m_scaleFactor;
+    //return (m_fwdTransformMap[(int) dRound(satValue)]);
+    int    valuePlus     = (int) dCeil(satValue) ;
+    double distancePlus  = (double) valuePlus - satValue;
     
-    return (m_fwdTransformMap[valuePlus - 1] * distancePlus + m_fwdTransformMap[valuePlus] * distanceMinus);
+    return (m_fwdTransformMap[valuePlus - 1] * distancePlus + m_fwdTransformMap[valuePlus] * (1.0 - distancePlus));
   }
 }
 
