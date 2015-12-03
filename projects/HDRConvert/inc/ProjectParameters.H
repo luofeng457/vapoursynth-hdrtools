@@ -92,8 +92,8 @@ public:
   ClosedLoopTrans   m_closedLoopConversion;
   int               m_closedLoopIterations;
   bool              m_linearDownConversion;
-  bool              m_useAdaptiveUpsampling;
-  bool              m_useAdaptiveDownsampling;
+  int               m_useAdaptiveUpsampling;
+  int               m_useAdaptiveDownsampling;
   bool              m_rgbDownConversion;
   bool              m_bUseChromaDeblocking;
   bool              m_bUseWienerFiltering;

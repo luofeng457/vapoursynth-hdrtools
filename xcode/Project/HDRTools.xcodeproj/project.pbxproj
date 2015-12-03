@@ -135,6 +135,8 @@
 		C530C3DB1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C530C3DA1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp */; };
 		C53E9BB91C0EA34200448F69 /* ColorTransformYAdjustTele.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C53E9BB81C0EA34200448F69 /* ColorTransformYAdjustTele.cpp */; };
 		C53E9BBB1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BBA1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H */; };
+		C53E9BBD1C0FCF2500448F69 /* Conv444to420CrEdge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C53E9BBC1C0FCF2500448F69 /* Conv444to420CrEdge.cpp */; };
+		C53E9BBF1C0FCF7100448F69 /* Conv444to420CrEdge.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BBE1C0FCF7100448F69 /* Conv444to420CrEdge.H */; };
 		C54BDE0A1ACB236A000A34BE /* ColorTransformClosedLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */; };
 		C54BDE0C1ACB2384000A34BE /* ColorTransformClosedLoop.H in Headers */ = {isa = PBXBuildFile; fileRef = C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */; };
 		C5528B301BE3045300CCADA5 /* TransferFunctionHPQ2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */; };
@@ -389,6 +391,8 @@
 		C530C3DA1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricBlockinessJ341.cpp; path = ../common/src/DistortionMetricBlockinessJ341.cpp; sourceTree = "<group>"; };
 		C53E9BB81C0EA34200448F69 /* ColorTransformYAdjustTele.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYAdjustTele.cpp; path = ../common/src/ColorTransformYAdjustTele.cpp; sourceTree = "<group>"; };
 		C53E9BBA1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYAdjustTele.H; path = ../common/inc/ColorTransformYAdjustTele.H; sourceTree = "<group>"; };
+		C53E9BBC1C0FCF2500448F69 /* Conv444to420CrEdge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv444to420CrEdge.cpp; path = ../common/src/Conv444to420CrEdge.cpp; sourceTree = "<group>"; };
+		C53E9BBE1C0FCF7100448F69 /* Conv444to420CrEdge.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to420CrEdge.H; path = ../common/inc/Conv444to420CrEdge.H; sourceTree = "<group>"; };
 		C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformClosedLoop.cpp; path = ../common/src/ColorTransformClosedLoop.cpp; sourceTree = "<group>"; };
 		C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformClosedLoop.H; path = ../common/inc/ColorTransformClosedLoop.H; sourceTree = "<group>"; };
 		C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionHPQ2.cpp; path = ../common/src/TransferFunctionHPQ2.cpp; sourceTree = "<group>"; };
@@ -879,6 +883,7 @@
 				C5BD26B319CCAC10003F1B51 /* Conv420to444NN.H */,
 				C5F1E38619D2035F00327932 /* Conv422to420Generic.H */,
 				C50BC6B51AE0C5F600F1A398 /* Conv444to420Adaptive.H */,
+				C53E9BBE1C0FCF7100448F69 /* Conv444to420CrEdge.H */,
 				C5BD26B519CCAC10003F1B51 /* Conv444to420BI.H */,
 				C5BD26B619CCAC10003F1B51 /* Conv444to420Generic.H */,
 				C5BD26B719CCAC10003F1B51 /* Conv444to420NN.H */,
@@ -998,6 +1003,7 @@
 				C5BD26E719CCAC17003F1B51 /* Conv420to444NN.cpp */,
 				C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */,
 				C50BC6B31AE0C5D600F1A398 /* Conv444to420Adaptive.cpp */,
+				C53E9BBC1C0FCF2500448F69 /* Conv444to420CrEdge.cpp */,
 				C5BD26E919CCAC17003F1B51 /* Conv444to420BI.cpp */,
 				C5BD26EA19CCAC17003F1B51 /* Conv444to420Generic.cpp */,
 				C5BD26EB19CCAC17003F1B51 /* Conv444to420NN.cpp */,
@@ -1226,6 +1232,7 @@
 				C5133DE019CCF59B00D64D48 /* BufToImgEndian.H in Headers */,
 				C5133DE119CCF59B00D64D48 /* ColorTransform.H in Headers */,
 				C5133E7E19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H in Headers */,
+				C53E9BBF1C0FCF7100448F69 /* Conv444to420CrEdge.H in Headers */,
 				C585BD071B041FA000235FE6 /* TransferFunctionAMPQ.H in Headers */,
 				C5E382EE1AE80FDB00FE5693 /* TransferFunctionAPQScaled.H in Headers */,
 				C5BE37C51B7AA62700350F6D /* TransferFunctionHLG.H in Headers */,
@@ -1504,6 +1511,7 @@
 				C5DE3F3519DB5330006FA313 /* DistortionMetricTFPSNR.cpp in Sources */,
 				C5133E1519CCF5B700D64D48 /* ColorTransformGeneric.cpp in Sources */,
 				C5133E1619CCF5B700D64D48 /* ColorTransformNull.cpp in Sources */,
+				C53E9BBD1C0FCF2500448F69 /* Conv444to420CrEdge.cpp in Sources */,
 				C5BE378D1B5730F800350F6D /* TransferFunctionPQLB.cpp in Sources */,
 				C5133E1719CCF5B700D64D48 /* ConvertColorFormat.cpp in Sources */,
 				C51896341ACF63D80021356F /* ScaleFilter.cpp in Sources */,

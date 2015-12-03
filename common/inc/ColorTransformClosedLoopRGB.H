@@ -115,8 +115,8 @@ private:
   int                 m_iLumaWeight;
   int                 m_interval;
 
-  bool                m_useAdaptiveDownsampler;
-  bool                m_useAdaptiveUpsampler;
+  int                 m_useAdaptiveDownsampler;
+  int                 m_useAdaptiveUpsampler;
 
   TransferFunctions   m_transferFunctions;
   TransferFunction   *m_transferFunction;
@@ -145,8 +145,8 @@ public:
                             TransferFunctions transferFunctions = TF_PQ,
                             int               downMethod = 2,
                             int               upMethod = 4,
-                            bool              useAdaptiveDownsampler = FALSE,
-                            bool              useAdaptiveUpsampler = FALSE,
+                            int               useAdaptiveDownsampler = 0,
+                            int               useAdaptiveUpsampler = 0,
                             int               useMinMax = 3,
                             int               bitDepth = 10, 
                             SampleRange       range = SR_FULL, 

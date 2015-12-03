@@ -139,6 +139,8 @@ IntegerParameter intParameterList[] = {
   { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,               3,    "Use Min/Max Filtering"                    },
   { "ToneMappingMode",         &pParams->m_toneMapping,                  TM_NULL,     TM_NULL,    TM_TOTAL - 1,    "Tone Mapping Mode "                       },
   { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,               2,    "High Precision Color Mode "               },
+  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,              0,           0,               1,    "Use Adaptive Upsampler"                   },
+  { "UseAdaptiveDownsampling", &pParams->m_useAdaptiveDownsampling,            0,           0,               2,    "Use Adaptive Downsampler"                   },
   
   { "",                        NULL,                                           0,           0,               0,    "Integer Termination entry"                }
 };
@@ -154,8 +156,6 @@ BoolParameter boolParameterList[] = {
   { "SetOutputEXRRounding",       &out->m_useFloatRound,                      FALSE,       FALSE,         TRUE,    "OpenEXR Output with Rounding Enabled"     },
   { "FilterUsingFloats",          &pParams->m_filterInFloat,                  FALSE,       FALSE,         TRUE,    "Perform Filtering using Floats "          },
   { "LinearDownConversion",       &pParams->m_linearDownConversion,           FALSE,       FALSE,         TRUE,    "Perform linear downconversion to 420"     },
-  { "UseAdaptiveUpsampling",       &pParams->m_useAdaptiveUpsampling,          FALSE,       FALSE,         TRUE,    "Use Adaptive Upsampler"                   },
-  { "UseAdaptiveDownsampling",     &pParams->m_useAdaptiveDownsampling,        FALSE,       FALSE,         TRUE,    "Use Adaptive Downsampler"                   },
   { "RGBDownConversion",          &pParams->m_rgbDownConversion,              FALSE,       FALSE,         TRUE,    "Perform downconversion in RGB"            },
   { "UseChromaDeblocking",        &pParams->m_bUseChromaDeblocking,           FALSE,       FALSE,         TRUE,    "Deblock Chroma before Upconversion"       },
   { "UseWienerFiltering",         &pParams->m_bUseWienerFiltering,            FALSE,       FALSE,         TRUE,    "Wiener Filtering before conversion"       },

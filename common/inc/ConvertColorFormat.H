@@ -60,7 +60,7 @@ class ConvertColorFormat {
 public:
   // Construct/Deconstruct
   virtual ~ConvertColorFormat() {};
-  static ConvertColorFormat *create(int width, int height, ChromaFormat iChromaFormat, ChromaFormat oChromaFormat, int method, ChromaLocation *iChromaLocationType, ChromaLocation *oChromaLocationType, bool useAdaptiveFilter = FALSE, int useMinMax = 0);
+  static ConvertColorFormat *create(int width, int height, ChromaFormat iChromaFormat, ChromaFormat oChromaFormat, int method, ChromaLocation *iChromaLocationType, ChromaLocation *oChromaLocationType, int useAdaptiveFilter = 0, int useMinMax = 0);
 
   virtual void process(Frame *out,  const Frame *inp) = 0;
 };

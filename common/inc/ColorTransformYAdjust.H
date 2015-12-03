@@ -116,8 +116,8 @@ private:
   double              m_chromaOffset;
   TransferFunction   *m_transferFunction;
   TransferFunctions   m_transferFunctions;
-  bool                m_useAdaptiveDownsampler;
-  bool                m_useAdaptiveUpsampler;
+  int                 m_useAdaptiveDownsampler;
+  int                 m_useAdaptiveUpsampler;
   
 
   void                allocateMemory(Frame* out, const Frame *inp);
@@ -137,8 +137,8 @@ public:
                          TransferFunctions transferFunction = TF_PQ,
                          int               downMethod = 2,
                          int               upMethod = 4,
-                         bool              useAdaptiveDownsampler = FALSE,
-                         bool              useAdaptiveUpsampler = FALSE,
+                         int               useAdaptiveDownsampler = 0,
+                         int               useAdaptiveUpsampler = 0,
                          int               useMinMax = 3,
                          int               bitDepth = 10, 
                          SampleRange       range = SR_FULL, 

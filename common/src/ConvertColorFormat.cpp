@@ -64,6 +64,7 @@
 #include "Conv444to420BI.H"
 #include "Conv444to420Generic.H"
 #include "Conv444to420Adaptive.H"
+#include "Conv444to420CrEdge.H"
 #include "Conv444to422Generic.H"
 #include "Conv422to420Generic.H"
 
@@ -74,7 +75,7 @@
 //-----------------------------------------------------------------------------
 // Public methods
 //-----------------------------------------------------------------------------
-ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaFormat iChromaFormat, ChromaFormat oChromaFormat, int method, ChromaLocation *iChromaLocationType, ChromaLocation *oChromaLocationType, bool useAdaptiveFilter, int useMinMax) {
+ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaFormat iChromaFormat, ChromaFormat oChromaFormat, int method, ChromaLocation *iChromaLocationType, ChromaLocation *oChromaLocationType, int useAdaptiveFilter, int useMinMax) {
   ConvertColorFormat *result = NULL;
  
   if (iChromaFormat == oChromaFormat) { // Do nothing
@@ -118,8 +119,10 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
       case DF_LZ4:
       case DF_SN2:
       case DF_SN3:
-      if (useAdaptiveFilter == TRUE)
+      if (useAdaptiveFilter == 1)
         result = new Conv444to420Adaptive(width, height, method, oChromaLocationType);
+      else if (useAdaptiveFilter == 2)
+        result = new Conv444to420CrEdge(width, height, method, oChromaLocationType);
       else      
         result = new Conv444to420Generic (width, height, method, oChromaLocationType, useMinMax);
         break;
@@ -168,9 +171,9 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
       case UF_LS5:
       case UF_LS6:
       case UF_TM:
-        if (useAdaptiveFilter == TRUE)
+        if (useAdaptiveFilter == 1)
           result = new Conv420to444Adaptive(width, height, method, iChromaLocationType);
-        else
+        else 
           result = new Conv420to444Generic(width, height, method, iChromaLocationType);
         break;
       default:
