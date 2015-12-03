@@ -15,356 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inc\AddNoise.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\AddNoiseNormal.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\AddNoiseNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\AVILib.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\BufToImg.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\BufToImgBasic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\BufToImgEndian.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransform.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformClosedLoop.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformFVDO.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformGeneric.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformXYZ2YUpVp.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv420to422Generic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv420to444Adaptive.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv420to444Generic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv420to444NN.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv422to420Generic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv444to420Adaptive.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv444to420BI.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv444to420Generic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv444to420NN.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv444to422Generic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Convert.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ConvertBitDepth.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ConvertColorFormat.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ConvertColorFormatNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ConvertNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ConvFixedToFloat.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ConvFloatToFixed.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Defines.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetric.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricDeltaE.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricmPSNR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricmPSNRfast.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricMSSSIM.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricPSNR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricSigmaCompare.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricTFPSNR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FastMemory.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Frame.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFormat.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Global.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\IFunctions.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ImgToBuf.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ImgToBufBasic.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ImgToBufEndian.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Input.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\InputEXR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\InputTIFF.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\InputYUV.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\IOFunctions.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\IOTIFF.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\IOVideo.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\OpenEXR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Output.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\OutputAVI.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\OutputEXR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\OutputTIFF.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\OutputYUV.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Parameters.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ScaleFilter.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunction.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionAPQ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionAPQScaled.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionHG.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionMPQ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionNormalize.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionPH.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionPower.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionPQ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TypeDefs.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Win32.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorSpaceMatrix.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformCL.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionBiasedMPQ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionAMPQ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionAPH.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameScale.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformYAdjust.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFilter.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFilter2DSep.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFilterDeblock.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFilterWiener2D.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricRegionPSNR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricRegionTFPSNR.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Filter1D.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFilterNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameScaleHalf.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameScaleNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformYAdjustAlt.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformRGBAdjust.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DisplayGammaAdjust.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DisplayGammaAdjustHLG.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DisplayGammaAdjustNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricBlockAct.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricBlockinessJ341.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionMetricTFMSSSIM.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\DistortionTransferFunction.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ToneMapping.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ToneMappingNull.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ToneMappingRoll.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionHGold.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionHLG.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionPQLB.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformClosedLoopCr.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformClosedLoopRGB.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformClosedLoopY.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformYAdjustFast.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformYAdjustXYZ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\FrameFilterWiener2DDark.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionHPQ.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\TransferFunctionHPQ2.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\ColorTransformYAdjustTele.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\Conv444to420CrEdge.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\AddNoise.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -677,5 +327,355 @@
     <ClCompile Include="src\Conv444to420CrEdge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\AddNoise.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AddNoiseNormal.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AddNoiseNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\AVILib.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\BufToImg.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\BufToImgBasic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\BufToImgEndian.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorSpaceMatrix.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransform.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformCL.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformClosedLoop.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformClosedLoopCr.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformClosedLoopRGB.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformClosedLoopY.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformFVDO.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformGeneric.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformRGBAdjust.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformXYZ2YUpVp.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjust.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjustAlt.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjustFast.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjustTele.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjustXYZ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv420to422Generic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv420to444Adaptive.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv420to444Generic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv420to444NN.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv422to420Generic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to420Adaptive.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to420BI.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to420CrEdge.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to420Generic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to420NN.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to422Generic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Convert.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ConvertBitDepth.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ConvertColorFormat.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ConvertColorFormatNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ConvertNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ConvFixedToFloat.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ConvFloatToFixed.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Defines.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DisplayGammaAdjust.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DisplayGammaAdjustHLG.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DisplayGammaAdjustNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetric.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricBlockAct.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricBlockinessJ341.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricDeltaE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricmPSNR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricmPSNRfast.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricMSSSIM.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricPSNR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricRegionPSNR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricRegionTFPSNR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricSigmaCompare.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricTFMSSSIM.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricTFPSNR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionTransferFunction.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FastMemory.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Filter1D.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Frame.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFilter.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFilter2DSep.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFilterDeblock.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFilterNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFilterWiener2D.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFilterWiener2DDark.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameFormat.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameScale.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameScaleHalf.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\FrameScaleNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Global.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\IFunctions.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ImgToBuf.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ImgToBufBasic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ImgToBufEndian.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Input.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\InputEXR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\InputTIFF.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\InputYUV.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\IOFunctions.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\IOTIFF.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\IOVideo.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\OpenEXR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Output.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\OutputAVI.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\OutputEXR.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\OutputTIFF.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\OutputYUV.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Parameters.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ScaleFilter.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ToneMapping.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ToneMappingNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ToneMappingRoll.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunction.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionAMPQ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionAPH.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionAPQ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionAPQScaled.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionBiasedMPQ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionHG.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionHGold.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionHLG.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionHPQ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionHPQ2.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionMPQ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionNormalize.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionNull.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionPH.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionPower.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionPQ.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TransferFunctionPQLB.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\TypeDefs.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Win32.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
