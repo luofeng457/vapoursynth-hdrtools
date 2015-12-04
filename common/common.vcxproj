@@ -102,6 +102,7 @@
     <ClCompile Include="src\Conv422to420Generic.cpp" />
     <ClCompile Include="src\Conv444to420Adaptive.cpp" />
     <ClCompile Include="src\Conv444to420BI.cpp" />
+    <ClCompile Include="src\Conv444to420CrBounds.cpp" />
     <ClCompile Include="src\Conv444to420CrEdge.cpp" />
     <ClCompile Include="src\Conv444to420Generic.cpp" />
     <ClCompile Include="src\Conv444to420NN.cpp" />
@@ -211,6 +212,7 @@
     <ClInclude Include="inc\Conv422to420Generic.H" />
     <ClInclude Include="inc\Conv444to420Adaptive.H" />
     <ClInclude Include="inc\Conv444to420BI.H" />
+    <ClInclude Include="inc\Conv444to420CrBounds.H" />
     <ClInclude Include="inc\Conv444to420CrEdge.H" />
     <ClInclude Include="inc\Conv444to420Generic.H" />
     <ClInclude Include="inc\Conv444to420NN.H" />

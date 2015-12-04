@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file Conv444to420CrEdge.H
+ * \file Conv444to420CrBounds.H
  *
  * \brief
- *    Conv444to420CrEdge class Header
+ *    Conv444to420CrBounds class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -49,8 +49,8 @@
  */
 
 
-#ifndef __Conv444to420CrEdge_H__
-#define __Conv444to420CrEdge_H__
+#ifndef __Conv444to420CrBounds_H__
+#define __Conv444to420CrBounds_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -58,7 +58,7 @@
 #include "ScaleFilter.H"
 
 
-class Conv444to420CrEdge : public ConvertColorFormat {
+class Conv444to420CrBounds : public ConvertColorFormat {
 
 private:
   int32  *m_i32Data;
@@ -68,6 +68,7 @@ private:
   
   double  m_edgeClassifier;
 
+  void    setupFilter(int index, DownSamplingFilters filter, int hPhase, int vPhase);
   
   void  filter(float  *out, const float  *inp, int width, int height, float minValue, float maxValue);
   void  filter(uint16 *out, const uint16 *inp, int width, int height, int   minValue, int   maxValue);
@@ -90,8 +91,8 @@ private:
   bool  analyzeVertical  (const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
 public:
   // Construct/Deconstruct
-  Conv444to420CrEdge(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax = 0);
-  virtual ~Conv444to420CrEdge();
+  Conv444to420CrBounds(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax = 0);
+  virtual ~Conv444to420CrBounds();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

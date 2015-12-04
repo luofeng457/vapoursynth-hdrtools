@@ -65,6 +65,7 @@
 #include "Conv444to420Generic.H"
 #include "Conv444to420Adaptive.H"
 #include "Conv444to420CrEdge.H"
+#include "Conv444to420CrBounds.H"
 #include "Conv444to422Generic.H"
 #include "Conv422to420Generic.H"
 
@@ -119,10 +120,12 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
       case DF_LZ4:
       case DF_SN2:
       case DF_SN3:
-      if (useAdaptiveFilter == 1)
+      if (useAdaptiveFilter == (int) ADF_MULTI)
         result = new Conv444to420Adaptive(width, height, method, oChromaLocationType);
-      else if (useAdaptiveFilter == 2)
+      else if (useAdaptiveFilter == (int) ADF_CREDGE)
         result = new Conv444to420CrEdge(width, height, method, oChromaLocationType);
+      else if (useAdaptiveFilter == (int) ADF_CRBOUNDS)
+        result = new Conv444to420CrBounds(width, height, method, oChromaLocationType);        
       else      
         result = new Conv444to420Generic (width, height, method, oChromaLocationType, useMinMax);
         break;

@@ -107,39 +107,39 @@ IntegerParameter intParameterList[] = {
 
   
   // Currently we do not need rescaling so we can keep these parameters disabled (could be added in the future if needed).
-  { "OutputWidth",             &out->m_width[Y_COMP],                        176,           0,         4096,    "Output/Processing width"                   },
-  { "OutputHeight",            &out->m_height[Y_COMP],                       144,           0,         4096,    "Output/Processing height"                  },
-  { "OutputChromaFormat",      (int *) &out->m_chromaFormat,              CF_420,      CF_400,       CF_444,    "Output Chroma Format"                     },
-  { "OutputChromaLocationTop", (int *) &out->m_chromaLocation[FP_TOP],   CL_ZERO,    CL_ZERO,   CL_TOTAL-1,    "Output Chroma Location Type (Top/Frame)"   },
-  { "OutputChromaLocationBottom", (int *) &out->m_chromaLocation[FP_BOTTOM], CL_ZERO, CL_ZERO,  CL_TOTAL-1,    "Output Chroma Location Type (Bottom)"      },
-  { "OutputFourCCCode",       (int *) &out->m_pixelFormat,              PF_UYVY,     PF_UYVY,       PF_XYZ,    "Output Pixel Format"                       },
-  { "OutputBitDepthCmp0",      &out->m_bitDepthComp[Y_COMP],                   8,           8,           16,    "Output Bitdepth Cmp0"                     },
-  { "OutputBitDepthCmp1",      &out->m_bitDepthComp[U_COMP],                   8,           8,           16,    "Output Bitdepth Cmp1"                     },
-  { "OutputBitDepthCmp2",      &out->m_bitDepthComp[V_COMP],                   8,           8,           16,    "Output Bitdepth Cmp2"                     },
-  { "OutputColorSpace",        (int *) &out->m_colorSpace,              CM_YCbCr,    CM_YCbCr,     CM_YUpVp,    "Output Color Space"                       },
-  { "OutputColorPrimaries",    (int *) &out->m_colorPrimaries,            CP_709,      CP_709,   CP_TOTAL-1,    "Output Color Primaries"                   },
-  { "OutputTransferFunction",  (int *) &out->m_transferFunction,           TF_PQ,     TF_NULL,   TF_TOTAL-1,    "Output Transfer Function"                 },
-  { "OutputSampleRange",       (int *) &out->m_sampleRange,          SR_STANDARD, SR_STANDARD,   SR_TOTAL-1,    "Output Sample Range"                      },
+  { "OutputWidth",             &out->m_width[Y_COMP],                        176,           0,           4096,    "Output/Processing width"                   },
+  { "OutputHeight",            &out->m_height[Y_COMP],                       144,           0,           4096,    "Output/Processing height"                  },
+  { "OutputChromaFormat",      (int *) &out->m_chromaFormat,              CF_420,      CF_400,         CF_444,    "Output Chroma Format"                     },
+  { "OutputChromaLocationTop", (int *) &out->m_chromaLocation[FP_TOP],   CL_ZERO,     CL_ZERO,     CL_TOTAL-1,    "Output Chroma Location Type (Top/Frame)"   },
+  { "OutputChromaLocationBottom", (int *) &out->m_chromaLocation[FP_BOTTOM], CL_ZERO, CL_ZERO,     CL_TOTAL-1,    "Output Chroma Location Type (Bottom)"      },
+  { "OutputFourCCCode",        (int *) &out->m_pixelFormat,              PF_UYVY,     PF_UYVY,         PF_XYZ,    "Output Pixel Format"                       },
+  { "OutputBitDepthCmp0",      &out->m_bitDepthComp[Y_COMP],                   8,           8,             16,    "Output Bitdepth Cmp0"                     },
+  { "OutputBitDepthCmp1",      &out->m_bitDepthComp[U_COMP],                   8,           8,             16,    "Output Bitdepth Cmp1"                     },
+  { "OutputBitDepthCmp2",      &out->m_bitDepthComp[V_COMP],                   8,           8,             16,    "Output Bitdepth Cmp2"                     },
+  { "OutputColorSpace",        (int *) &out->m_colorSpace,              CM_YCbCr,    CM_YCbCr,       CM_YUpVp,    "Output Color Space"                       },
+  { "OutputColorPrimaries",    (int *) &out->m_colorPrimaries,            CP_709,      CP_709,     CP_TOTAL-1,    "Output Color Primaries"                   },
+  { "OutputTransferFunction",  (int *) &out->m_transferFunction,           TF_PQ,     TF_NULL,     TF_TOTAL-1,    "Output Transfer Function"                 },
+  { "OutputSampleRange",       (int *) &out->m_sampleRange,          SR_STANDARD, SR_STANDARD,     SR_TOTAL-1,    "Output Sample Range"                      },
   //! Various Params
-  { "NumberOfFrames",          &pParams->m_numberOfFrames,                     1,           1,      INT_INF,    "Number of Frames to process"              },
-  { "InputFileHeader",         &pParams->m_inputFile.m_fileHeader,             0,           0,      INT_INF,    "Source Header (bytes)"                    },
-  { "StartFrame",              &pParams->m_inputFile.m_startFrame,             0,           0,      INT_INF,    "Source Start Frame"                       },
-  { "FrameSkip",               &pParams->m_frameSkip,                          0,           0,      INT_INF,    "Source Frame Skipping"                    },
+  { "NumberOfFrames",          &pParams->m_numberOfFrames,                     1,           1,        INT_INF,    "Number of Frames to process"              },
+  { "InputFileHeader",         &pParams->m_inputFile.m_fileHeader,             0,           0,        INT_INF,    "Source Header (bytes)"                    },
+  { "StartFrame",              &pParams->m_inputFile.m_startFrame,             0,           0,        INT_INF,    "Source Start Frame"                       },
+  { "FrameSkip",               &pParams->m_frameSkip,                          0,           0,        INT_INF,    "Source Frame Skipping"                    },
 
-  { "ChromaDownsampleFilter",  &pParams->m_chromaDownsampleFilter,         DF_F0,       DF_NN, DF_TOTAL - 1,    "Chroma Downsampling Filter"               },
-  { "ChromaUpsampleFilter",    &pParams->m_chromaUpsampleFilter,           UF_NN,       UF_NN, UF_TOTAL - 1,    "Chroma Upsampling Filter"                 },
-  { "AddNoise",                &pParams->m_addNoise,                  NOISE_NULL,  NOISE_NULL, NOISE_NORMAL,    "Add noise to the input signal"            },
-  { "ClosedLoopConversion",    (int *) &pParams->m_closedLoopConversion,CLT_NULL,    CLT_NULL,CLT_TOTAL - 1,    "Enable Closed Loop Conversion"            },
-  { "ClosedLoopIterations",    &pParams->m_closedLoopIterations,              10,           1,           50,    "Number of Closed Loop Iterations"            },
-  { "SourceConstantLuminance", &src->m_iConstantLuminance,                     0,           0,            2,    "Constant Luminance Source"                },
-  { "OutputConstantLuminance", &out->m_iConstantLuminance,                     0,           0,            2,    "Constant Luminance Output"                },
-  { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,            3,    "Use Min/Max Filtering"                    },
-  { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,            2,    "High Precision Color Mode "               },
-  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,              0,           0,            1,    "Use Adaptive Upsampler"                   },
-  { "UseAdaptiveDownsampling", &pParams->m_useAdaptiveDownsampling,            0,           0,            2,    "Use Adaptive Downsampler"                   },
+  { "ChromaDownsampleFilter",  &pParams->m_chromaDownsampleFilter,         DF_F0,       DF_NN,   DF_TOTAL - 1,    "Chroma Downsampling Filter"               },
+  { "ChromaUpsampleFilter",    &pParams->m_chromaUpsampleFilter,           UF_NN,       UF_NN,   UF_TOTAL - 1,    "Chroma Upsampling Filter"                 },
+  { "AddNoise",                &pParams->m_addNoise,                  NOISE_NULL,  NOISE_NULL,   NOISE_NORMAL,    "Add noise to the input signal"            },
+  { "ClosedLoopConversion",    (int *) &pParams->m_closedLoopConversion,CLT_NULL,    CLT_NULL,  CLT_TOTAL - 1,    "Enable Closed Loop Conversion"            },
+  { "ClosedLoopIterations",    &pParams->m_closedLoopIterations,              10,           1,             50,    "Number of Closed Loop Iterations"            },
+  { "SourceConstantLuminance", &src->m_iConstantLuminance,                     0,           0,              2,    "Constant Luminance Source"                },
+  { "OutputConstantLuminance", &out->m_iConstantLuminance,                     0,           0,              2,    "Constant Luminance Output"                },
+  { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,              3,    "Use Min/Max Filtering"                    },
+  { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,              2,    "High Precision Color Mode "               },
+  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,              0,           0,              1,    "Use Adaptive Upsampler"                   },
+  { "UseAdaptiveDownsampling", &pParams->m_useAdaptiveDownsampling,     ADF_NULL,    ADF_NULL,  ADF_TOTAL - 1,    "Use Adaptive Downsampler"                   },
 
   
-  { "",                        NULL,                                           0,           0,            0,    "Integer Termination entry"                }
+  { "",                        NULL,                                           0,           0,              0,    "Integer Termination entry"                }
 };
 
 BoolParameter boolParameterList[] = {

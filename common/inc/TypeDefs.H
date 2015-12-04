@@ -188,6 +188,14 @@ typedef enum{
   DA_TOTAL
 } DisplayAdjustment;
 
+typedef enum{
+  ADF_NULL      = 0,
+  ADF_MULTI     = 1,
+  ADF_CREDGE    = 2,
+  ADF_CRBOUNDS  = 3,
+  ADF_TOTAL
+} AdaptiveDownsampler;
+
 
 typedef enum{
   CL_ZERO  = 0,   // middle aligned vertically, left aligned (co-sited) horizontally
