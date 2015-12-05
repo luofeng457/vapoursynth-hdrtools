@@ -66,6 +66,7 @@
 #include "Conv444to420Adaptive.H"
 #include "Conv444to420CrEdge.H"
 #include "Conv444to420CrBounds.H"
+#include "Conv444to420CrFBounds.H"
 #include "Conv444to422Generic.H"
 #include "Conv422to420Generic.H"
 
@@ -106,11 +107,12 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
       case DF_BI: // Bilinear
         result = new Conv444to420BI(width, height);
         break;
-      case DF_F0: // Generic
+     // case DF_F0 ... (DF_TOTAL - 1): // Generic
+	  case DF_F0:
       case DF_F1:
       case DF_TM:
       case DF_FV:
-      case DF_GS:
+     case DF_GS:
       case DF_WCS:
       case DF_SVC:
       case DF_LZW:
@@ -120,12 +122,23 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
       case DF_LZ4:
       case DF_SN2:
       case DF_SN3:
+	  case DF_SNW3:
+	  case DF_SNW7:
+	  case DF_SNW11:
+	  case DF_SNW15:
+	  case DF_SSW3:
+	  case DF_SSW5:
+	  case DF_SSW7:
+	  case DF_SSW11:
+	  case DF_SSW15:
       if (useAdaptiveFilter == (int) ADF_MULTI)
         result = new Conv444to420Adaptive(width, height, method, oChromaLocationType);
       else if (useAdaptiveFilter == (int) ADF_CREDGE)
         result = new Conv444to420CrEdge(width, height, method, oChromaLocationType);
       else if (useAdaptiveFilter == (int) ADF_CRBOUNDS)
         result = new Conv444to420CrBounds(width, height, method, oChromaLocationType);        
+      else if (useAdaptiveFilter == (int) ADF_CRFBOUNDS)
+        result = new Conv444to420CrFBounds(width, height, method, oChromaLocationType);        
       else      
         result = new Conv444to420Generic (width, height, method, oChromaLocationType, useMinMax);
         break;

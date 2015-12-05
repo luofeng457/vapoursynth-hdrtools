@@ -193,6 +193,7 @@ typedef enum{
   ADF_MULTI     = 1,
   ADF_CREDGE    = 2,
   ADF_CRBOUNDS  = 3,
+  ADF_CRFBOUNDS = 4,
   ADF_TOTAL
 } AdaptiveDownsampler;
 

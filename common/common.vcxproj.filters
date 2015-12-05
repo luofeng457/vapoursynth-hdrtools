@@ -333,6 +333,9 @@
     <ClCompile Include="src\Conv444to420CrBounds.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Conv444to420CrFBounds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -687,6 +690,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Conv444to420CrBounds.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to420CrFBounds.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
