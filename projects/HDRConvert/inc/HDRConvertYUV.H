@@ -80,6 +80,7 @@ private:
   FrameFilter        *m_frameFilter;
   FrameFilter        *m_frameFilterNoise0;
   FrameFilter        *m_frameFilterNoise1;
+  FrameFilter        *m_frameFilterNoise2;
   
   Convert            *m_convertProcess;         // Final Conversion process
   Convert            *m_convertIQuantize;       // Initial Conversion process
@@ -101,6 +102,7 @@ private:
   bool                m_bUseChromaDeblocking;
   bool                m_bUseWienerFiltering;
   bool                m_bUse2DSepFiltering;
+  bool                m_bUseNLMeansFiltering;
   bool                m_b2DSepMode;
   
   // Cropping information

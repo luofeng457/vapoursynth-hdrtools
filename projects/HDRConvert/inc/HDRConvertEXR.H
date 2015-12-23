@@ -88,6 +88,7 @@ private:
   Frame                *m_colorSpaceFrame;
   FrameFilter          *m_frameFilterNoise0;
   FrameFilter          *m_frameFilterNoise1;
+  FrameFilter          *m_frameFilterNoise2;
   
   Convert              *m_convertProcess;           // Conversion process
   
@@ -122,6 +123,7 @@ private:
   bool                  m_rgbDownConversion;
   bool                  m_bUseWienerFiltering;
   bool                  m_bUse2DSepFiltering;
+  bool                  m_bUseNLMeansFiltering;
   bool                  m_b2DSepMode;
 
   

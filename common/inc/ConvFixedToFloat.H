@@ -61,11 +61,14 @@ private:
   static float convertValue        (const imgpel iComp,               double weight, double offset, float minValue, float maxValue);  
   static float convertValue        (const uint16 iComp,               double weight, double offset, float minValue, float maxValue);
   static float convertValue        (const uint16 iComp, int bitScale, double weight, double offset, float minValue, float maxValue);
-
+  static float convertValue        (const imgpel iComp,               double weight, const uint16 offset, float minValue, float maxValue);
+  static float convertValue        (const uint16 iComp,               double weight, const uint16 offset, float minValue, float maxValue);
+  
   void  convertComponent    (const imgpel *iComp, float *oComp,               int compSize, double weight, double offset, float minValue, float maxValue);
   void  convertComponent    (const uint16 *iComp, float *oComp,               int compSize, double weight, double offset, float minValue, float maxValue);
   void  convertComponent    (const uint16 *iComp, float *oComp, int bitScale, int compSize, double weight, double offset, float minValue, float maxValue);
   void  convertComponent    (const uint16 *iComp, float *oComp,               int compSize, double weight, const uint16 offset, float minValue, float maxValue);
+  void  convertComponent    (const imgpel *iComp, float *oComp,               int compSize, double weight, const uint16 offset, float minValue, float maxValue);
   void  convertUi16CompData (Frame* out, const Frame *inp);
   void  convertCompData     (Frame* out, const Frame *inp);
 public:

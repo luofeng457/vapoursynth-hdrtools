@@ -97,6 +97,7 @@ public:
   bool              m_rgbDownConversion;
   bool              m_bUseChromaDeblocking;
   bool              m_bUseWienerFiltering;
+  bool              m_bUseNLMeansFiltering;
   bool              m_bUse2DSepFiltering;
   bool              m_b2DSepMode;
 

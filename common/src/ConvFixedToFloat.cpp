@@ -77,11 +77,21 @@ float ConvFixedToFloat::convertValue (const imgpel iComp, double weight, double 
 }
 
 float ConvFixedToFloat::convertValue (const uint16 iComp, double weight, double offset, float minValue, float maxValue) {
+
     return fClip((float) ((weight * (double) (iComp)) - offset), minValue, maxValue);
 }
 
 float ConvFixedToFloat::convertValue (const uint16 iComp,  int bitScale, double weight, double offset, float minValue, float maxValue) {
     return fClip((float) (weight * (((double) (iComp >> bitScale)) - offset)), minValue, maxValue);
+}
+
+
+float ConvFixedToFloat::convertValue (const imgpel iComp, double weight, const uint16 offset, float minValue, float maxValue) {
+    return fClip((float) ((weight * (double) (iComp - offset))), minValue, maxValue);
+}
+
+float ConvFixedToFloat::convertValue (const uint16 iComp, double weight, const uint16 offset, float minValue, float maxValue) {
+    return fClip((float) ((weight * (double) (iComp - offset))), minValue, maxValue);
 }
 
 void ConvFixedToFloat::convertComponent (const imgpel *iComp, float *oComp, int compSize, double weight, double offset, float minValue, float maxValue) {
@@ -93,6 +103,12 @@ void ConvFixedToFloat::convertComponent (const imgpel *iComp, float *oComp, int 
 void ConvFixedToFloat::convertComponent (const uint16 *iComp, float *oComp, int compSize, double weight, double offset, float minValue, float maxValue) {
   for (int i = 0; i < compSize; i++) {
     *oComp++ = fClip((float) ((weight * (double) (*iComp++)) - offset), minValue, maxValue);
+  }
+}
+
+void ConvFixedToFloat::convertComponent (const imgpel *iComp, float *oComp, int compSize, double weight, const uint16 offset, float minValue, float maxValue) {
+  for (int i = 0; i < compSize; i++) {
+    *oComp++ = fClip((float) ((weight * (double) (*iComp++ - offset))), minValue, maxValue);
   }
 }
 
@@ -115,10 +131,10 @@ float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sample
       switch (component) {
         case Y_COMP:
         default:
-          return convertValue (inpValue, 1.0 / ((1 << bitDepth) - 1.0), 0.0,  0.0f, 1.0f);
+          return convertValue (inpValue, 1.0 / ((1 << bitDepth) - 1.0), (const uint16) 0, -0.5f, 0.5f);
         case U_COMP:
         case V_COMP:
-          return convertValue (inpValue, 1.0 / ((1 << bitDepth) - 1.0), 0.5, -0.5f, 0.5f);
+          return convertValue (inpValue, 1.0 / ((1 << bitDepth) - 1.0), (const uint16) ((1 << (bitDepth - 1))), -0.5f, 0.5f);
       }
     }
     else {
@@ -220,9 +236,9 @@ void ConvFixedToFloat::convertCompData(Frame* out, const Frame *inp) {
   switch (inp->m_sampleRange) {
     case SR_FULL:
       if (inp->m_colorSpace == CM_YCbCr) {
-        convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), 0.0,  0.0f, 1.0f);
-        convertComponent (inp->m_comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP])) - 1.0), 0.5, -0.5f, 0.5f);
-        convertComponent (inp->m_comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP])) - 1.0), 0.5, -0.5f, 0.5f);
+        convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), (const uint16) 0,  0.0f, 1.0f);
+        convertComponent (inp->m_comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[U_COMP]-1))), -0.5f, 0.5f);
+        convertComponent (inp->m_comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[V_COMP]-1))), -0.5f, 0.5f);
       }
       else {
         convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), 0.0,  0.0f, 1.0f);
@@ -234,9 +250,10 @@ void ConvFixedToFloat::convertCompData(Frame* out, const Frame *inp) {
     case SR_STANDARD:
     default:
       if (inp->m_colorSpace == CM_YCbCr) {
-        convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0),  16.0 / 219.0,  0.0f, 1.0f);
-        convertComponent (inp->m_comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), 128.0 / 224.0, -0.5f, 0.5f);
-        convertComponent (inp->m_comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), 128.0 / 224.0, -0.5f, 0.5f);
+        convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0), (const uint16) (1 << (inp->m_bitDepthComp[Y_COMP]-4)),  0.0f, 1.0f);
+        convertComponent (inp->m_comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[U_COMP]-1)), -0.5f, 0.5f);
+        convertComponent (inp->m_comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[V_COMP]-1)), -0.5f, 0.5f);
+
       }
       else {
         convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0),  16.0 / 219.0,  0.0f, 1.0f);
@@ -254,9 +271,9 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
   switch (inp->m_sampleRange) {
     case SR_FULL:
       if (inp->m_colorSpace == CM_YCbCr) {
-        convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), 0.0,  0.0f, 1.0f);
-        convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP])) - 1.0), 0.5, -0.5f, 0.5f);
-        convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP])) - 1.0), 0.5, -0.5f, 0.5f);
+        convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), (const uint16) 0,  0.0f, 1.0f);
+        convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[U_COMP]-1))), -0.5f, 0.5f);
+        convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[V_COMP]-1))), -0.5f, 0.5f);
       }
       else {
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), 0.0,  0.0f, 1.0f);
@@ -267,13 +284,9 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
     case SR_STANDARD:
     default:
       if (inp->m_colorSpace == CM_YCbCr) {
-//        convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0),  16.0 / 219.0,  0.0f, 1.0f);
-//        convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), 128.0 / 224.0, -0.5f, 0.5f);
-//        convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), 128.0 / 224.0, -0.5f, 0.5f);
-        convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0),  (const uint16) (16 * (1 << (inp->m_bitDepthComp[Y_COMP]-8))),  0.0f, 1.0f);
-        convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), (const uint16) (128 * (1 << (inp->m_bitDepthComp[U_COMP]-8))), -0.5f, 0.5f);
-        convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), (const uint16) (128 * (1 << (inp->m_bitDepthComp[V_COMP]-8))), -0.5f, 0.5f);
-
+        convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0), (const uint16) (1 << (inp->m_bitDepthComp[Y_COMP]-4)),  0.0f, 1.0f);
+        convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[U_COMP]-1)), -0.5f, 0.5f);
+        convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[V_COMP]-1)), -0.5f, 0.5f);
       }
       else {
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0),  16.0 / 219.0,  0.0f, 1.0f);

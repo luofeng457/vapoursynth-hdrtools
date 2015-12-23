@@ -81,6 +81,7 @@ HDRConvertEXR::HDRConvertEXR(ProjectParameters *inputParams) {
   
   m_frameFilterNoise0        = NULL;
   m_frameFilterNoise1        = NULL;
+  m_frameFilterNoise2        = NULL;
   
   m_useMinMax                = inputParams->m_useMinMax;
   
@@ -104,6 +105,8 @@ HDRConvertEXR::HDRConvertEXR(ProjectParameters *inputParams) {
   m_rgbDownConversion        = inputParams->m_rgbDownConversion;
   m_bUseWienerFiltering      = inputParams->m_bUseWienerFiltering;
   m_bUse2DSepFiltering       = inputParams->m_bUse2DSepFiltering;
+  m_bUseNLMeansFiltering     = inputParams->m_bUseNLMeansFiltering;
+
   m_b2DSepMode               = inputParams->m_b2DSepMode;
   
   m_srcDisplayGammaAdjust    = NULL;
@@ -233,9 +236,15 @@ void HDRConvertEXR::destroy() {
     delete m_frameFilterNoise0;
     m_frameFilterNoise0 = NULL;
   }
+  
   if (m_frameFilterNoise1 != NULL) {
     delete m_frameFilterNoise1;
     m_frameFilterNoise1 = NULL;
+  }
+
+  if (m_frameFilterNoise2 != NULL) {
+    delete m_frameFilterNoise2;
+    m_frameFilterNoise2 = NULL;
   }
   
   IOFunctions::closeFile(m_inputFile);
@@ -377,11 +386,16 @@ void HDRConvertEXR::allocateFrameStores(ProjectParameters *inputParams, FrameFor
   
   if (m_bUseWienerFiltering == TRUE) {
     m_frameFilterNoise0 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_WIENER2DD);
-    
   }
   
-  if (m_bUse2DSepFiltering == TRUE)
+  if (m_bUse2DSepFiltering == TRUE) {
     m_frameFilterNoise1 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_2DSEP, m_b2DSepMode);
+  }
+  
+  if (m_bUseNLMeansFiltering == TRUE) {
+    m_frameFilterNoise2 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_NLMEANS);
+  }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -510,6 +524,10 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
     if (m_bUse2DSepFiltering == TRUE)
       m_frameFilterNoise1->process(currentFrame);
 
+    // NLMeans denoiser      
+    if (m_bUseNLMeansFiltering == TRUE)
+      m_frameFilterNoise2->process(currentFrame);
+    
     m_toneMapping->process(currentFrame);
     
     linearFrame = currentFrame;

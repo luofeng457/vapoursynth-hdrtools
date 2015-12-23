@@ -143,6 +143,8 @@
 		C53E9BC91C10F87C00448F69 /* Conv444to420CrBounds.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BC81C10F87C00448F69 /* Conv444to420CrBounds.H */; };
 		C53E9BCB1C12615500448F69 /* Conv444to420CrFBounds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C53E9BCA1C12615500448F69 /* Conv444to420CrFBounds.cpp */; };
 		C53E9BCD1C1261A100448F69 /* Conv444to420CrFBounds.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */; };
+		C53E9BCF1C175C2100448F69 /* FrameFilterNLMeans.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */; };
+		C53E9BD11C175C3800448F69 /* FrameFilterNLMeans.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */; };
 		C54BDE0A1ACB236A000A34BE /* ColorTransformClosedLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */; };
 		C54BDE0C1ACB2384000A34BE /* ColorTransformClosedLoop.H in Headers */ = {isa = PBXBuildFile; fileRef = C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */; };
 		C5528B301BE3045300CCADA5 /* TransferFunctionHPQ2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */; };
@@ -405,6 +407,8 @@
 		C53E9BC81C10F87C00448F69 /* Conv444to420CrBounds.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to420CrBounds.H; path = ../common/inc/Conv444to420CrBounds.H; sourceTree = "<group>"; };
 		C53E9BCA1C12615500448F69 /* Conv444to420CrFBounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv444to420CrFBounds.cpp; path = ../common/src/Conv444to420CrFBounds.cpp; sourceTree = "<group>"; };
 		C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to420CrFBounds.H; path = ../common/inc/Conv444to420CrFBounds.H; sourceTree = "<group>"; };
+		C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameFilterNLMeans.cpp; path = ../common/src/FrameFilterNLMeans.cpp; sourceTree = "<group>"; };
+		C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameFilterNLMeans.H; path = ../common/inc/FrameFilterNLMeans.H; sourceTree = "<group>"; };
 		C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformClosedLoop.cpp; path = ../common/src/ColorTransformClosedLoop.cpp; sourceTree = "<group>"; };
 		C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformClosedLoop.H; path = ../common/inc/ColorTransformClosedLoop.H; sourceTree = "<group>"; };
 		C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionHPQ2.cpp; path = ../common/src/TransferFunctionHPQ2.cpp; sourceTree = "<group>"; };
@@ -936,6 +940,7 @@
 				C585BD141B06C54700235FE6 /* FrameFilterDeblock.H */,
 				C585BD121B06C48B00235FE6 /* FrameFilterNull.H */,
 				C59D6C6F1B1672F3009F704D /* FrameFilterWiener2D.H */,
+				C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */,
 				C5CC7E3A1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H */,
 				C5E382EF1AE8107200FE5693 /* FrameFormat.H */,
 				C5E384B11AFF1BB900FE5693 /* FrameScale.H */,
@@ -1057,6 +1062,7 @@
 				C585BD161B06C55B00235FE6 /* FrameFilterDeblock.cpp */,
 				C585BD101B06C44100235FE6 /* FrameFilterNull.cpp */,
 				C59D6C711B167306009F704D /* FrameFilterWiener2D.cpp */,
+				C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */,
 				C5CC7E381BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp */,
 				C5E384B31AFF1BD000FE5693 /* FrameScale.cpp */,
 				C5E384B91AFF311500FE5693 /* FrameScaleHalf.cpp */,
@@ -1335,6 +1341,7 @@
 				C5133E0419CCF59C00D64D48 /* Output.H in Headers */,
 				C5133E0519CCF59C00D64D48 /* OutputEXR.H in Headers */,
 				C5C79C2B1AC4E37D00FB9A29 /* Conv444to422Generic.H in Headers */,
+				C53E9BD11C175C3800448F69 /* FrameFilterNLMeans.H in Headers */,
 				C5133E0619CCF59C00D64D48 /* OutputYUV.H in Headers */,
 				C5133E0719CCF59C00D64D48 /* Parameters.H in Headers */,
 				C5133E0819CCF59D00D64D48 /* TransferFunction.H in Headers */,
@@ -1588,6 +1595,7 @@
 				C5FF1E7B1A1AD166008CFF60 /* TransferFunctionPower.cpp in Sources */,
 				C5133E2A19CCF5B700D64D48 /* ImgToBufEndian.cpp in Sources */,
 				C530C3891B7E93D100FD6D7E /* ToneMapping.cpp in Sources */,
+				C53E9BCF1C175C2100448F69 /* FrameFilterNLMeans.cpp in Sources */,
 				C5133E2B19CCF5B700D64D48 /* Input.cpp in Sources */,
 				C5133E2C19CCF5B700D64D48 /* InputEXR.cpp in Sources */,
 				C5BE37CB1B7BE73200350F6D /* DisplayGammaAdjust.cpp in Sources */,

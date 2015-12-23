@@ -137,6 +137,7 @@
     <ClCompile Include="src\FrameFilter.cpp" />
     <ClCompile Include="src\FrameFilter2DSep.cpp" />
     <ClCompile Include="src\FrameFilterDeblock.cpp" />
+    <ClCompile Include="src\FrameFilterNLMeans.cpp" />
     <ClCompile Include="src\FrameFilterNull.cpp" />
     <ClCompile Include="src\FrameFilterWiener2D.cpp" />
     <ClCompile Include="src\FrameFilterWiener2DDark.cpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="inc\FrameFilter.H" />
     <ClInclude Include="inc\FrameFilter2DSep.H" />
     <ClInclude Include="inc\FrameFilterDeblock.H" />
+    <ClInclude Include="inc\FrameFilterNLMeans.H" />
     <ClInclude Include="inc\FrameFilterNull.H" />
     <ClInclude Include="inc\FrameFilterWiener2D.H" />
     <ClInclude Include="inc\FrameFilterWiener2DDark.H" />

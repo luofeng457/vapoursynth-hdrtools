@@ -77,6 +77,7 @@ HDRConvertYUV::HDRConvertYUV(ProjectParameters *inputParams) {
   m_frameFilter            = NULL;
   m_frameFilterNoise0      = NULL;
   m_frameFilterNoise1      = NULL;
+  m_frameFilterNoise2      = NULL;
  
   
   m_filterInFloat          = inputParams->m_filterInFloat;
@@ -95,6 +96,8 @@ HDRConvertYUV::HDRConvertYUV(ProjectParameters *inputParams) {
   m_bUseChromaDeblocking   =  inputParams->m_bUseChromaDeblocking;
   m_bUseWienerFiltering    =  inputParams->m_bUseWienerFiltering;
   m_bUse2DSepFiltering     =  inputParams->m_bUse2DSepFiltering;
+  m_bUseNLMeansFiltering   =  inputParams->m_bUseNLMeansFiltering;
+
   m_b2DSepMode             =  inputParams->m_b2DSepMode;
 
   m_croppedFrameStore      = NULL;
@@ -119,6 +122,10 @@ void HDRConvertYUV::destroy() {
   if (m_frameFilterNoise1 != NULL) {
     delete m_frameFilterNoise1;
     m_frameFilterNoise1 = NULL;    
+  }
+  if (m_frameFilterNoise2 != NULL) {
+    delete m_frameFilterNoise2;
+    m_frameFilterNoise2 = NULL;    
   }
   
   if (m_convertFormat != NULL){
@@ -386,6 +393,8 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
     m_frameFilterNoise0 = FrameFilter::create(m_width, m_height, FT_WIENER2D);
   if (m_bUse2DSepFiltering == TRUE)
     m_frameFilterNoise1 = FrameFilter::create(m_width, m_height, FT_2DSEP, m_b2DSepMode);
+  if (m_bUseNLMeansFiltering == TRUE)
+    m_frameFilterNoise2 = FrameFilter::create(m_width, m_height, FT_NLMEANS);
   
   m_srcDisplayGammaAdjust = DisplayGammaAdjust::create(input->m_displayAdjustment,  m_useSingleTransferStep ? inputParams->m_srcNormalScale : 1.0f, input->m_systemGamma);
   m_outDisplayGammaAdjust = DisplayGammaAdjust::create(output->m_displayAdjustment, m_useSingleTransferStep ? inputParams->m_outNormalScale : 1.0f, output->m_systemGamma);
@@ -471,6 +480,8 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
       m_frameFilterNoise0->process(m_convertFrameStore);
     if (m_bUse2DSepFiltering == TRUE)
       m_frameFilterNoise1->process(m_convertFrameStore);
+    if (m_bUseNLMeansFiltering == TRUE)
+      m_frameFilterNoise2->process(m_convertFrameStore);
 
     // Now perform a color format conversion
     // Output to m_pFrameStore memory with appropriate color space conversion

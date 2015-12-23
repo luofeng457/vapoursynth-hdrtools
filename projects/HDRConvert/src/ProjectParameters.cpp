@@ -159,8 +159,9 @@ BoolParameter boolParameterList[] = {
   { "RGBDownConversion",          &pParams->m_rgbDownConversion,              FALSE,       FALSE,         TRUE,    "Perform downconversion in RGB"            },
   { "UseChromaDeblocking",        &pParams->m_bUseChromaDeblocking,           FALSE,       FALSE,         TRUE,    "Deblock Chroma before Upconversion"       },
   { "UseWienerFiltering",         &pParams->m_bUseWienerFiltering,            FALSE,       FALSE,         TRUE,    "Wiener Filtering before conversion"       },
-  { "Use2DSepFiltering",          &pParams->m_bUse2DSepFiltering,             FALSE,       FALSE,         TRUE,    "Separable Filtering before conversion"       },
-  { "2DSepFilteringMode",         &pParams->m_b2DSepMode,                     FALSE,       FALSE,         TRUE,    "Edge Adaptation On or OFF"               },
+  { "UseNLMeansFiltering",        &pParams->m_bUseNLMeansFiltering,           FALSE,       FALSE,         TRUE,    "NLMeans Filtering before conversion"      },
+  { "Use2DSepFiltering",          &pParams->m_bUse2DSepFiltering,             FALSE,       FALSE,         TRUE,    "Separable Filtering before conversion"    },
+  { "2DSepFilteringMode",         &pParams->m_b2DSepMode,                     FALSE,       FALSE,         TRUE,    "Edge Adaptation On or OFF"                },
   
   
   

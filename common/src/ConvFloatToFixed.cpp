@@ -84,23 +84,20 @@ uint16 ConvFloatToFixed::convertValue (const float iComp, int bitScale, double w
 
 
 void ConvFloatToFixed::convertComponent (const float *iComp, imgpel *oComp, int compSize, double weight, double offset, int maxPelValue) {
-  int i;
-  for (i = 0; i < compSize; i++) {
+  printf("values %10.8f %10.8f %d\n", weight, offset, maxPelValue);
+  for (int i = 0; i < compSize; i++) {
     *oComp++ = (imgpel) fClip(fRound((float) (weight * (double) *iComp++ + offset)), 0.0f, (float) maxPelValue);
-
   }
 }
 
 void ConvFloatToFixed::convertComponent (const float *iComp, uint16 *oComp, int compSize, double weight, double offset, int maxPelValue) {
-  int i;
-  for (i = 0; i < compSize; i++) {
+  for (int i = 0; i < compSize; i++) {
     *oComp++ = (uint16) fClip(fRound((float) (weight * (double) *iComp++ + offset)), 0.0f, (float) maxPelValue);
   }
 }
 
 void ConvFloatToFixed::convertComponentLowBias (const float *iComp, uint16 *oComp, int compSize, double weight, double offset, int maxPelValue) {
-  int i;
-  for (i = 0; i < compSize; i++) {
+  for (int i = 0; i < compSize; i++) {
     *oComp++ = (uint16) fClip(fRoundLowBias ((float) (weight * (double) *iComp++ + offset)), 0.0f, (float) maxPelValue);
   }
 }

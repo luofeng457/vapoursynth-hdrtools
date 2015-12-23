@@ -59,6 +59,7 @@
 #include "FrameFilterWiener2D.H"
 #include "FrameFilterWiener2DDark.H"
 #include "FrameFilter2DSep.H"
+#include "FrameFilterNLMeans.H"
 
 //-----------------------------------------------------------------------------
 // Private methods
@@ -84,6 +85,9 @@ FrameFilter *FrameFilter::create(int iWidth, int iHeight, int method, bool mode)
   }
   else if (method == FT_WIENER2DD) {
     result = new FrameFilterWiener2DDark(iWidth, iHeight);
+  }
+  else if (method == FT_NLMEANS) {
+    result = new FrameFilterNLMeans(iWidth, iHeight);
   }
   
   return result;

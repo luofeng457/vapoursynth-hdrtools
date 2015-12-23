@@ -80,6 +80,7 @@ HDRConvertTIFF::HDRConvertTIFF(ProjectParameters *inputParams) {
 
   m_frameFilterNoise0        = NULL;
   m_frameFilterNoise1        = NULL;
+  m_frameFilterNoise2        = NULL;
 
   m_useMinMax                = inputParams->m_useMinMax;
 
@@ -98,6 +99,7 @@ HDRConvertTIFF::HDRConvertTIFF(ProjectParameters *inputParams) {
 
   m_bUseWienerFiltering      = inputParams->m_bUseWienerFiltering;
   m_bUse2DSepFiltering       = inputParams->m_bUse2DSepFiltering;
+  m_bUseNLMeansFiltering     = inputParams->m_bUseNLMeansFiltering;
   m_b2DSepMode               = inputParams->m_b2DSepMode;
 
   m_convertIQuantize        = NULL;
@@ -150,6 +152,10 @@ void HDRConvertTIFF::deleteMemory(){
     m_frameFilterNoise1 = NULL;
   }
   
+  if (m_frameFilterNoise2 != NULL) {
+    delete m_frameFilterNoise2;
+    m_frameFilterNoise2 = NULL;
+  }
   
   if (m_convertTo420 != NULL) {
     delete m_convertTo420;
@@ -236,9 +242,15 @@ void HDRConvertTIFF::destroy() {
     delete m_frameFilterNoise0;
     m_frameFilterNoise0 = NULL;
   }
+  
   if (m_frameFilterNoise1 != NULL) {
     delete m_frameFilterNoise1;
     m_frameFilterNoise1 = NULL;
+  }
+  
+  if (m_frameFilterNoise2 != NULL) {
+    delete m_frameFilterNoise2;
+    m_frameFilterNoise2 = NULL;
   }
   
   IOFunctions::closeFile(m_inputFile);
@@ -352,11 +364,17 @@ void HDRConvertTIFF::allocateFrameStores(ProjectParameters *inputParams, FrameFo
   // To be done later.
   m_convertTo420 = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveDownsampling, inputParams->m_useMinMax);
   
-  if (m_bUseWienerFiltering == TRUE)
+  if (m_bUseWienerFiltering == TRUE) {
     m_frameFilterNoise0 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_WIENER2D);
-
-  if (m_bUse2DSepFiltering == TRUE)
+  }
+  
+  if (m_bUse2DSepFiltering == TRUE) {
     m_frameFilterNoise1 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_2DSEP, m_b2DSepMode);
+  }
+  
+  if (m_bUseNLMeansFiltering == TRUE) {
+    m_frameFilterNoise2 = FrameFilter::create(output->m_width[Y_COMP], output->m_height[Y_COMP], FT_NLMEANS);
+  }
 }
 
 void HDRConvertTIFF::init (ProjectParameters *inputParams) {
@@ -484,6 +502,10 @@ void HDRConvertTIFF::process( ProjectParameters *inputParams ) {
     // Separable denoiser      
     if (m_bUse2DSepFiltering == TRUE)
       m_frameFilterNoise1->process(currentFrame);
+
+    // NLMeans denoiser      
+    if (m_bUseNLMeansFiltering == TRUE)
+      m_frameFilterNoise2->process(currentFrame);
 
     m_toneMapping->process(currentFrame);
 

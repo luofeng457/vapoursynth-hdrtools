@@ -221,6 +221,7 @@ typedef enum  {
   FT_WIENER2D  = 2,
   FT_2DSEP     = 3,
   FT_WIENER2DD = 4,
+  FT_NLMEANS   = 5,
   FT_TOTAL
 } FilterTypes;
 
