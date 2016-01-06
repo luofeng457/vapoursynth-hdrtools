@@ -101,7 +101,7 @@ HDRConvert *HDRConvert::create(ProjectParameters *inputParams) {
   
   if (inputParams->m_inputFile.m_videoType == VIDEO_YUV)
     result = new HDRConvertYUV(inputParams);
-  else if (inputParams->m_inputFile.m_videoType == VIDEO_TIFF)
+  else if (inputParams->m_inputFile.m_videoType == VIDEO_TIFF || inputParams->m_inputFile.m_videoType == VIDEO_Y4M)
     result = new HDRConvertTIFF(inputParams);
   else
     result = new HDRConvertEXR(inputParams);

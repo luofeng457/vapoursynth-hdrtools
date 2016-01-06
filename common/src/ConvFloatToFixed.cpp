@@ -84,7 +84,6 @@ uint16 ConvFloatToFixed::convertValue (const float iComp, int bitScale, double w
 
 
 void ConvFloatToFixed::convertComponent (const float *iComp, imgpel *oComp, int compSize, double weight, double offset, int maxPelValue) {
-  printf("values %10.8f %10.8f %d\n", weight, offset, maxPelValue);
   for (int i = 0; i < compSize; i++) {
     *oComp++ = (imgpel) fClip(fRound((float) (weight * (double) *iComp++ + offset)), 0.0f, (float) maxPelValue);
   }

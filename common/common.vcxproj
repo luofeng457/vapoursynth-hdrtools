@@ -150,12 +150,14 @@
     <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\InputEXR.cpp" />
     <ClCompile Include="src\InputTIFF.cpp" />
+    <ClCompile Include="src\InputY4M.cpp" />
     <ClCompile Include="src\InputYUV.cpp" />
     <ClCompile Include="src\IOFunctions.cpp" />
     <ClCompile Include="src\Output.cpp" />
     <ClCompile Include="src\OutputAVI.cpp" />
     <ClCompile Include="src\OutputEXR.cpp" />
     <ClCompile Include="src\OutputTIFF.cpp" />
+    <ClCompile Include="src\OutputY4M.cpp" />
     <ClCompile Include="src\OutputYUV.cpp" />
     <ClCompile Include="src\Parameters.cpp" />
     <ClCompile Include="src\ScaleFilter.cpp" />
@@ -267,6 +269,7 @@
     <ClInclude Include="inc\Input.H" />
     <ClInclude Include="inc\InputEXR.H" />
     <ClInclude Include="inc\InputTIFF.H" />
+    <ClInclude Include="inc\InputY4M.H" />
     <ClInclude Include="inc\InputYUV.H" />
     <ClInclude Include="inc\IOFunctions.H" />
     <ClInclude Include="inc\IOTIFF.H" />
@@ -276,6 +279,7 @@
     <ClInclude Include="inc\OutputAVI.H" />
     <ClInclude Include="inc\OutputEXR.H" />
     <ClInclude Include="inc\OutputTIFF.H" />
+    <ClInclude Include="inc\OutputY4M.H" />
     <ClInclude Include="inc\OutputYUV.H" />
     <ClInclude Include="inc\Parameters.H" />
     <ClInclude Include="inc\ScaleFilter.H" />

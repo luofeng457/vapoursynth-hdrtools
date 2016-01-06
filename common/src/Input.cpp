@@ -54,6 +54,7 @@
 //-----------------------------------------------------------------------------
 
 #include "Input.H"
+#include "InputY4M.H"
 #include "InputYUV.H"
 #include "InputEXR.H"
 #include "InputTIFF.H"
@@ -399,6 +400,9 @@ Input *Input::create(IOVideo *inputFile, FrameFormat *format, Parameters *inputP
       break;
     case VIDEO_TIFF:
       result = new InputTIFF(inputFile, format);
+      break;
+    case VIDEO_Y4M:
+      result = new InputY4M(inputFile, format);
       break;
     default:
       fprintf(stderr, "Not supported format type %d\n", inputFile->m_videoType);

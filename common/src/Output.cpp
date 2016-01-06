@@ -57,6 +57,7 @@
 #include "OutputAVI.H"
 #include "OutputEXR.H"
 #include "OutputTIFF.H"
+#include "OutputY4M.H"
 #include "OutputYUV.H"
 #include "Global.H"
 
@@ -322,6 +323,9 @@ Output *Output::create(IOVideo *outputFile, FrameFormat *format) {
       exit(EXIT_FAILURE);
     }
     break;
+    case VIDEO_Y4M:
+      result = new OutputY4M(outputFile, format);
+      break;
     case VIDEO_EXR:
       result = new OutputEXR(outputFile, format);
       break;

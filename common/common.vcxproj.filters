@@ -339,6 +339,12 @@
     <ClCompile Include="src\FrameFilterNLMeans.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\InputY4M.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\OutputY4M.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -699,6 +705,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\FrameFilterNLMeans.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\InputY4M.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\OutputY4M.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

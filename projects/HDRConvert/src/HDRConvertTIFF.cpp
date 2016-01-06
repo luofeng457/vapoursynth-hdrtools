@@ -274,6 +274,7 @@ void HDRConvertTIFF::allocateFrameStores(ProjectParameters *inputParams, FrameFo
   // Input. This has the same format as the Input file.
   m_iFrameStore  = new Frame(m_inputFrame->m_width[Y_COMP], m_inputFrame->m_height[Y_COMP], m_inputFrame->m_isFloat, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries, m_inputFrame->m_chromaFormat, m_inputFrame->m_sampleRange, m_inputFrame->m_bitDepthComp[Y_COMP], m_inputFrame->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
   m_iFrameStore->clear();
+  
   // update input parameters to avoid any possible errors later on
   *input = m_iFrameStore->m_format;
   // frame rate is not passed into the frame store so lets copy this here back to the input
@@ -392,7 +393,8 @@ void HDRConvertTIFF::init (ProjectParameters *inputParams) {
   // create memory for reading the input filesource
   
   m_inputFrame = Input::create(m_inputFile, input, inputParams);
-  
+  m_inputFile->m_format = *input;
+    
   // Read first frame just to see if there is need to update any parameters (resolution of TIFF files is in the file).
   if (m_inputFrame->readOneFrame(m_inputFile, 0, m_inputFile->m_fileHeader, m_startFrame) == TRUE) {
     allocateFrameStores(inputParams, input, output);

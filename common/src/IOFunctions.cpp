@@ -390,7 +390,12 @@ VideoFileType IOFunctions::parseVideoType (IOVideo *inputFile) {
   char *format  = inputFile->m_fName + (int) strlen(inputFile->m_fName) - 3;
   char *format2 = inputFile->m_fName + (int) strlen(inputFile->m_fName) - 4;
 
-  if (strcasecmp (format, "yuv") == 0) {
+  if (strcasecmp (format, "y4m") == 0) {
+    inputFile->m_videoType = VIDEO_Y4M;
+    inputFile->m_format.m_chromaFormat = CF_420;
+    inputFile->m_avi = NULL;
+  }
+  else if (strcasecmp (format, "yuv") == 0) {
     inputFile->m_videoType = VIDEO_YUV;
     inputFile->m_format.m_chromaFormat = CF_420;
     inputFile->m_avi = NULL;
@@ -401,13 +406,11 @@ VideoFileType IOFunctions::parseVideoType (IOVideo *inputFile) {
     inputFile->m_avi = NULL;
   }
   else if ((strcasecmp (format, "tif") == 0) || (strcasecmp (format2, "tiff") == 0)) {
-  // Currently format is not supported
     inputFile->m_videoType = VIDEO_TIFF;
     inputFile->m_format.m_chromaFormat = CF_444;
     inputFile->m_avi = NULL;
   }
   else if (strcasecmp (format, "exr") == 0) {
-  // Currently format is not supported
     inputFile->m_videoType = VIDEO_EXR;
     inputFile->m_format.m_chromaFormat = CF_444;
     inputFile->m_avi = NULL;

@@ -179,6 +179,10 @@
 		C59D6C721B167306009F704D /* FrameFilterWiener2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C59D6C711B167306009F704D /* FrameFilterWiener2D.cpp */; };
 		C5AED38A1BD92B8800682304 /* TransferFunctionHPQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5AED3891BD92B8800682304 /* TransferFunctionHPQ.cpp */; };
 		C5AED38C1BD92BAC00682304 /* TransferFunctionHPQ.H in Headers */ = {isa = PBXBuildFile; fileRef = C5AED38B1BD92BAC00682304 /* TransferFunctionHPQ.H */; };
+		C5B0803D1C2B6920000335A7 /* OutputY4M.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5B0803C1C2B6920000335A7 /* OutputY4M.cpp */; };
+		C5B0803F1C2B6957000335A7 /* OutputY4M.H in Headers */ = {isa = PBXBuildFile; fileRef = C5B0803E1C2B6957000335A7 /* OutputY4M.H */; };
+		C5B080411C2B6975000335A7 /* InputY4M.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5B080401C2B6975000335A7 /* InputY4M.cpp */; };
+		C5B080431C2B6B50000335A7 /* InputY4M.H in Headers */ = {isa = PBXBuildFile; fileRef = C5B080421C2B6B50000335A7 /* InputY4M.H */; };
 		C5BE378D1B5730F800350F6D /* TransferFunctionPQLB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE378C1B5730F800350F6D /* TransferFunctionPQLB.cpp */; };
 		C5BE378F1B57312800350F6D /* TransferFunctionPQLB.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BE378E1B57312800350F6D /* TransferFunctionPQLB.H */; };
 		C5BE37911B58612300350F6D /* ColorTransformYAdjustAlt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37901B58612300350F6D /* ColorTransformYAdjustAlt.cpp */; };
@@ -449,6 +453,10 @@
 		C59D6C711B167306009F704D /* FrameFilterWiener2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameFilterWiener2D.cpp; path = ../common/src/FrameFilterWiener2D.cpp; sourceTree = "<group>"; };
 		C5AED3891BD92B8800682304 /* TransferFunctionHPQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionHPQ.cpp; path = ../common/src/TransferFunctionHPQ.cpp; sourceTree = "<group>"; };
 		C5AED38B1BD92BAC00682304 /* TransferFunctionHPQ.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransferFunctionHPQ.H; path = ../common/inc/TransferFunctionHPQ.H; sourceTree = "<group>"; };
+		C5B0803C1C2B6920000335A7 /* OutputY4M.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = OutputY4M.cpp; path = ../common/src/OutputY4M.cpp; sourceTree = "<group>"; };
+		C5B0803E1C2B6957000335A7 /* OutputY4M.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OutputY4M.H; path = ../common/inc/OutputY4M.H; sourceTree = "<group>"; };
+		C5B080401C2B6975000335A7 /* InputY4M.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputY4M.cpp; path = ../common/src/InputY4M.cpp; sourceTree = "<group>"; };
+		C5B080421C2B6B50000335A7 /* InputY4M.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = InputY4M.H; path = ../common/inc/InputY4M.H; sourceTree = "<group>"; };
 		C5BD26A819CCAC10003F1B51 /* AddNoise.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AddNoise.H; path = ../common/inc/AddNoise.H; sourceTree = "<group>"; };
 		C5BD26A919CCAC10003F1B51 /* AddNoiseNull.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AddNoiseNull.H; path = ../common/inc/AddNoiseNull.H; sourceTree = "<group>"; };
 		C5BD26AA19CCAC10003F1B51 /* AddNoiseNormal.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AddNoiseNormal.H; path = ../common/inc/AddNoiseNormal.H; sourceTree = "<group>"; };
@@ -955,6 +963,7 @@
 				C5BD26CA19CCAC10003F1B51 /* InputEXR.H */,
 				C5BD26CB19CCAC10003F1B51 /* InputTIFF.H */,
 				C5BD26CC19CCAC10003F1B51 /* InputYUV.H */,
+				C5B080421C2B6B50000335A7 /* InputY4M.H */,
 				C5BD26CD19CCAC10003F1B51 /* IOFunctions.H */,
 				C5BD26D019CCAC10003F1B51 /* IOTIFF.H */,
 				C5BD26CE19CCAC10003F1B51 /* IOVideo.H */,
@@ -964,6 +973,7 @@
 				C5BD26D219CCAC10003F1B51 /* OutputEXR.H */,
 				C5DE88D61A09B7E300248B84 /* OutputTIFF.H */,
 				C5BD26D319CCAC10003F1B51 /* OutputYUV.H */,
+				C5B0803E1C2B6957000335A7 /* OutputY4M.H */,
 				C5BD26D419CCAC10003F1B51 /* Parameters.H */,
 				C51896351ACF64230021356F /* ScaleFilter.H */,
 				C530C38A1B7E946300FD6D7E /* ToneMapping.H */,
@@ -1074,12 +1084,14 @@
 				C5BD26FA19CCAC17003F1B51 /* InputEXR.cpp */,
 				C5BD26FB19CCAC17003F1B51 /* InputTIFF.cpp */,
 				C5BD26FC19CCAC17003F1B51 /* InputYUV.cpp */,
+				C5B080401C2B6975000335A7 /* InputY4M.cpp */,
 				C5BD26FD19CCAC17003F1B51 /* IOFunctions.cpp */,
 				C5BD26FE19CCAC17003F1B51 /* Output.cpp */,
 				C5DA4E411A5CB64800DA2F2E /* OutputAVI.cpp */,
 				C5BD26FF19CCAC17003F1B51 /* OutputEXR.cpp */,
 				C5DE88D41A09B7CC00248B84 /* OutputTIFF.cpp */,
 				C5BD270019CCAC17003F1B51 /* OutputYUV.cpp */,
+				C5B0803C1C2B6920000335A7 /* OutputY4M.cpp */,
 				C5BD270119CCAC17003F1B51 /* Parameters.cpp */,
 				C51896331ACF63D80021356F /* ScaleFilter.cpp */,
 				C530C3881B7E93D100FD6D7E /* ToneMapping.cpp */,
@@ -1256,6 +1268,7 @@
 				C5528B3E1BEAC27700CCADA5 /* ColorTransformClosedLoopRGB.H in Headers */,
 				C5133DE019CCF59B00D64D48 /* BufToImgEndian.H in Headers */,
 				C5133DE119CCF59B00D64D48 /* ColorTransform.H in Headers */,
+				C5B080431C2B6B50000335A7 /* InputY4M.H in Headers */,
 				C5133E7E19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H in Headers */,
 				C53E9BBF1C0FCF7100448F69 /* Conv444to420CrEdge.H in Headers */,
 				C585BD071B041FA000235FE6 /* TransferFunctionAMPQ.H in Headers */,
@@ -1317,6 +1330,7 @@
 				C54BDE0C1ACB2384000A34BE /* ColorTransformClosedLoop.H in Headers */,
 				C5133DF619CCF59C00D64D48 /* Frame.H in Headers */,
 				C5133DF719CCF59C00D64D48 /* Global.H in Headers */,
+				C5B0803F1C2B6957000335A7 /* OutputY4M.H in Headers */,
 				C53E9BC51C10C9FA00448F69 /* ColorTransformYAdjustLFast.H in Headers */,
 				C5BE379F1B752C8A00350F6D /* HDRConvScalerTIFF.H in Headers */,
 				C5133DF819CCF59C00D64D48 /* IFunctions.H in Headers */,
@@ -1529,6 +1543,7 @@
 				C5528B401BEAE67A00CCADA5 /* ColorTransformClosedLoopY.cpp in Sources */,
 				C5BE37CD1B7BEA2900350F6D /* DisplayGammaAdjustNull.cpp in Sources */,
 				C5133E1119CCF5B700D64D48 /* BufToImg.cpp in Sources */,
+				C5B0803D1C2B6920000335A7 /* OutputY4M.cpp in Sources */,
 				C5133E1219CCF5B700D64D48 /* BufToImgBasic.cpp in Sources */,
 				C55438DE1AE6CA5C003ABEA0 /* TransferFunctionMPQ.cpp in Sources */,
 				C5133E1319CCF5B700D64D48 /* BufToImgEndian.cpp in Sources */,
@@ -1566,6 +1581,7 @@
 				C585BD051B041F9000235FE6 /* TransferFunctionAMPQ.cpp in Sources */,
 				C585BD171B06C55B00235FE6 /* FrameFilterDeblock.cpp in Sources */,
 				C5133E2019CCF5B700D64D48 /* ConvFixedToFloat.cpp in Sources */,
+				C5B080411C2B6975000335A7 /* InputY4M.cpp in Sources */,
 				C5DE3F3D19E3B877006FA313 /* TransferFunctionHG.cpp in Sources */,
 				C585BD091B05190500235FE6 /* TransferFunctionAPH.cpp in Sources */,
 				C5528B3C1BEAC24900CCADA5 /* ColorTransformClosedLoopRGB.cpp in Sources */,

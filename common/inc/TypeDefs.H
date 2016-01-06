@@ -61,6 +61,7 @@ typedef enum {
   VIDEO_TIFF    =  3,
   VIDEO_AVI     =  4,
   VIDEO_EXR     =  5,
+  VIDEO_Y4M     =  6,
   VIDEO_TOTAL
 } VideoFileType;
 
