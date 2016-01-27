@@ -583,7 +583,7 @@ int OutputEXR::writeHeaderData( int vfile, FrameFormat *source)
   }
   else {
     int count = 0;
-    // Read magic number
+    // Write magic number
     if (mm_write(vfile, (char *) &m_magicNumber, sizeof(int)) != sizeof(int)) {
       printf ("cannot write magic number to output file, unexpected EOF!\n");
       return 0;

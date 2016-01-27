@@ -126,9 +126,11 @@ typedef enum {
   PF_RGB     =  5,     //!< RGB
   PF_V210    =  6,     //!< V210
   PF_UYVY10  =  7,     //!< UYVY10
-  PF_XYZ     =  8,     //!< XYZ
+  PF_V410    =  8,     //!< V410
+  PF_R210    =  9,     //!< R210
+  PF_XYZ     =  10,    //!< XYZ
 #ifdef __SIM2_SUPPORT_ENABLED__
-  PF_SIM2    =  9,     //!< Sim2
+  PF_SIM2    =  11,    //!< Sim2
 #endif
   PF_TOTAL
 } PixelFormat;

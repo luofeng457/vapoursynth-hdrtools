@@ -220,6 +220,9 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
   m_avi->m_frameRate = format->m_frameRate;
   
   if (format->m_colorSpace == CM_RGB) {
+    if (format->m_bitDepthComp[Y_COMP] == 10  && format->m_pixelFormat == PF_R210) // assumes m_pixelFormat PF_V410
+      strcpy( m_avi->m_compressor, "r210");
+    else
     strcpy( m_avi->m_compressor, "\0\0\0\0");
   }
 #ifdef __SIM2_SUPPORT_ENABLED__  
@@ -249,7 +252,10 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
           break;
         default:
         case CF_444:
-          strcpy( m_avi->m_compressor, "\0\0\0\0");
+          if (format->m_bitDepthComp[Y_COMP] == 10 && format->m_pixelFormat == PF_V410) // assumes m_pixelFormat PF_V410
+            strcpy( m_avi->m_compressor, "v410");
+          else
+            strcpy( m_avi->m_compressor, "\0\0\0\0");
           break;
       }
     }
@@ -633,7 +639,7 @@ int64 OutputAVI::getFrameSizeInBytes(FrameFormat *source, bool isInterleaved)
   const int bytesY  = m_compSize[Y_COMP];
   const int bytesUV = m_compSize[U_COMP];
   
-  if (isInterleaved == FALSE) {
+  if (0 && isInterleaved == FALSE) {
     framesizeInBytes = (bytesY + 2 * bytesUV) * symbolSizeInBytes;
   }
   else {
@@ -669,7 +675,13 @@ int64 OutputAVI::getFrameSizeInBytes(FrameFormat *source, bool isInterleaved)
           }
           break;
         case CF_444:
-          framesizeInBytes = (bytesY + 2 * bytesUV) * symbolSizeInBytes;
+          if (source->m_pixelFormat == PF_V410 || source->m_pixelFormat == PF_R210) {
+            // Pack 3 10-bit samples into a 32 bit little-endian word
+            framesizeInBytes = bytesY * 4;
+          }
+          else {
+            framesizeInBytes = (bytesY + 2 * bytesUV) * symbolSizeInBytes;
+          }
           break;
         default:
           fprintf(stderr, "Unknown Chroma Format type %d\n", source->m_chromaFormat);
@@ -1691,51 +1703,6 @@ void OutputAVI::formatRGB8(uint8** input,       //!< input buffer
   *output = ocmp;
 }
 
-void OutputAVI::formatV210(uint8** input,       //!< input buffer
-                           uint8** output,      //!< output buffer
-                           FrameFormat *source,         //!< format of source buffer
-                           int symbolSizeInBytes     //!< number of bytes per symbol
-)
-{
-  int i;
-  // final buffer
-  uint8 *ocmp  = NULL;
-  // original buffer
-  
-  uint32  *ui32cmp = (uint32 *) *output;
-  uint16 *ui16cmp0 = (uint16 *) *input;
-  uint16 *ui16cmp1 = ui16cmp0 + source->m_compSize[Y_COMP];
-  uint16 *ui16cmp2 = ui16cmp1 + source->m_compSize[U_COMP];
-  
-  for (i = 0; i < source->m_compSize[Y_COMP]; i+= 6) {
-    // Byte 3          Byte 2          Byte 1          Byte 0
-    // Cr 0                Y 0                 Cb 0
-    // X X 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    *(ui32cmp++)    = (((uint32) *ui16cmp2 & 0x3ff) << 20) | (((uint32) *ui16cmp0  & 0x3ff) << 10) | (((uint32) *ui16cmp1 & 0x3ff) );
-    // Byte 7          Byte 6          Byte 5          Byte 4
-    // Y 2                 Cb 1                Y 1
-    // X X 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    *(ui32cmp++)    = (((uint32) *(ui16cmp0 + 2) & 0x3ff) << 20) | (((uint32) *(ui16cmp1 + 1) & 0x3ff) << 10) | (((uint32) *(ui16cmp0 + 1) & 0x3ff) );
-    
-    // Byte 11         Byte 10         Byte 9          Byte 8
-    // Cb 2                Y 3                 Cr 1
-    // X X 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    *(ui32cmp++)    = (((uint32) *(ui16cmp1 + 2) & 0x3ff) << 20) | (((uint32) *(ui16cmp0 + 3) & 0x3ff) << 10) | (((uint32) *(ui16cmp2 + 1) & 0x3ff));
-    
-    // Byte 15         Byte 14         Byte 13         Byte 12
-    // Y 5                 Cr 2                Y 4
-    // X X 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
-    *(ui32cmp++)    = (((uint32) *(ui16cmp0 + 5) & 0x3ff) << 20) | (((uint32) *(ui16cmp2 + 2) & 0x3ff) << 10) | (((uint32) *(ui16cmp0 + 4) & 0x3ff));
-    
-    ui16cmp0 += 6;
-    ui16cmp1 += 3;
-    ui16cmp2 += 3;
-  }
-  // flip buffers
-  ocmp    = *input;
-  *input  = *output;
-  *output = ocmp;
-}
 
 void OutputAVI::reFormat(uint8** input,       //!< input buffer
                          uint8** output,      //!< output buffer
@@ -1764,7 +1731,6 @@ void OutputAVI::reFormat(uint8** input,       //!< input buffer
     formatRGB8(input, output, format, symbolSizeInBytes);
   }
   else {
-    //formatV210(input, output, format, symbolSizeInBytes);
     reInterleave(input, output, format, symbolSizeInBytes);
   }
 }

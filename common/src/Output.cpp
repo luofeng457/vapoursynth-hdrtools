@@ -306,6 +306,72 @@ void Output::reinterleaveV210(uint8** input,       //!< input buffer
   *output = ocmp;
 }
 
+void Output::reinterleaveV410(uint8** input,       //!< input buffer
+                              uint8** output,      //!< output buffer
+                              FrameFormat *source,         //!< format of source buffer
+                              int symbolSizeInBytes     //!< number of bytes per symbol
+)
+{
+  int i;
+  // final buffer
+  uint8 *ocmp  = NULL;
+  // original buffer
+  
+  uint32  *ui32cmp = (uint32 *) *output;
+  uint16 *ui16cmp0 = (uint16 *) *input;
+  uint16 *ui16cmp1 = ui16cmp0 + source->m_compSize[Y_COMP];
+  uint16 *ui16cmp2 = ui16cmp1 + source->m_compSize[U_COMP];
+  
+  for (i = 0; i < source->m_compSize[Y_COMP]; i++) {
+    // Byte 3          Byte 2          Byte 1          Byte 0
+    // Cr                  Y                  Cb 
+    // 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 X X
+    *(ui32cmp++)    = (((uint32) *(ui16cmp2++) & 0x3ff) << 22) | (((uint32) *(ui16cmp0++)  & 0x3ff) << 12) | (((uint32) *(ui16cmp1++) & 0x3ff) << 2 );
+    
+  }
+  // flip buffers
+  ocmp    = *input;
+  *input  = *output;
+  *output = ocmp;
+}
+
+void Output::reinterleaveR210(uint8** input,       //!< input buffer
+                              uint8** output,      //!< output buffer
+                              FrameFormat *source,         //!< format of source buffer
+                              int symbolSizeInBytes     //!< number of bytes per symbol
+)
+{
+  int i;
+  // final buffer
+  uint8 *ocmp  = NULL;
+  // original buffer
+  
+  uint32  *ui32cmp = (uint32 *) *output;
+  uint16 *ui16cmp0 = (uint16 *) *input;
+  uint16 *ui16cmp1 = ui16cmp0 + source->m_compSize[Y_COMP];
+  uint16 *ui16cmp2 = ui16cmp1 + source->m_compSize[U_COMP];
+  
+  for (i = 0; i < source->m_compSize[Y_COMP]; i++) {
+    // Byte 3          Byte 2          Byte 1          Byte 0
+    // Blo             Glo         Bhi Rlo     Ghi     X X Rhi
+    // 7 6 5 4 3 2 1 0 5 4 3 2 1 0 9 8 3 2 1 0 9 8 7 6 x x 9 8 7 6 5 4
+    *(ui32cmp++)    = (((uint32) *(ui16cmp0) & 0x0ff) << 24) |  // Blo
+                      (((uint32) *(ui16cmp2) & 0x03f) << 18) |  // Glo
+                      (((uint32) *(ui16cmp0) & 0x300) <<  8) |  // Bhi
+                      (((uint32) *(ui16cmp1) & 0x00F) << 12) |  // Rlo
+                      (((uint32) *(ui16cmp2) & 0x3C0) <<  2) |  // Ghi
+                      (((uint32) *(ui16cmp1) & 0x3F0) >>  4);   // Rhi
+                      
+    ui16cmp0++;
+    ui16cmp1++;
+    ui16cmp2++;
+  }
+  // flip buffers
+  ocmp    = *input;
+  *input  = *output;
+  *output = ocmp;
+}
+
 //-----------------------------------------------------------------------------
 // Public methods
 //-----------------------------------------------------------------------------
@@ -441,6 +507,13 @@ void Output::reInterleave ( uint8** input,         //!< input buffer
       }
       break;
     case CF_444:
+      if (format->m_pixelFormat == PF_V410) {
+        reinterleaveV410(input, output, format, symbolSizeInBytes);
+      }
+      else if (format->m_pixelFormat == PF_R210) {
+        reinterleaveR210(input, output, format, symbolSizeInBytes);
+      }
+      else
 #ifdef __SIM2_SUPPORT_ENABLED__
       if (format->m_pixelFormat == PF_SIM2) {
         if (format->m_cositedSampling) {

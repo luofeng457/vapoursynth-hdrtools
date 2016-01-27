@@ -288,7 +288,13 @@ int64 OutputY4M::getFrameSizeInBytes(FrameFormat *source, bool isInterleaved)
           }
           break;
         case CF_444:
-          framesizeInBytes = (bytesY + 2 * bytesUV) * symbolSizeInBytes;
+          if (source->m_pixelFormat == PF_V410 || source->m_pixelFormat == PF_R210) {
+            // Pack 3 10-bit samples into a 32 bit little-endian word
+            framesizeInBytes = bytesY * 4;
+          }
+          else {
+            framesizeInBytes = (bytesY + 2 * bytesUV) * symbolSizeInBytes;
+          }
           break;
         default:
           fprintf(stderr, "Unknown Chroma Format type %d\n", source->m_chromaFormat);

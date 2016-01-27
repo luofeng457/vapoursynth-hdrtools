@@ -71,6 +71,8 @@ private:
   void deInterleaveYVYU   (uint8** input, uint8** output, FrameFormat *source, int symbol_size_in_bytes);
   void deInterleaveUYVY   (uint8** input, uint8** output, FrameFormat *source, int symbol_size_in_bytes);
   void deInterleaveV210   (uint8** input, uint8** output, FrameFormat *source, int symbol_size_in_bytes);
+  void deInterleaveV410   (uint8** input, uint8** output, FrameFormat *source, int symbol_size_in_bytes);
+  void deInterleaveR210   (uint8** input, uint8** output, FrameFormat *source, int symbol_size_in_bytes);
   void deInterleaveUYVY10 (uint8** input, uint8** output, FrameFormat *source, int symbol_size_in_bytes);
 
 public:

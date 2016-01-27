@@ -126,7 +126,6 @@ private:
 #endif
 
   void    formatRGB8(uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes);
-  void    formatV210(uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes);
 
 public:
   OutputAVI(IOVideo *inputFile, FrameFormat *format);

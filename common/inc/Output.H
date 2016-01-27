@@ -69,6 +69,8 @@ private:
   void reinterleaveYVYU   ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
   void reinterleaveUYVY   ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
   void reinterleaveV210   ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
+  void reinterleaveV410   ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
+  void reinterleaveR210   ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
 #ifdef __SIM2_SUPPORT_ENABLED__
   void reinterleaveSim2          ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
   void reinterleaveSim2CoSited   ( uint8** input, uint8** output, FrameFormat *source, int symbolSizeInBytes );
