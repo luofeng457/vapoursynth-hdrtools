@@ -335,6 +335,47 @@ void Output::reinterleaveV410(uint8** input,       //!< input buffer
   *output = ocmp;
 }
 
+void Output::reinterleaveR10K(uint8** input,       //!< input buffer
+                              uint8** output,      //!< output buffer
+                              FrameFormat *source,         //!< format of source buffer
+                              int symbolSizeInBytes     //!< number of bytes per symbol
+)
+{
+  int i;
+  // final buffer
+  uint8 *ocmp  = NULL;
+  // original buffer
+  
+  uint32  *ui32cmp = (uint32 *) *output;
+  uint16 *ui16cmp0 = (uint16 *) *input;
+  uint16 *ui16cmp1 = ui16cmp0 + source->m_compSize[Y_COMP];
+  uint16 *ui16cmp2 = ui16cmp1 + source->m_compSize[U_COMP];
+  
+  for (i = 0; i < source->m_compSize[Y_COMP]; i++) {
+    // Byte 3          Byte 2          Byte 1          Byte 0
+    // R                   G                   B 
+    // 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 X X
+    *(ui32cmp++)    = (((uint32) *(ui16cmp1++) & 0x3FF) | (((uint32) *(ui16cmp2++) & 0x3FF) << 10) | (((uint32) *(ui16cmp0++) & 0x3FF) << 20)) ;
+/*
+    *ui32cmp = 0;
+        
+    *(((uint8 *) ui32cmp) + 0)    = (uint8) (((*(ui16cmp1  ) & 0x0ff) >> 0)); 
+    *(((uint8 *) ui32cmp) + 1)    = (uint8) (((*(ui16cmp1  ) & 0x300) >> 8)) | (uint8) (((*(ui16cmp2  ) & 0x3F) << 2)); 
+    *(((uint8 *) ui32cmp) + 2)    = (uint8) (((*(ui16cmp2  ) & 0x3C0) >> 6)) | (uint8) (((*(ui16cmp0  ) & 0x0F) << 4)); 
+    *(((uint8 *) ui32cmp) + 3)    = (uint8) (((*(ui16cmp0  ) & 0x3F0) >> 4)); 
+    ui32cmp++;
+
+    ui16cmp0++;
+    ui16cmp1++;
+    ui16cmp2++;
+*/    
+  }
+  // flip buffers
+  ocmp    = *input;
+  *input  = *output;
+  *output = ocmp;
+}
+
 void Output::reinterleaveR210(uint8** input,       //!< input buffer
                               uint8** output,      //!< output buffer
                               FrameFormat *source,         //!< format of source buffer
@@ -361,7 +402,6 @@ void Output::reinterleaveR210(uint8** input,       //!< input buffer
                       (((uint32) *(ui16cmp1) & 0x00F) << 12) |  // Rlo
                       (((uint32) *(ui16cmp2) & 0x3C0) <<  2) |  // Ghi
                       (((uint32) *(ui16cmp1) & 0x3F0) >>  4);   // Rhi
-                      
     ui16cmp0++;
     ui16cmp1++;
     ui16cmp2++;
@@ -509,6 +549,9 @@ void Output::reInterleave ( uint8** input,         //!< input buffer
     case CF_444:
       if (format->m_pixelFormat == PF_V410) {
         reinterleaveV410(input, output, format, symbolSizeInBytes);
+      }
+      else if (format->m_pixelFormat == PF_R10K) {
+        reinterleaveR10K(input, output, format, symbolSizeInBytes);
       }
       else if (format->m_pixelFormat == PF_R210) {
         reinterleaveR210(input, output, format, symbolSizeInBytes);

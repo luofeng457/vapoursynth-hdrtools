@@ -166,6 +166,7 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
     m_floatComp[U_COMP] = NULL;
     m_floatComp[V_COMP] = NULL;
   }
+  m_format = *format;
   outputFile->m_format = *format;
 
   m_errorNumber = 0;
@@ -220,8 +221,12 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
   m_avi->m_frameRate = format->m_frameRate;
   
   if (format->m_colorSpace == CM_RGB) {
-    if (format->m_bitDepthComp[Y_COMP] == 10  && format->m_pixelFormat == PF_R210) // assumes m_pixelFormat PF_V410
-      strcpy( m_avi->m_compressor, "r210");
+    if (format->m_bitDepthComp[Y_COMP] == 10) {
+      if(format->m_pixelFormat == PF_R210) // assumes m_pixelFormat PF_R210
+        strcpy( m_avi->m_compressor, "r210");
+      else // r10k
+        strcpy( m_avi->m_compressor, "f10k");
+    }
     else
     strcpy( m_avi->m_compressor, "\0\0\0\0");
   }
@@ -263,12 +268,12 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
   // 0 byte
   m_avi->m_compressor[4] = 0;
   
-  updateHeader();
+  updateHeader(format);
 }
 
 OutputAVI::~OutputAVI() {
   
-  close();
+  close(&(m_outputFile->m_format));
   
   m_outputFile->m_fileNum = -1;
 
@@ -383,7 +388,7 @@ int OutputAVI::sampleSize(int j)
 }
 
 
-int OutputAVI::updateHeader()
+int OutputAVI::updateHeader(FrameFormat *format)
 {
   int njunk, sampsize, ms_per_frame, frate, flag;
   int hdrl_start, strl_start, j;
@@ -490,11 +495,20 @@ int OutputAVI::updateHeader()
   outLong ((char *) header, m_avi->m_width, &nhb);         /* Width */
   outLong ((char *) header, m_avi->m_height, &nhb);        /* Height */
   outShort((char *) header,  1, &nhb);
-  outShort((char *) header, 24, &nhb);     /* Planes, Count */
+  if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K) {
+    outShort((char *) header, 30, &nhb);     /* Planes, Count */
+  }
+  else
+    outShort((char *) header, 24, &nhb);     /* Planes, Count */
   out4CC  ((char *) header, m_avi->m_compressor, &nhb);    /* Compression */
 
   // ThOe (*3)
-  outLong ((char *) header, m_avi->m_width * m_avi->m_height * 3, &nhb);  /* SizeImage (in bytes?) */
+  int sizeImage = m_avi->m_width * m_avi->m_height * 3;
+  if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K)
+    sizeImage = m_avi->m_width * m_avi->m_height * 4;
+  else if (format->m_pixelFormat == PF_V210)
+    sizeImage = (m_avi->m_width * m_avi->m_height / 3) << 3;
+  outLong ((char *) header, sizeImage * 10, &nhb);  /* SizeImage (in bytes?) */
   outLong ((char *) header, 0, &nhb);                  /* XPelsPerMeter */
   outLong((char *) header, 0, &nhb);                  /* YPelsPerMeter */
   outLong((char *) header, 0, &nhb);                  /* ClrUsed: Number of colors used */
@@ -609,8 +623,8 @@ int OutputAVI::updateHeader()
    actually written, report an error if someting goes wrong */
   
   if ( lseek(m_avi->m_fileNum, 0, SEEK_SET)<0 ||
-      mm_write(m_avi->m_fileNum,(char *)header,HEADERBYTES)!=HEADERBYTES ||
-      lseek(m_avi->m_fileNum,m_avi->m_pos,SEEK_SET)<0)
+      mm_write(m_avi->m_fileNum,(char *)header, HEADERBYTES)!=HEADERBYTES ||
+      lseek(m_avi->m_fileNum,m_avi->m_pos, SEEK_SET)<0)
   {
     m_errorNumber = AVI_ERR_CLOSE;
     return -1;
@@ -675,7 +689,7 @@ int64 OutputAVI::getFrameSizeInBytes(FrameFormat *source, bool isInterleaved)
           }
           break;
         case CF_444:
-          if (source->m_pixelFormat == PF_V410 || source->m_pixelFormat == PF_R210) {
+          if (source->m_pixelFormat == PF_V410 || source->m_pixelFormat == PF_R210 || source->m_pixelFormat == PF_R10K) {
             // Pack 3 10-bit samples into a 32 bit little-endian word
             framesizeInBytes = bytesY * 4;
           }
@@ -699,7 +713,7 @@ int64 OutputAVI::getFrameSizeInBytes(FrameFormat *source, bool isInterleaved)
  returns 0 on success, -1 on write error.
  */
 
-int OutputAVI::closeOutputFile()
+int OutputAVI::closeOutputFile(FrameFormat *format)
 {
   
   int ret, njunk, sampsize, hasIndex, ms_per_frame, frate, idxerror, flag;
@@ -888,10 +902,20 @@ int OutputAVI::closeOutputFile()
   outLong ((char *) AVI_header,m_avi->m_width, &nhb);         /* Width */
   outLong ((char *) AVI_header,m_avi->m_height, &nhb);        /* Height */
   outShort ((char *) AVI_header,1, &nhb);
-  outShort ((char *) AVI_header,24, &nhb);     /* Planes, Count */
+  if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K)
+    outShort ((char *) AVI_header, 30, &nhb);     /* Planes, Count */
+  else
+    outShort ((char *) AVI_header,24, &nhb);     /* Planes, Count */
   out4CC ((char *) AVI_header,m_avi->m_compressor, &nhb);    /* Compression */
   // ThOe (*3)
-  outLong ((char *) AVI_header,m_avi->m_width*m_avi->m_height*3, &nhb);  /* SizeImage (in bytes?) */
+  int sizeImage = m_avi->m_width * m_avi->m_height * 3;
+
+  if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K)
+    sizeImage = m_avi->m_width * m_avi->m_height * 4;
+  else if (format->m_pixelFormat == PF_V210)
+    sizeImage = (m_avi->m_width * m_avi->m_height / 3) << 3;
+  
+  outLong ((char *) AVI_header,sizeImage, &nhb);  /* SizeImage (in bytes?) */
   outLong ((char *) AVI_header,0, &nhb);                  /* XPelsPerMeter */
   outLong ((char *) AVI_header,0, &nhb);                  /* YPelsPerMeter */
   outLong ((char *) AVI_header,0, &nhb);                  /* ClrUsed: Number of colors used */
@@ -1251,7 +1275,7 @@ int OutputAVI::closeOutputFile()
   return 0;
 }
 
-int OutputAVI::close()
+int OutputAVI::close(FrameFormat *format)
 {
   int ret;
   
@@ -1259,7 +1283,7 @@ int OutputAVI::close()
    to be written */
 
   if(m_avi->m_mode == AVI_MODE_WRITE)
-    ret = closeOutputFile();
+    ret = closeOutputFile(format);
   else
     ret = 0;
   

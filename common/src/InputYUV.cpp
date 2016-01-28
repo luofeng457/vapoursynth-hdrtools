@@ -272,7 +272,7 @@ int64 InputYUV::getFrameSizeInBytes(FrameFormat *source, bool isInterleaved)
         }
         break;
       case CF_444:
-        if(source->m_pixelFormat== PF_V410 || source->m_pixelFormat== PF_R210) {
+        if(source->m_pixelFormat== PF_V410 || source->m_pixelFormat== PF_R210 || source->m_pixelFormat== PF_R10K) {
           // Pack 3 10-bit samples into a 32 bit little-endian word
           framesizeInBytes = bytesY * 4;
         }

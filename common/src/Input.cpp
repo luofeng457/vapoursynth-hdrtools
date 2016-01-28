@@ -351,7 +351,7 @@ void Input::deInterleaveV410 (
   *output = icmp;
 }
 
-void Input::deInterleaveR210 (
+void Input::deInterleaveR10K (
                               uint8** input,            //!< input buffer
                               uint8** output,           //!< output buffer
                               FrameFormat *source,      //!< format of source buffer
@@ -369,12 +369,45 @@ void Input::deInterleaveR210 (
   
   for (i = 0; i < source->m_compSize[Y_COMP]; i++) {
     // Byte 3          Byte 2          Byte 1          Byte 0
-    // Cr                  Y                  Cb 
+    // R                   G                   B 
     // 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 X X
-    *ui16cmp2++   = (*ui32cmp & 0xFFC00000) >> 22;         // Cr 
-    *ui16cmp0++   = (*ui32cmp & 0x003FF000) >> 12;         // Y 
-    *ui16cmp1++   = (*ui32cmp & 0x00000FFC) >>  2;         // Cb 
+    *ui16cmp1++   = (*ui32cmp & 0x3FF) ;            // R 
+    *ui16cmp2++   = ((*ui32cmp >> 10) & 0x3FF);    // G 
+    *ui16cmp0++   = ((*ui32cmp >> 20) & 0x3FF);    // B 
     ui32cmp++;
+  }
+  
+  // flip buffers
+  icmp    = *input;
+  *input  = *output;
+  *output = icmp;
+}
+
+void Input::deInterleaveR210 (
+                              uint8** input,            //!< input buffer
+                              uint8** output,           //!< output buffer
+                              FrameFormat *source,      //!< format of source buffer
+                              int symbol_size_in_bytes  //!< number of bytes per symbol
+)
+{
+  int i;
+  // original buffer
+  uint8 *icmp  = *input;
+  
+  uint32  *ui32cmp = (uint32 *) *input;
+  uint16 *ui16cmp0 = (uint16 *) *output;
+  uint16 *ui16cmp1 = ui16cmp0 + source->m_compSize[Y_COMP];
+  uint16 *ui16cmp2 = ui16cmp1 + source->m_compSize[U_COMP];
+
+  for (i = 0; i < source->m_compSize[Y_COMP]; i++) {
+    // Byte 3          Byte 2          Byte 1          Byte 0
+    // Blo             Glo         Bhi Rlo     Ghi     X X Rhi
+    // 7 6 5 4 3 2 1 0 5 4 3 2 1 0 9 8 3 2 1 0 9 8 7 6 x x 9 8 7 6 5 4
+    *ui16cmp0++ = ((*ui32cmp & 0xFF000000) >> 24) & ((*ui32cmp & 0x00030000)<< 8);
+    *ui16cmp1++ = ((*ui32cmp & 0x00FC0000) >> 18) & ((*ui32cmp & 0x00000F00) << 4);
+    *ui16cmp2++ = ((*ui32cmp & 0x0000F000) >> 12) & ((*ui32cmp & 0x0000003F) << 4);
+
+      ui32cmp++;
   }
   
   // flip buffers
@@ -590,6 +623,9 @@ void Input::deInterleave ( uint8** input,       //!< input buffer
           break;
         case PF_V410:
           deInterleaveV410(input, output, source, symbolSizeInBytes);
+          break;
+        case PF_R10K:
+          deInterleaveR10K(input, output, source, symbolSizeInBytes);
           break;
         case PF_R210:
           deInterleaveR210(input, output, source, symbolSizeInBytes);

@@ -91,12 +91,13 @@ private:
   IOVideo       *m_outputFile;
   AVIFile       *m_avi;
   byte          *m_header;
+  FrameFormat    m_format;
   
   int     writeData (int vfile, uint8 *buf);
   int     writeData (int vfile, int framesizeInBytes, uint8 *buf);
   int64   getFrameSizeInBytes(FrameFormat *source, bool isInterleaved);
   int64   aviWrite (int fd, char *buffer, int64 len);
-  int     updateHeader();
+  int     updateHeader(FrameFormat *format);
   void    out4CC   (char *dest, const char *source, int64 *length);
   void    outLong  (char *dest, int32 value, int64 *length);
   void    outShort (char *dest, int32 value, int64 *length);
@@ -113,8 +114,8 @@ private:
   int     addStandardIndex(unsigned char *idxtag, unsigned char *strtag, AVIStandardIndexChunk *stdil);
   int     ixnnEntry(AVIStandardIndexChunk *ch, AVISuperIndexEntry *en);
   
-  int     closeOutputFile();
-  int     close();
+  int     closeOutputFile(FrameFormat *format);
+  int     close(FrameFormat *format);
   
   void    reFormat(uint8** , uint8** , FrameFormat *, int  );
 
