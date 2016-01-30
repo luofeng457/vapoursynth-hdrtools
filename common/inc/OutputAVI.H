@@ -67,7 +67,7 @@
 #include "Output.H"
 #include "AVILib.H"
 
-#define HEADERBYTES 2048
+#define HEADERBYTES 7684
 #define AVI_MAX_LEN (UINT_MAX-(1<<20)*16-HEADERBYTES)
 
 #define FRAME_RATE_SCALE 1000000
@@ -92,6 +92,7 @@ private:
   AVIFile       *m_avi;
   byte          *m_header;
   FrameFormat    m_format;
+  int            m_headerBytes;
   
   int     writeData (int vfile, uint8 *buf);
   int     writeData (int vfile, int framesizeInBytes, uint8 *buf);

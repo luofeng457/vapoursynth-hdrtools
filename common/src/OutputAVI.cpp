@@ -60,6 +60,7 @@
 #include "Global.H"
 #include "IOFunctions.H"
 
+//#define INFO_LIST
 //-----------------------------------------------------------------------------
 // Macros/Defines
 //-----------------------------------------------------------------------------
@@ -71,6 +72,7 @@
 
 OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
   
+  m_headerBytes          = (int) HEADERBYTES;
   m_outputFile           = outputFile;
   m_isFloat              = FALSE;
   format->m_isFloat      = m_isFloat;
@@ -177,8 +179,8 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
     return;
   }
   
-  m_header = new byte[HEADERBYTES];
-  memset(m_header,0, HEADERBYTES * sizeof(byte));
+  m_header = new byte[m_headerBytes];
+  memset(m_header,0, m_headerBytes * sizeof(byte));
   
   m_avi->m_fileNum = outputFile->m_fileNum;
   
@@ -195,7 +197,7 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
     return;
   }
 
-  if (aviWrite(m_avi->m_fileNum, (char *) m_header, HEADERBYTES) != HEADERBYTES) {
+  if (aviWrite(m_avi->m_fileNum, (char *) m_header, m_headerBytes) != m_headerBytes) {
 
     IOFunctions::closeFile(&m_avi->m_fileNum);
     m_errorNumber = AVI_ERR_WRITE;
@@ -210,22 +212,13 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
     return;
   }
   
-  m_avi->m_pos  = HEADERBYTES;
-  m_avi->m_mode = AVI_MODE_WRITE;
-  
-  m_avi->m_numberAudioTracks   = 0;
-  m_avi->m_currentAudioTrack   = 0;
-  
-  m_avi->m_width     = format->m_width[Y_COMP];
-  m_avi->m_height    = format->m_height[Y_COMP];
-  m_avi->m_frameRate = format->m_frameRate;
   
   if (format->m_colorSpace == CM_RGB) {
     if (format->m_bitDepthComp[Y_COMP] == 10) {
       if(format->m_pixelFormat == PF_R210) // assumes m_pixelFormat PF_R210
         strcpy( m_avi->m_compressor, "r210");
       else // r10k
-        strcpy( m_avi->m_compressor, "f10k");
+        strcpy( m_avi->m_compressor, "r10k");
     }
     else
     strcpy( m_avi->m_compressor, "\0\0\0\0");
@@ -265,6 +258,24 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
       }
     }
   }
+  
+  if(format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K || format->m_pixelFormat == PF_V410)
+    m_headerBytes = (1 + format->m_width[Y_COMP]) * 4;
+  else if (format->m_pixelFormat == PF_V210)
+    m_headerBytes = 4 + ((format->m_width[Y_COMP]) / 3) * 8;
+  else 
+    m_headerBytes = 2048;
+
+  m_avi->m_pos  = m_headerBytes;
+  m_avi->m_mode = AVI_MODE_WRITE;
+  
+  m_avi->m_numberAudioTracks   = 0;
+  m_avi->m_currentAudioTrack   = 0;
+  
+  m_avi->m_width     = format->m_width[Y_COMP];
+  m_avi->m_height    = format->m_height[Y_COMP];
+  m_avi->m_frameRate = format->m_frameRate;
+  
   // 0 byte
   m_avi->m_compressor[4] = 0;
   
@@ -329,7 +340,7 @@ OutputAVI::~OutputAVI() {
 // Private methods
 //-----------------------------------------------------------------------------
 void OutputAVI::out4CC(char *dest, const char *source, int64 *length) {
-  if(*length <= HEADERBYTES - 4)
+  if(*length <= m_headerBytes - 4)
     memcpy(dest + *length, source, 4);
   *length += 4;
 }
@@ -348,7 +359,7 @@ void OutputAVI::outLong(char *dest, int32 value, int64 *length) {
 
 
 void OutputAVI::outShort(char *dest, int32 value, int64 *length) {
-  if(*length <= HEADERBYTES - 2) {
+  if(*length <= m_headerBytes - 2) {
     dest[ *length  ] = (value   ) & 0xff;
     dest[ *length+1] = (value>>8) & 0xff;
   }
@@ -356,14 +367,14 @@ void OutputAVI::outShort(char *dest, int32 value, int64 *length) {
 }
 
 void OutputAVI::outChar(char *dest, int32 value, int64 *length) {
-  if(*length <= HEADERBYTES - 1) {
+  if(*length <= m_headerBytes - 1) {
     dest[*length  ] = (value)&0xff;
   }
   *length += 1;
 }
 
 void OutputAVI::outMemory(char *dest, void *source, int64 *length, uint32 size) {
-  if(*length <= HEADERBYTES - size)
+  if(*length <= m_headerBytes - size)
     memcpy(dest + *length, source, size);
   *length += size;
 }
@@ -392,12 +403,12 @@ int OutputAVI::updateHeader(FrameFormat *format)
 {
   int njunk, sampsize, ms_per_frame, frate, flag;
   int hdrl_start, strl_start, j;
-  unsigned char header[HEADERBYTES];
+  unsigned char header[m_headerBytes];
   int64 nhb = 0;
   unsigned long xd_size, xd_size_align2;
   
   //assume max size
-  int movi_len = AVI_MAX_LEN - HEADERBYTES + 4;
+  int movi_len = AVI_MAX_LEN - m_headerBytes + 4;
   
   //assume index will be written
   bool hasIndex = TRUE;
@@ -595,10 +606,9 @@ int OutputAVI::updateHeader(FrameFormat *format)
   
   /* Calculate the needed amount of junk bytes, output junk */
   
-  njunk = HEADERBYTES - (int) nhb - 8 - 12;
-  
+  njunk = m_headerBytes - (int) nhb - 8 - 12;
   /* Safety first: if njunk <= 0, somebody has played with
-   HEADERBYTES without knowing what (s)he did.
+   m_headerBytes without knowing what (s)he did.
    This is a fatal error */
   
   if(njunk<=0)
@@ -623,7 +633,7 @@ int OutputAVI::updateHeader(FrameFormat *format)
    actually written, report an error if someting goes wrong */
   
   if ( lseek(m_avi->m_fileNum, 0, SEEK_SET)<0 ||
-      mm_write(m_avi->m_fileNum,(char *)header, HEADERBYTES)!=HEADERBYTES ||
+      mm_write(m_avi->m_fileNum,(char *)header, m_headerBytes)!=m_headerBytes ||
       lseek(m_avi->m_fileNum,m_avi->m_pos, SEEK_SET)<0)
   {
     m_errorNumber = AVI_ERR_CLOSE;
@@ -719,7 +729,7 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   int ret, njunk, sampsize, hasIndex, ms_per_frame, frate, idxerror, flag;
   unsigned long movi_len;
   int hdrl_start, strl_start, j;
-  unsigned char AVI_header[HEADERBYTES];
+  unsigned char AVI_header[m_headerBytes];
   int64 nhb = 0;
   unsigned long xd_size, xd_size_align2;
   
@@ -731,7 +741,6 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
 #endif
   
   /* Calculate length of movi list */
-  
   // dump the rest of the index
   if (m_avi->m_isOpenDML) {
     int cur_std_idx = m_avi->m_videoSuperIndex->nEntriesInUse-1;
@@ -766,9 +775,10 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   
   if (m_avi->m_isOpenDML) {
     // Correct!
-    movi_len = (unsigned long) (m_avi->m_videoSuperIndex->stdindex[ 1 ]->qwBaseOffset - HEADERBYTES+4 - m_avi->m_noIndex*16 - 8);
-  } else {
-    movi_len = (unsigned long) (m_avi->m_pos - HEADERBYTES + 4);
+    movi_len = (unsigned long) (m_avi->m_videoSuperIndex->stdindex[ 1 ]->qwBaseOffset - m_headerBytes + 4 - m_avi->m_noIndex * 16 - 8);
+  } 
+  else {
+    movi_len = (unsigned long) (m_avi->m_pos - m_headerBytes + 4);
   }
   
   /* Try to ouput the index entries. This may fail e.g. if no space
@@ -803,7 +813,6 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   
   
   /* The RIFF header */
-  
   out4CC ((char *) AVI_header, "RIFF", &nhb);
   
   if (m_avi->m_isOpenDML) {
@@ -892,7 +901,6 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   //outLong ((char *) AVI_header,0, &nhb);                  /* Frame */
   
   /* The video stream format */
-  
   xd_size        = m_avi->m_extraDataSize;
   xd_size_align2 = (m_avi->m_extraDataSize+1) & ~1;
   
@@ -901,9 +909,10 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   outLong ((char *) AVI_header,40 + xd_size, &nhb);	/* Size */
   outLong ((char *) AVI_header,m_avi->m_width, &nhb);         /* Width */
   outLong ((char *) AVI_header,m_avi->m_height, &nhb);        /* Height */
+
   outShort ((char *) AVI_header,1, &nhb);
   if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K)
-    outShort ((char *) AVI_header, 30, &nhb);     /* Planes, Count */
+    outShort ((char *) AVI_header, 64, &nhb);     /* Planes, Count */
   else
     outShort ((char *) AVI_header,24, &nhb);     /* Planes, Count */
   out4CC ((char *) AVI_header,m_avi->m_compressor, &nhb);    /* Compression */
@@ -911,15 +920,15 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   int sizeImage = m_avi->m_width * m_avi->m_height * 3;
 
   if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K)
-    sizeImage = m_avi->m_width * m_avi->m_height * 4;
+    sizeImage = m_avi->m_width * m_avi->m_height * 4 ;
   else if (format->m_pixelFormat == PF_V210)
     sizeImage = (m_avi->m_width * m_avi->m_height / 3) << 3;
   
   outLong ((char *) AVI_header,sizeImage, &nhb);  /* SizeImage (in bytes?) */
   outLong ((char *) AVI_header,0, &nhb);                  /* XPelsPerMeter */
   outLong ((char *) AVI_header,0, &nhb);                  /* YPelsPerMeter */
-  outLong ((char *) AVI_header,0, &nhb);                  /* ClrUsed: Number of colors used */
-  outLong ((char *) AVI_header,0, &nhb);                  /* ClrImportant: Number of colors important */
+  outLong ((char *) AVI_header,3, &nhb);                  /* ClrUsed: Number of colors used */
+  outLong ((char *) AVI_header,3, &nhb);                  /* ClrImportant: Number of colors important */
   
   // write extradata if present
   if (xd_size > 0 && m_avi->m_extraData) {
@@ -1184,7 +1193,7 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   memcpy(AVI_header+nhb, id_str, id_len);
   nhb += id_len;
   
-  info_len = avi_parse_comments (AVI->m_commentFilePos, AVI_header+nhb, HEADERBYTES - nhb - 8 - 12);
+  info_len = avi_parse_comments (AVI->m_commentFilePos, AVI_header+nhb, m_headerBytes - nhb - 8 - 12);
   if (info_len <= 0)
     info_len=0;
   
@@ -1207,10 +1216,10 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   
   /* Calculate the needed amount of junk bytes, output junk */
   
-  njunk = (int) (HEADERBYTES - nhb - 8 - 12);
+  njunk = (int) (m_headerBytes - nhb - 8 - 12);
   
   /* Safety first: if njunk <= 0, somebody has played with
-   HEADERBYTES without knowing what (s)he did.
+   m_headerBytes without knowing what (s)he did.
    This is a fatal error */
   
   if(njunk<=0)
@@ -1221,7 +1230,7 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   
   out4CC ((char *) AVI_header,"JUNK", &nhb);
   outLong ((char *) AVI_header,njunk, &nhb);
-  memset(AVI_header+nhb,0,njunk);
+  memset(AVI_header + nhb,0,njunk);
   
   nhb += njunk;
   
@@ -1234,7 +1243,7 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
    actually written, report an error if someting goes wrong */
   
   if ( lseek(m_avi->m_fileNum, 0, SEEK_SET)<0 ||
-      mm_write(m_avi->m_fileNum,(char *)AVI_header, HEADERBYTES)!=HEADERBYTES ||
+      mm_write(m_avi->m_fileNum,(char *)AVI_header, m_headerBytes)!=m_headerBytes ||
       ftruncate(m_avi->m_fileNum, m_avi->m_pos) <0 )
   {
     m_errorNumber = AVI_ERR_CLOSE;
@@ -1504,7 +1513,7 @@ int OutputAVI::addOdmlIndexEntry(unsigned char *tag, long flags, int64 pos, unsi
     towrite += m_avi->m_videoSuperIndex->stdindex[cur_std_idx]->nEntriesInUse * 8 + 32;
     if (cur_std_idx == 0) {
       towrite += m_avi->m_noIndex * 16 + 8;
-      towrite += HEADERBYTES;
+      towrite += m_headerBytes;
     }
   }
   
