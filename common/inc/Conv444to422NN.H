@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file ConvertNull.cpp
+ * \file Conv444to422NN.H
  *
  * \brief
- *    ConvertNull Class
+ *    Conv444to422NN class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -48,48 +48,26 @@
  *************************************************************************************
  */
 
-//-----------------------------------------------------------------------------
-// Include headers
-//-----------------------------------------------------------------------------
+
+#ifndef __Conv444to422NN_H__
+#define __Conv444to422NN_H__
 
 #include "Global.H"
-#include "ConvertNull.H"
+#include "Frame.H"
+#include "ConvertColorFormat.H"
 
-//-----------------------------------------------------------------------------
-// Macros
-//-----------------------------------------------------------------------------
+class Conv444to422NN : public ConvertColorFormat {
+private:
+  void filter(float  *out, const float  *inp, int width, int height);
+  void filter(uint16 *out, const uint16 *inp, int width, int height);
+  void filter(imgpel *out, const imgpel *inp, int width, int height);
+public:
+  // Construct/Deconstruct
+  Conv444to422NN();
+  virtual ~Conv444to422NN();
 
-//-----------------------------------------------------------------------------
-// Constructor/destructor
-//-----------------------------------------------------------------------------
+  virtual void process(Frame *out,  const Frame *inp);
+};
 
-ConvertNull::ConvertNull() {
-}
+#endif
 
-ConvertNull::~ConvertNull() {
-}
-
-//-----------------------------------------------------------------------------
-// Private methods (non-MMX)
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-// Public methods
-//-----------------------------------------------------------------------------
-
-
-void ConvertNull::process ( Frame* out, const Frame *inp) {
-  printf("convert null\n");
-  if (out == NULL) {
-    // should only be done for pointers. This should help speeding up the code and reducing memory.
-    out = (Frame *)inp;
-  }
-  else {
-    out->copy((Frame *) inp);
-  }
-}
-
-
-//-----------------------------------------------------------------------------
-// End of file
-//-----------------------------------------------------------------------------

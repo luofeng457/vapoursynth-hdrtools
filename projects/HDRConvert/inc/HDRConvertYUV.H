@@ -86,7 +86,9 @@ private:
   Convert            *m_convertIQuantize;       // Initial Conversion process
   ColorTransform     *m_colorTransform;         // Color space conversion
   ColorTransform     *m_colorSpaceConvert;      // Color space conversion (second)
-  ConvertColorFormat *m_convertFormat;          // Chroma format conversion
+  ColorTransform     *m_colorSpaceConvertMC;    // Color space conversion (final)
+  ConvertColorFormat *m_convertFormatIn;        // Input Chroma format conversion
+  ConvertColorFormat *m_convertFormatOut;       // Output chroma format conversion
   
   DisplayGammaAdjust   *m_srcDisplayGammaAdjust;    // Source Display Gamma adjustment (for the HLG TF)
   DisplayGammaAdjust   *m_outDisplayGammaAdjust;    // Output Display Gamma adjustment (for the HLG TF)

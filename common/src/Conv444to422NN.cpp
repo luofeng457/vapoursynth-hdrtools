@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file ConvertNull.cpp
+ * \file Conv444to422NN.cpp
  *
  * \brief
- *    ConvertNull Class
+ *    Convert 444 to 420 using the Nearest Neighbor approach
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -53,7 +53,8 @@
 //-----------------------------------------------------------------------------
 
 #include "Global.H"
-#include "ConvertNull.H"
+#include "Conv444to422NN.H"
+#include <string.h>
 
 //-----------------------------------------------------------------------------
 // Macros
@@ -63,29 +64,95 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ConvertNull::ConvertNull() {
+Conv444to422NN::Conv444to422NN() {
 }
 
-ConvertNull::~ConvertNull() {
+Conv444to422NN::~Conv444to422NN() {
 }
 
 //-----------------------------------------------------------------------------
-// Private methods (non-MMX)
+// Private methods
 //-----------------------------------------------------------------------------
+void Conv444to422NN::filter(float *out, const float *inp, int width, int height)
+{
+  int i, j;
+  int inp_width = 2 * width;
+  
+  for (j = 0; j < height; j++) {
+    for (i = 0; i < width; i++) {
+      out[ j * width + i ] = inp[ j * inp_width + 2 * i ];
+     }
+  }
+}
+
+void Conv444to422NN::filter(uint16 *out, const uint16 *inp, int width, int height)
+{
+  int i, j;
+  int inp_width = 2 * width;
+
+  for (j = 0; j < height; j++) {
+    for (i = 0; i < width; i++) {
+      out[ j * width + i ] = inp[ j * inp_width + 2 * i ];
+    }
+  }
+}
+
+void Conv444to422NN::filter(imgpel *out, const imgpel *inp, int width, int height)
+{
+  int i, j;
+  int inp_width = 2 * width;
+  
+  for (j = 0; j < height; j++) {
+    for (i = 0; i < width; i++) {
+      out[ j * width + i ] = inp[ j * inp_width + 2 * i ];
+    }
+  }
+}
 
 //-----------------------------------------------------------------------------
 // Public methods
 //-----------------------------------------------------------------------------
 
-
-void ConvertNull::process ( Frame* out, const Frame *inp) {
-  printf("convert null\n");
-  if (out == NULL) {
-    // should only be done for pointers. This should help speeding up the code and reducing memory.
-    out = (Frame *)inp;
+void Conv444to422NN::process ( Frame* out, const Frame *inp)
+{
+  if (( out->m_isFloat != inp->m_isFloat ) || (( inp->m_isFloat == 0 ) && ( out->m_bitDepth != inp->m_bitDepth ))) {
+    fprintf(stderr, "Error: trying to copy frames of different data types. \n");
+    exit(EXIT_FAILURE);
   }
-  else {
-    out->copy((Frame *) inp);
+  
+  if (out->m_compSize[Y_COMP] != inp->m_compSize[Y_COMP]) {
+    fprintf(stderr, "Error: trying to copy frames of different sizes (%d  vs %d). \n",out->m_compSize[Y_COMP], inp->m_compSize[Y_COMP]);
+    exit(EXIT_FAILURE);
+  }
+  
+  int c;
+  
+  out->m_frameNo = inp->m_frameNo;
+  out->m_isAvailable = TRUE;
+  
+  for (c = Y_COMP; c <= V_COMP; c++) {
+    out->m_minPelValue[c]  = inp->m_minPelValue[c];
+    out->m_midPelValue[c]  = inp->m_midPelValue[c];
+    out->m_maxPelValue[c]  = inp->m_maxPelValue[c];
+  }
+  
+  if (out->m_isFloat == TRUE) {    // floating point data
+    memcpy(out->m_floatComp[Y_COMP], inp->m_floatComp[Y_COMP], (int) out->m_compSize[Y_COMP] * sizeof(float));
+    for (c = U_COMP; c <= V_COMP; c++) {
+      filter(out->m_floatComp[c], inp->m_floatComp[c], out->m_width[c], out->m_height[c]);
+    }
+  }
+  else if (out->m_bitDepth == 8) {   // 8 bit data
+    memcpy(out->m_comp[Y_COMP], inp->m_comp[Y_COMP], (int) out->m_compSize[Y_COMP] * sizeof(imgpel));
+    for (c = U_COMP; c <= V_COMP; c++) {
+      filter(out->m_comp[c], inp->m_comp[c], out->m_width[c], out->m_height[c]);
+    }
+  }
+  else { // 16 bit data
+    memcpy(out->m_ui16Comp[Y_COMP], inp->m_ui16Comp[Y_COMP], (int) out->m_compSize[Y_COMP] * sizeof(uint16));
+    for (c = U_COMP; c <= V_COMP; c++) {
+      filter(out->m_ui16Comp[c], inp->m_ui16Comp[c], out->m_width[c], out->m_height[c]);
+    }
   }
 }
 

@@ -64,6 +64,7 @@ HDRConvertYUV::HDRConvertYUV(ProjectParameters *inputParams) {
   
   m_convertFrameStore      = NULL;
   m_colorSpaceConvert      = NULL;
+  m_colorSpaceConvertMC    = NULL;
   m_convertIQuantize       = NULL;
   m_colorSpaceFrame        = NULL;
   m_convertProcess         = NULL;
@@ -73,7 +74,8 @@ HDRConvertYUV::HDRConvertYUV(ProjectParameters *inputParams) {
   m_outputTransferFunction = NULL;
   m_inputFrame             = NULL;
   m_outputFrame            = NULL;
-  m_convertFormat          = NULL;
+  m_convertFormatIn        = NULL;
+  m_convertFormatOut       = NULL;
   m_frameFilter            = NULL;
   m_frameFilterNoise0      = NULL;
   m_frameFilterNoise1      = NULL;
@@ -128,9 +130,14 @@ void HDRConvertYUV::destroy() {
     m_frameFilterNoise2 = NULL;    
   }
   
-  if (m_convertFormat != NULL){
-    delete m_convertFormat;
-    m_convertFormat = NULL;
+  if (m_convertFormatIn != NULL){
+    delete m_convertFormatIn;
+    m_convertFormatIn = NULL;
+  }
+
+  if (m_convertFormatOut != NULL){
+    delete m_convertFormatOut;
+    m_convertFormatOut = NULL;
   }
   
   if (m_convertProcess != NULL){
@@ -164,6 +171,11 @@ void HDRConvertYUV::destroy() {
   if (m_colorSpaceConvert != NULL) {
     delete m_colorSpaceConvert;
     m_colorSpaceConvert = NULL;
+  }
+
+  if (m_colorSpaceConvertMC != NULL) {
+    delete m_colorSpaceConvertMC;
+    m_colorSpaceConvertMC = NULL;
   }
   
   if (m_colorSpaceFrame != NULL) {
@@ -268,14 +280,16 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   
   // Create output file
   m_outputFrame = Output::create(m_outputFile, output);
+
+  ChromaFormat chromaFormat = (m_inputFrame->m_colorPrimaries != output->m_colorPrimaries)? CF_444 : output->m_chromaFormat;
   
   // Chroma format conversion (if needed). Only difference is in chroma format
-  if (output->m_chromaFormat != m_inputFrame->m_chromaFormat) {
+  if (output->m_chromaFormat != m_inputFrame->m_chromaFormat || (m_inputFrame->m_chromaFormat != CF_444 && (m_inputFrame->m_colorPrimaries != output->m_colorPrimaries))) {
     if (m_filterInFloat == TRUE) {
-      m_pFrameStore[0]  = new Frame(m_width, m_height, TRUE, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries, output->m_chromaFormat, m_inputFrame->m_sampleRange, m_inputFrame->m_bitDepthComp[Y_COMP], m_inputFrame->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
+      m_pFrameStore[0]  = new Frame(m_width, m_height, TRUE, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries, chromaFormat, m_inputFrame->m_sampleRange, m_inputFrame->m_bitDepthComp[Y_COMP], m_inputFrame->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
     }
     else {
-      m_pFrameStore[0]  = new Frame(m_width, m_height, m_inputFrame->m_isFloat, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries, output->m_chromaFormat, m_inputFrame->m_sampleRange, m_inputFrame->m_bitDepthComp[Y_COMP], m_inputFrame->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);      
+      m_pFrameStore[0]  = new Frame(m_width, m_height, m_inputFrame->m_isFloat, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries, chromaFormat, m_inputFrame->m_sampleRange, m_inputFrame->m_bitDepthComp[Y_COMP], m_inputFrame->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);      
     }
 
     m_pFrameStore[0]->clear();
@@ -286,18 +300,19 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   
   // Here we may convert to the output's format type (e.g. from integer to float).
   //  m_convertFrameStore  = new Frame(m_width, m_height, output->m_isFloat, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries,output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
-  m_convertFrameStore  = new Frame(m_width, m_height, TRUE, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries,output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
+  
+
+  m_convertFrameStore  = new Frame(m_width, m_height, TRUE, m_inputFrame->m_colorSpace, m_inputFrame->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
   m_convertFrameStore->clear();
 
   
-  
   // Also creation of frame store for the transfer function processed images
   //m_pFrameStore[3]  = new Frame(m_width, m_height, output->m_isFloat, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
-  m_pFrameStore[3]  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
+  m_pFrameStore[3]  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
   m_pFrameStore[3]->clear();
   
   // Frame store for the inversion of PQ TF
-  m_pFrameStore[1]   = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
+  m_pFrameStore[1]   = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
   m_pFrameStore[1]->clear();
 
 
@@ -316,28 +331,31 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
       m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, CM_RGB, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, input->m_iConstantLuminance, 0);
       m_changeColorPrimaries = TRUE;
     }
-    m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
+    if (m_oFrameStore->m_colorSpace != CM_YCbCr) {
+      m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
+    }
+    else {
+      m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, CM_RGB, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);      
+      m_colorSpaceConvertMC = ColorTransform::create(CM_RGB, m_oFrameStore->m_colorPrimaries, CM_YCbCr, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);      
+    }
     
     // frame store for color format conversion
     //m_pFrameStore[2]  = new Frame(m_width, m_height, output->m_isFloat, CM_RGB, m_iFrameStore->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
-    m_pFrameStore[2]  = new Frame(m_width, m_height, TRUE, CM_RGB, m_iFrameStore->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
+    m_pFrameStore[2]  = new Frame(m_width, m_height, TRUE, CM_RGB, m_iFrameStore->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
     m_pFrameStore[2]->clear();
     
-    m_colorSpaceFrame  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, TF_NULL, 1.0);
+    m_colorSpaceFrame  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, TF_NULL, 1.0);
     m_colorSpaceFrame->clear();
-    
-    
-    
   }
   else {
     m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL);
     m_colorSpaceConvert = ColorTransform::create(m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion);
     
     // frame store for color format conversion
-    m_pFrameStore[2]  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
+    m_pFrameStore[2]  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
     m_pFrameStore[2]->clear();
     
-    m_colorSpaceFrame  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, TF_NULL, 1.0);
+    m_colorSpaceFrame  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, TF_NULL, 1.0);
     m_colorSpaceFrame->clear();
     
     m_changeColorPrimaries = FALSE;
@@ -346,16 +364,39 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   // Chroma subsampling
   // We may wish to create a single convert class that uses as inputs the output resolution as well the input and output chroma format, and the downsampling/upsampling method. That would make the code easier to handle.
   // To be done later.
-  if (input->m_chromaFormat == output->m_chromaFormat) {
-    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, 0, m_inputFrame->m_chromaLocation, output->m_chromaLocation);
+  
+  
+  if (input->m_chromaFormat == output->m_chromaFormat && input->m_chromaFormat == CF_444) {
+    m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, 0, m_inputFrame->m_chromaLocation, output->m_chromaLocation);
+  }
+  else if (input->m_chromaFormat != CF_444 && output->m_chromaFormat != CF_444) { // If not 444, check also color space
+    int inMode = (input->m_chromaFormat != CF_444) ? inputParams->m_chromaUpsampleFilter : inputParams->m_chromaDownsampleFilter;
+    int outMode = (output->m_chromaFormat != CF_444) ? inputParams->m_chromaDownsampleFilter : inputParams->m_chromaUpsampleFilter;
+
+    if (input->m_colorPrimaries != output->m_colorPrimaries) {
+      m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, CF_444, inMode, m_inputFrame->m_chromaLocation, output->m_chromaLocation);
+      m_convertFormatOut = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], CF_444, output->m_chromaFormat, outMode, output->m_chromaLocation, output->m_chromaLocation);
+      m_pFrameStore[5]   = new Frame(output->m_width[Y_COMP], output->m_height[Y_COMP], TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
+      m_pFrameStore[5]->clear();
+    }
+    else {
+      m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inMode, m_inputFrame->m_chromaLocation, output->m_chromaLocation);      
+      m_convertFormatOut = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, outMode, m_inputFrame->m_chromaLocation, output->m_chromaLocation); 
+    }
   }
   else if (input->m_chromaFormat == CF_444 && output->m_chromaFormat == CF_420) {
-    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveDownsampling, inputParams->m_useMinMax);
+    m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveDownsampling, inputParams->m_useMinMax);
   }
   else if (input->m_chromaFormat == CF_420 && output->m_chromaFormat == CF_444) {
-    m_convertFormat = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaUpsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveUpsampling, inputParams->m_useMinMax);
+    m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaUpsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveUpsampling, inputParams->m_useMinMax);
   }
+
+  m_pFrameStore[4]   = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
+  m_pFrameStore[4]->clear();
   
+  m_pFrameStore[6]   = new Frame(m_width, m_height, TRUE, CM_RGB, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
+  m_pFrameStore[6]->clear();
+
   if ( (input->m_colorSpace == output->m_colorSpace) && (input->m_colorPrimaries == output->m_colorPrimaries) && (input->m_transferFunction == output->m_transferFunction)) {
     m_useSingleTransferStep = TRUE;
     m_normalizeFunction = NULL;
@@ -365,7 +406,6 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   }
   else 
   {
-    
     if ( (input->m_iConstantLuminance != 0 || output->m_iConstantLuminance != 0 )|| ( input->m_transferFunction != TF_NULL && input->m_transferFunction != TF_POWER && ( inputParams->m_useSingleTransferStep == FALSE || (input->m_transferFunction != TF_PQ && input->m_transferFunction != TF_HPQ && input->m_transferFunction != TF_HPQ2 && input->m_transferFunction != TF_APQ && input->m_transferFunction != TF_APQS && input->m_transferFunction != TF_MPQ && input->m_transferFunction != TF_AMPQ && input->m_transferFunction != TF_PH && input->m_transferFunction != TF_APH && input->m_transferFunction != TF_HLG) ))) {
       m_useSingleTransferStep = FALSE;
       m_normalizeFunction = TransferFunction::create(TF_NORMAL, FALSE, inputParams->m_srcNormalScale, input->m_systemGamma, inputParams->m_srcMinValue, inputParams->m_srcMaxValue);
@@ -380,8 +420,6 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
     m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, TRUE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);
   }
   
-  m_pFrameStore[4]   = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, output->m_transferFunction, output->m_systemGamma);
-  m_pFrameStore[4]->clear();
   
   // Format conversion process
   m_convertIQuantize = Convert::create(&m_iFrameStore->m_format, &m_convertFrameStore->m_format);
@@ -448,7 +486,8 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
       currentFrame = m_croppedFrameStore;
     }
       
-    if (m_iFrameStore->m_chromaFormat != m_oFrameStore->m_chromaFormat) {
+    if (m_iFrameStore->m_chromaFormat != m_oFrameStore->m_chromaFormat || 
+    (m_iFrameStore->m_chromaFormat != CF_444 && m_iFrameStore->m_colorPrimaries != m_oFrameStore->m_colorPrimaries)) {
       // Convert chroma format if needed (note that given the current code
       // we can always create m_cFrameStore if we want to and avoid the conditional,
       // while being penalized with memory copy operations.
@@ -463,10 +502,10 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
         if (m_bUseChromaDeblocking == TRUE) // Perform deblocking
           m_frameFilter->process(m_pFrameStore[0]);
         // Chroma conversion
-        m_convertFormat->process(m_convertFrameStore, m_pFrameStore[0]);
+        m_convertFormatIn->process(m_convertFrameStore, m_pFrameStore[0]);
       }
       else {      
-        m_convertFormat->process (m_pFrameStore[0], currentFrame);
+        m_convertFormatIn->process (m_pFrameStore[0], currentFrame);
         // Convert to different format if needed (integer to float)
         m_convertIQuantize->process(m_convertFrameStore, m_pFrameStore[0]);
       }
@@ -506,16 +545,30 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
     
     if (m_changeColorPrimaries == TRUE) {
       m_colorSpaceConvert->process(m_colorSpaceFrame, m_pFrameStore[1]);
+      
       m_outDisplayGammaAdjust->inverse(m_colorSpaceFrame);
-      m_outputTransferFunction->inverse(m_pFrameStore[4], m_colorSpaceFrame);
+      if (m_oFrameStore->m_colorSpace == CM_YCbCr) {
+        m_outputTransferFunction->inverse(m_pFrameStore[6], m_colorSpaceFrame);
+        m_colorSpaceConvertMC->process(m_pFrameStore[4], m_pFrameStore[6]);
+      }
+      else {
+        m_outputTransferFunction->inverse(m_pFrameStore[4], m_colorSpaceFrame);        
+      }
+      
     }
     else{
       // here we apply the output transfer function (to be fixed)
       m_outDisplayGammaAdjust->inverse(m_pFrameStore[1]);
       m_outputTransferFunction->inverse(m_pFrameStore[4], m_pFrameStore[1]);
     }
-    m_convertProcess->process(m_oFrameStore, m_pFrameStore[4]);
 
+    if (m_iFrameStore->m_chromaFormat != CF_444 && m_oFrameStore->m_chromaFormat != CF_444 && m_iFrameStore->m_colorPrimaries != m_oFrameStore->m_colorPrimaries) {
+      m_convertFormatOut->process(m_pFrameStore[5], m_pFrameStore[4]);
+      m_convertProcess->process(m_oFrameStore, m_pFrameStore[5]);   
+    }
+    else
+      m_convertProcess->process(m_oFrameStore, m_pFrameStore[4]);
+    
     // frame output
     m_outputFrame->copyFrame(m_oFrameStore);
     m_outputFrame->writeOneFrame(m_outputFile, frameNumber, m_outputFile->m_fileHeader, 0);

@@ -143,9 +143,8 @@ ConvertFilter444To422::ConvertFilter444To422(int filter, int paramsMode, int inO
 
   m_positionOffset = (m_numberOfTaps - 1) >> 1;
 
-  m_floatOffset    = (float) m_i16Offset;
+  m_floatOffset    = 0.0f;
   m_floatScale     = 1.0f / ((float) (1 << m_i16Shift));
-  
 }
 
 ConvertFilter444To422::~ConvertFilter444To422() {
@@ -189,7 +188,7 @@ float Conv444to422Generic::filterHorizontal(const float *inp, const ConvertFilte
   for (i = 0; i < filter->m_numberOfTaps; i++) {
     value += filter->m_floatFilter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
   }
-  
+
   if (filter->m_clip == TRUE)
     return fClip((value + filter->m_floatOffset) * filter->m_floatScale, minValue, maxValue);
   else

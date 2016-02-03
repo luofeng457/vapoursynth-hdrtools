@@ -252,6 +252,7 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     m_transform1 = INV_TRANSFORM[m_mode][U_COMP];
     m_transform2 = INV_TRANSFORM[m_mode][V_COMP];
   }
+  
 }
 
 ColorTransformGeneric::~ColorTransformGeneric() {
@@ -403,7 +404,6 @@ void ColorTransformGeneric::process ( Frame* out, const Frame *inp) {
   // Current condition to perform this is that Frames are of same size and in 4:4:4
   // Can add more code to do the interpolation on the fly (and save memory/improve speed),
   // but this keeps our code more flexible for now.
-  
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])
   {
     if( m_mode == CTF_RGB2020_2_YUV2020CL  && (inp->m_bitDepth == out->m_bitDepth))

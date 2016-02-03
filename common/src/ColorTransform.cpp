@@ -101,7 +101,7 @@ ColorTransform *ColorTransform::create(
                                        bool              useFloatPrecision
                                        ) {
   ColorTransform *result = NULL;
-  
+    
   if ((iColorSpace == oColorSpace) && (iColorPrimaries == oColorPrimaries) && ((iConstantLuminance == oConstantLuminance) || (iColorSpace != CM_YCbCr)))
     result = new ColorTransformNull();
   else if ((iColorSpace == CM_XYZ && oColorSpace == CM_YUpVp) || (iColorSpace == CM_YUpVp && oColorSpace == CM_XYZ)) 
@@ -118,8 +118,9 @@ ColorTransform *ColorTransform::create(
             ((iColorSpace == CM_YCbCr) && (iConstantLuminance == 2) && (oColorSpace == CM_RGB)))){
              result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, transferFunction, FALSE);
            }
-  else if (closedLoopTransform == CLT_NULL)
+  else if (closedLoopTransform == CLT_NULL) {
     result = new ColorTransformGeneric(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision, useHighPrecision);
+  }
   else if (closedLoopTransform == CLT_YADJ)
     result = new ColorTransformYAdjust(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
   else if (closedLoopTransform == CLT_YADJALT)

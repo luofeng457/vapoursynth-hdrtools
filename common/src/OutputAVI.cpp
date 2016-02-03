@@ -179,6 +179,14 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
     return;
   }
   
+  if(format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K || format->m_pixelFormat == PF_V410)
+    m_headerBytes = (1 + format->m_width[Y_COMP]) * 4;
+  else if (format->m_pixelFormat == PF_V210)
+    m_headerBytes = 4 + ((format->m_width[Y_COMP]) / 3) * 8;
+  else 
+    m_headerBytes = 2048;
+
+  
   m_header = new byte[m_headerBytes];
   memset(m_header,0, m_headerBytes * sizeof(byte));
   
@@ -259,12 +267,6 @@ OutputAVI::OutputAVI(IOVideo *outputFile, FrameFormat *format) {
     }
   }
   
-  if(format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K || format->m_pixelFormat == PF_V410)
-    m_headerBytes = (1 + format->m_width[Y_COMP]) * 4;
-  else if (format->m_pixelFormat == PF_V210)
-    m_headerBytes = 4 + ((format->m_width[Y_COMP]) / 3) * 8;
-  else 
-    m_headerBytes = 2048;
 
   m_avi->m_pos  = m_headerBytes;
   m_avi->m_mode = AVI_MODE_WRITE;
@@ -912,9 +914,10 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
 
   outShort ((char *) AVI_header,1, &nhb);
   if (format->m_pixelFormat == PF_V410 || format->m_pixelFormat == PF_R210 || format->m_pixelFormat == PF_R10K)
-    outShort ((char *) AVI_header, 64, &nhb);     /* Planes, Count */
+    outShort ((char *) AVI_header, 30, &nhb);     /* Planes, Count */
   else
     outShort ((char *) AVI_header,24, &nhb);     /* Planes, Count */
+    
   out4CC ((char *) AVI_header,m_avi->m_compressor, &nhb);    /* Compression */
   // ThOe (*3)
   int sizeImage = m_avi->m_width * m_avi->m_height * 3;
@@ -927,8 +930,8 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   outLong ((char *) AVI_header,sizeImage, &nhb);  /* SizeImage (in bytes?) */
   outLong ((char *) AVI_header,0, &nhb);                  /* XPelsPerMeter */
   outLong ((char *) AVI_header,0, &nhb);                  /* YPelsPerMeter */
-  outLong ((char *) AVI_header,3, &nhb);                  /* ClrUsed: Number of colors used */
-  outLong ((char *) AVI_header,3, &nhb);                  /* ClrImportant: Number of colors important */
+  outLong ((char *) AVI_header,0, &nhb);                  /* ClrUsed: Number of colors used */
+  outLong ((char *) AVI_header,0, &nhb);                  /* ClrImportant: Number of colors important */
   
   // write extradata if present
   if (xd_size > 0 && m_avi->m_extraData) {

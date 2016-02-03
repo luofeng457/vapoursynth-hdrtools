@@ -79,6 +79,7 @@ ColorTransformNull::~ColorTransformNull() {
 
 
 void ColorTransformNull::process ( Frame* out, const Frame *inp) {
+
   if (out == NULL) {
     // should only be done for pointers. This should help speeding up the code and reducing memory.
     out = (Frame *)inp;

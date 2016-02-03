@@ -381,7 +381,7 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
 void ConvFixedToFloat::process ( Frame* out, const Frame *inp) {
   out->m_frameNo = inp->m_frameNo;
   out->m_isAvailable = TRUE;
-  
+    
   if (inp->m_bitDepth == 8)
     convertCompData(out, inp);
   else
