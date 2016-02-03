@@ -108,6 +108,7 @@
     <ClCompile Include="src\Conv444to420Generic.cpp" />
     <ClCompile Include="src\Conv444to420NN.cpp" />
     <ClCompile Include="src\Conv444to422Generic.cpp" />
+    <ClCompile Include="src\Conv444to422NN.cpp" />
     <ClCompile Include="src\Convert.cpp" />
     <ClCompile Include="src\ConvertBitDepth.cpp" />
     <ClCompile Include="src\ConvertColorFormat.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="inc\Conv444to420Generic.H" />
     <ClInclude Include="inc\Conv444to420NN.H" />
     <ClInclude Include="inc\Conv444to422Generic.H" />
+    <ClInclude Include="inc\Conv444to422NN.H" />
     <ClInclude Include="inc\Convert.H" />
     <ClInclude Include="inc\ConvertBitDepth.H" />
     <ClInclude Include="inc\ConvertColorFormat.H" />

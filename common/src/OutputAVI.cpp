@@ -405,10 +405,11 @@ int OutputAVI::updateHeader(FrameFormat *format)
 {
   int njunk, sampsize, ms_per_frame, frate, flag;
   int hdrl_start, strl_start, j;
-  unsigned char header[m_headerBytes];
+  unsigned char *header;
   int64 nhb = 0;
   unsigned long xd_size, xd_size_align2;
   
+  header = new unsigned char[m_headerBytes];
   //assume max size
   int movi_len = AVI_MAX_LEN - m_headerBytes + 4;
   
@@ -639,9 +640,11 @@ int OutputAVI::updateHeader(FrameFormat *format)
       lseek(m_avi->m_fileNum,m_avi->m_pos, SEEK_SET)<0)
   {
     m_errorNumber = AVI_ERR_CLOSE;
+	delete [] header;
     return -1;
   }
   
+  delete [] header;
   return 0;
 }
 
@@ -731,10 +734,10 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
   int ret, njunk, sampsize, hasIndex, ms_per_frame, frate, idxerror, flag;
   unsigned long movi_len;
   int hdrl_start, strl_start, j;
-  unsigned char AVI_header[m_headerBytes];
+  unsigned char *AVI_header = new unsigned char[m_headerBytes];
   int64 nhb = 0;
   unsigned long xd_size, xd_size_align2;
-  
+ 
 #ifdef INFO_LIST
   long info_len;
   long id_len, real_id_len;
@@ -1281,6 +1284,8 @@ int OutputAVI::closeOutputFile(FrameFormat *format)
     }
   }
    
+  delete [] AVI_header;
+
   if(idxerror)
     return -1;
   

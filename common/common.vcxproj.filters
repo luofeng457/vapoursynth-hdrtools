@@ -345,6 +345,9 @@
     <ClCompile Include="src\OutputY4M.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Conv444to422NN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -711,6 +714,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\OutputY4M.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv444to422NN.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
