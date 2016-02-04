@@ -219,8 +219,8 @@
 		C5C2CC421B1D41E100AD96EA /* DistortionMetricRegionPSNR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C2CC411B1D41E100AD96EA /* DistortionMetricRegionPSNR.cpp */; };
 		C5C2CC441B1E2EE900AD96EA /* DistortionMetricRegionTFPSNR.H in Headers */ = {isa = PBXBuildFile; fileRef = C5C2CC431B1E2EE900AD96EA /* DistortionMetricRegionTFPSNR.H */; };
 		C5C2CC461B1E2F1300AD96EA /* DistortionMetricRegionTFPSNR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C2CC451B1E2F1300AD96EA /* DistortionMetricRegionTFPSNR.cpp */; };
-		C5C79C291AC4E34500FB9A29 /* Conv444to422Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C79C281AC4E34500FB9A29 /* Conv444to422Generic.cpp */; };
-		C5C79C2B1AC4E37D00FB9A29 /* Conv444to422Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5C79C2A1AC4E37D00FB9A29 /* Conv444to422Generic.H */; };
+		C5C79C291AC4E34500FB9A29 /* Conv444to422GenericOld.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C79C281AC4E34500FB9A29 /* Conv444to422GenericOld.cpp */; };
+		C5C79C2B1AC4E37D00FB9A29 /* Conv444to422GenericOld.H in Headers */ = {isa = PBXBuildFile; fileRef = C5C79C2A1AC4E37D00FB9A29 /* Conv444to422GenericOld.H */; };
 		C5CC7E2D1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5CC7E2C1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp */; };
 		C5CC7E2F1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H in Headers */ = {isa = PBXBuildFile; fileRef = C5CC7E2E1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H */; };
 		C5CC7E311BB0A86000EBE780 /* DistortionTransferFunction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5CC7E301BB0A86000EBE780 /* DistortionTransferFunction.cpp */; };
@@ -269,6 +269,8 @@
 		C5F45AFC1A1FE7CD00AF6D26 /* DistortionMetricMSSSIM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F45AFB1A1FE7CD00AF6D26 /* DistortionMetricMSSSIM.cpp */; };
 		C5F63D1F1C61896B004D8B25 /* Conv444to422NN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F63D1E1C61896B004D8B25 /* Conv444to422NN.cpp */; };
 		C5F63D211C618A25004D8B25 /* Conv444to422NN.H in Headers */ = {isa = PBXBuildFile; fileRef = C5F63D201C618A25004D8B25 /* Conv444to422NN.H */; };
+		C5F63D231C62C47F004D8B25 /* Conv444to422Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5F63D221C62C47F004D8B25 /* Conv444to422Generic.H */; };
+		C5F63D251C62C49F004D8B25 /* Conv444to422Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F63D241C62C49F004D8B25 /* Conv444to422Generic.cpp */; };
 		C5FF1E7B1A1AD166008CFF60 /* TransferFunctionPower.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5FF1E7A1A1AD166008CFF60 /* TransferFunctionPower.cpp */; };
 		C5FF1E7D1A1AD18B008CFF60 /* TransferFunctionPower.H in Headers */ = {isa = PBXBuildFile; fileRef = C5FF1E7C1A1AD18B008CFF60 /* TransferFunctionPower.H */; };
 /* End PBXBuildFile section */
@@ -585,8 +587,8 @@
 		C5C2CC411B1D41E100AD96EA /* DistortionMetricRegionPSNR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricRegionPSNR.cpp; path = ../common/src/DistortionMetricRegionPSNR.cpp; sourceTree = "<group>"; };
 		C5C2CC431B1E2EE900AD96EA /* DistortionMetricRegionTFPSNR.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricRegionTFPSNR.H; path = ../common/inc/DistortionMetricRegionTFPSNR.H; sourceTree = "<group>"; };
 		C5C2CC451B1E2F1300AD96EA /* DistortionMetricRegionTFPSNR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricRegionTFPSNR.cpp; path = ../common/src/DistortionMetricRegionTFPSNR.cpp; sourceTree = "<group>"; };
-		C5C79C281AC4E34500FB9A29 /* Conv444to422Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv444to422Generic.cpp; path = ../common/src/Conv444to422Generic.cpp; sourceTree = "<group>"; };
-		C5C79C2A1AC4E37D00FB9A29 /* Conv444to422Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to422Generic.H; path = ../common/inc/Conv444to422Generic.H; sourceTree = "<group>"; };
+		C5C79C281AC4E34500FB9A29 /* Conv444to422GenericOld.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv444to422GenericOld.cpp; path = ../common/src/Conv444to422GenericOld.cpp; sourceTree = "<group>"; };
+		C5C79C2A1AC4E37D00FB9A29 /* Conv444to422GenericOld.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to422GenericOld.H; path = ../common/inc/Conv444to422GenericOld.H; sourceTree = "<group>"; };
 		C5CC7E2C1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricTFMSSSIM.cpp; path = ../common/src/DistortionMetricTFMSSSIM.cpp; sourceTree = "<group>"; };
 		C5CC7E2E1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricTFMSSSIM.H; path = ../common/inc/DistortionMetricTFMSSSIM.H; sourceTree = "<group>"; };
 		C5CC7E301BB0A86000EBE780 /* DistortionTransferFunction.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionTransferFunction.cpp; path = ../common/src/DistortionTransferFunction.cpp; sourceTree = "<group>"; };
@@ -658,6 +660,8 @@
 		C5F45AFB1A1FE7CD00AF6D26 /* DistortionMetricMSSSIM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricMSSSIM.cpp; path = ../common/src/DistortionMetricMSSSIM.cpp; sourceTree = "<group>"; };
 		C5F63D1E1C61896B004D8B25 /* Conv444to422NN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv444to422NN.cpp; path = ../common/src/Conv444to422NN.cpp; sourceTree = "<group>"; };
 		C5F63D201C618A25004D8B25 /* Conv444to422NN.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to422NN.H; path = ../common/inc/Conv444to422NN.H; sourceTree = "<group>"; };
+		C5F63D221C62C47F004D8B25 /* Conv444to422Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to422Generic.H; path = ../common/inc/Conv444to422Generic.H; sourceTree = "<group>"; };
+		C5F63D241C62C49F004D8B25 /* Conv444to422Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv444to422Generic.cpp; path = ../common/src/Conv444to422Generic.cpp; sourceTree = "<group>"; };
 		C5FF1E7A1A1AD166008CFF60 /* TransferFunctionPower.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionPower.cpp; path = ../common/src/TransferFunctionPower.cpp; sourceTree = "<group>"; };
 		C5FF1E7C1A1AD18B008CFF60 /* TransferFunctionPower.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransferFunctionPower.H; path = ../common/inc/TransferFunctionPower.H; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -917,9 +921,10 @@
 				C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */,
 				C5BD26B519CCAC10003F1B51 /* Conv444to420BI.H */,
 				C5BD26B619CCAC10003F1B51 /* Conv444to420Generic.H */,
+				C5F63D221C62C47F004D8B25 /* Conv444to422Generic.H */,
 				C5BD26B719CCAC10003F1B51 /* Conv444to420NN.H */,
 				C5F63D201C618A25004D8B25 /* Conv444to422NN.H */,
-				C5C79C2A1AC4E37D00FB9A29 /* Conv444to422Generic.H */,
+				C5C79C2A1AC4E37D00FB9A29 /* Conv444to422GenericOld.H */,
 				C5BD26B819CCAC10003F1B51 /* Convert.H */,
 				C5BD26BB19CCAC10003F1B51 /* ConvertBitDepth.H */,
 				C5BD26B219CCAC10003F1B51 /* ConvertColorFormat.H */,
@@ -1044,9 +1049,10 @@
 				C53E9BCA1C12615500448F69 /* Conv444to420CrFBounds.cpp */,
 				C5BD26E919CCAC17003F1B51 /* Conv444to420BI.cpp */,
 				C5BD26EA19CCAC17003F1B51 /* Conv444to420Generic.cpp */,
+				C5F63D241C62C49F004D8B25 /* Conv444to422Generic.cpp */,
 				C5BD26EB19CCAC17003F1B51 /* Conv444to420NN.cpp */,
 				C5F63D1E1C61896B004D8B25 /* Conv444to422NN.cpp */,
-				C5C79C281AC4E34500FB9A29 /* Conv444to422Generic.cpp */,
+				C5C79C281AC4E34500FB9A29 /* Conv444to422GenericOld.cpp */,
 				C5BD26EC19CCAC17003F1B51 /* Convert.cpp */,
 				C5BD26EF19CCAC17003F1B51 /* ConvertBitDepth.cpp */,
 				C5BD26E519CCAC17003F1B51 /* ConvertColorFormat.cpp */,
@@ -1251,6 +1257,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C5133DDB19CCF59B00D64D48 /* AddNoise.H in Headers */,
+				C5F63D231C62C47F004D8B25 /* Conv444to422Generic.H in Headers */,
 				C5E382F01AE8107200FE5693 /* FrameFormat.H in Headers */,
 				C5528B321BE3046600CCADA5 /* TransferFunctionHPQ2.H in Headers */,
 				C5BE37C91B7BE6D700350F6D /* DisplayGammaAdjust.H in Headers */,
@@ -1361,7 +1368,7 @@
 				C5DE3F3319DB5303006FA313 /* DistortionMetricTFPSNR.H in Headers */,
 				C5133E0419CCF59C00D64D48 /* Output.H in Headers */,
 				C5133E0519CCF59C00D64D48 /* OutputEXR.H in Headers */,
-				C5C79C2B1AC4E37D00FB9A29 /* Conv444to422Generic.H in Headers */,
+				C5C79C2B1AC4E37D00FB9A29 /* Conv444to422GenericOld.H in Headers */,
 				C53E9BD11C175C3800448F69 /* FrameFilterNLMeans.H in Headers */,
 				C5133E0619CCF59C00D64D48 /* OutputYUV.H in Headers */,
 				C5133E0719CCF59C00D64D48 /* Parameters.H in Headers */,
@@ -1607,6 +1614,7 @@
 				C5133E2419CCF5B700D64D48 /* DistortionMetricDeltaE.cpp in Sources */,
 				C53E9BC31C10C20100448F69 /* ColorTransformYAdjustLFast.cpp in Sources */,
 				C5133E2519CCF5B700D64D48 /* DistortionMetricPSNR.cpp in Sources */,
+				C5F63D251C62C49F004D8B25 /* Conv444to422Generic.cpp in Sources */,
 				C5133E2619CCF5B700D64D48 /* DistortionMetricmPSNR.cpp in Sources */,
 				C501510D1BF6CBCC00980F49 /* ColorTransformYAdjustXYZ.cpp in Sources */,
 				C5CC7E311BB0A86000EBE780 /* DistortionTransferFunction.cpp in Sources */,
@@ -1648,7 +1656,7 @@
 				C5528B341BE4515000CCADA5 /* ColorTransformClosedLoopCr.cpp in Sources */,
 				C5133E3419CCF5B700D64D48 /* TransferFunction.cpp in Sources */,
 				C5133E3519CCF5B700D64D48 /* TransferFunctionNormalize.cpp in Sources */,
-				C5C79C291AC4E34500FB9A29 /* Conv444to422Generic.cpp in Sources */,
+				C5C79C291AC4E34500FB9A29 /* Conv444to422GenericOld.cpp in Sources */,
 				C5E382EC1AE80FA900FE5693 /* TransferFunctionAPQScaled.cpp in Sources */,
 				9E856AAC19D0145C00C5499A /* DistortionMetricSigmaCompare.cpp in Sources */,
 				C5C2CC3C1B19164E00AD96EA /* Filter1D.cpp in Sources */,

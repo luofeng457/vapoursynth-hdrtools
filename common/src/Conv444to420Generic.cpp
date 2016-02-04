@@ -371,7 +371,7 @@ int Conv444to420Generic::filterHorizontal(const uint16 *inp, const ScaleFilter *
   }
   
   if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i32Offset) * filter->m_i32Shift, minValue, maxValue);
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
   else
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
@@ -384,7 +384,7 @@ int Conv444to420Generic::filterHorizontal(const int32 *inp, const ScaleFilter *f
   }
 
   if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i32Offset) * filter->m_i32Shift, minValue, maxValue);
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
   else
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
@@ -450,7 +450,7 @@ int Conv444to420Generic::filterVertical(const imgpel *inp, const ScaleFilter *fi
   }
   
   if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i32Offset) * filter->m_i32Shift, minValue, maxValue);
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
   else
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
@@ -588,6 +588,7 @@ void Conv444to420Generic::process ( Frame* out, const Frame *inp)
     memcpy(out->m_floatComp[Y_COMP], inp->m_floatComp[Y_COMP], (int) out->m_compSize[Y_COMP] * sizeof(float));
     for (c = U_COMP; c <= V_COMP; c++) {
       filter(out->m_floatComp[c], inp->m_floatComp[c], out->m_width[c], out->m_height[c], (float) out->m_minPelValue[c], (float) out->m_maxPelValue[c] );
+      //filter(out->m_floatComp[c], inp->m_floatComp[c], out->m_width[c], out->m_height[c], -0.5f, 0.5f );
     }
   }
   else if (out->m_bitDepth == 8) {   // 8 bit data

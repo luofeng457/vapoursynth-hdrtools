@@ -70,6 +70,7 @@
 #include "Conv444to420CrFBounds.H"
 #include "Conv444to422Generic.H"
 #include "Conv422to420Generic.H"
+#include "Conv444to422GenericOld.H"
 
 //-----------------------------------------------------------------------------
 // Private methods
@@ -95,7 +96,32 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
         break;
       case DF_F0: // Generic
       case DF_F1:
-        result = new Conv444to422Generic(width, height, method);
+#if 0
+        result = new Conv444to422GenericOld(width, height, method);
+#else
+      case DF_TM:
+      case DF_FV:
+      case DF_GS:
+      case DF_WCS:
+      case DF_SVC:
+      case DF_LZW:
+      case DF_SNW:
+      case DF_LZ2:
+      case DF_LZ3:
+      case DF_LZ4:
+      case DF_SN2:
+      case DF_SN3:
+      case DF_SNW3:
+      case DF_SNW7:
+      case DF_SNW11:
+      case DF_SNW15:
+      case DF_SSW3:
+      case DF_SSW5:
+      case DF_SSW7:
+      case DF_SSW11:
+      case DF_SSW15:
+        result = new Conv444to422Generic(width, height, method, oChromaLocationType, useMinMax);
+#endif
         break;
       default:
         fprintf(stderr, "Not supported chroma downsampling method %d\n", method);

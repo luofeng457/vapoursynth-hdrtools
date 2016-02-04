@@ -55,37 +55,31 @@
 #include "Global.H"
 #include "Frame.H"
 #include "ConvertColorFormat.H"
+#include "ScaleFilter.H"
 
-class ConvertFilter444To422 {
-public:
-  int     m_numberOfTaps;
-  int     m_positionOffset;
-  float  *m_floatFilter;
-  float   m_floatOffset;
-  float   m_floatScale;
-  int16  *m_i16Filter;
-  int16   m_i16Offset;
-  int16   m_i16Shift;
-  bool    m_clip;
-  ConvertFilter444To422(int filter, int paramsMode, int inOffset, int inShift, int *outOffset, int *outShift);
-  ~ConvertFilter444To422();
-};
 
 class Conv444to422Generic : public ConvertColorFormat {
 
 private:
-  ConvertFilter444To422 *m_horFilter;
+  int     m_useMinMax;
+  ScaleFilter *m_horFilter;
+  ScaleFilter *m_horFilterM;
+
   
   void  filter(float  *out, const float  *inp, int width, int height, float minValue, float maxValue);
   void  filter(uint16 *out, const uint16 *inp, int width, int height, int   minValue, int   maxValue);
   void  filter(imgpel *out, const imgpel *inp, int width, int height, int   minValue, int   maxValue);
-  float filterHorizontal(const float  *inp, const ConvertFilter444To422 *filter, int pos_x, int width, float minValue, float maxValue);
-  int   filterHorizontal(const uint16 *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int   minValue, int   maxValue);
-  int   filterHorizontal(const int32  *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int   minValue, int   maxValue);
-  int   filterHorizontal(const imgpel *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int   minValue, int   maxValue);
+
+  float filterHorizontalMinMax  (const float  *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue);
+  float filterHorizontalMinMax2 (const float  *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue);
+  float filterHorizontalMinMax3 (const float  *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue);
+  float filterHorizontal        (const float  *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue);
+  int   filterHorizontal        (const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
+  int   filterHorizontal        (const int32  *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
+  int   filterHorizontal        (const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
 public:
   // Construct/Deconstruct
-  Conv444to422Generic(int width, int height, int method);
+  Conv444to422Generic(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax = 0);
   virtual ~Conv444to422Generic();
   
   virtual void process(Frame *out,  const Frame *inp);

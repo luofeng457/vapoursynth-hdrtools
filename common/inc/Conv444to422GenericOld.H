@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file ConvertNull.cpp
+ * \file Conv444to422GenericOld.H
  *
  * \brief
- *    ConvertNull Class
+ *    Conv444to422GenericOld class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -48,47 +48,47 @@
  *************************************************************************************
  */
 
-//-----------------------------------------------------------------------------
-// Include headers
-//-----------------------------------------------------------------------------
+
+#ifndef __Conv444to422GenericOld_H__
+#define __Conv444to422GenericOld_H__
 
 #include "Global.H"
-#include "ConvertNull.H"
+#include "Frame.H"
+#include "ConvertColorFormat.H"
 
-//-----------------------------------------------------------------------------
-// Macros
-//-----------------------------------------------------------------------------
+class ConvertFilter444To422 {
+public:
+  int     m_numberOfTaps;
+  int     m_positionOffset;
+  float  *m_floatFilter;
+  float   m_floatOffset;
+  float   m_floatScale;
+  int16  *m_i16Filter;
+  int16   m_i16Offset;
+  int16   m_i16Shift;
+  bool    m_clip;
+  ConvertFilter444To422(int filter, int paramsMode, int inOffset, int inShift, int *outOffset, int *outShift);
+  ~ConvertFilter444To422();
+};
 
-//-----------------------------------------------------------------------------
-// Constructor/destructor
-//-----------------------------------------------------------------------------
+class Conv444to422GenericOld : public ConvertColorFormat {
 
-ConvertNull::ConvertNull() {
-}
+private:
+  ConvertFilter444To422 *m_horFilter;
+  
+  void  filter(float  *out, const float  *inp, int width, int height, float minValue, float maxValue);
+  void  filter(uint16 *out, const uint16 *inp, int width, int height, int   minValue, int   maxValue);
+  void  filter(imgpel *out, const imgpel *inp, int width, int height, int   minValue, int   maxValue);
+  float filterHorizontal(const float  *inp, const ConvertFilter444To422 *filter, int pos_x, int width, float minValue, float maxValue);
+  int   filterHorizontal(const uint16 *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int   minValue, int   maxValue);
+  int   filterHorizontal(const int32  *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int   minValue, int   maxValue);
+  int   filterHorizontal(const imgpel *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int   minValue, int   maxValue);
+public:
+  // Construct/Deconstruct
+  Conv444to422GenericOld(int width, int height, int method);
+  virtual ~Conv444to422GenericOld();
+  
+  virtual void process(Frame *out,  const Frame *inp);
+};
 
-ConvertNull::~ConvertNull() {
-}
-
-//-----------------------------------------------------------------------------
-// Private methods (non-MMX)
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-// Public methods
-//-----------------------------------------------------------------------------
-
-
-void ConvertNull::process ( Frame* out, const Frame *inp) {
-  if (out == NULL) {
-    // should only be done for pointers. This should help speeding up the code and reducing memory.
-    out = (Frame *)inp;
-  }
-  else {
-    out->copy((Frame *) inp);
-  }
-}
-
-
-//-----------------------------------------------------------------------------
-// End of file
-//-----------------------------------------------------------------------------
+#endif

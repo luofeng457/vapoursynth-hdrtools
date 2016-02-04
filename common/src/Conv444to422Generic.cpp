@@ -40,7 +40,7 @@
  * \file Conv444to422Generic.cpp
  *
  * \brief
- *    Convert 444 to 422 using a Generic  filter approach
+ *    Convert 444 to 422 using a Generic separable filter approach
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -54,186 +54,223 @@
 
 #include "Global.H"
 #include "Conv444to422Generic.H"
-#include "ScaleFilter.H"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
 // Macros
 //-----------------------------------------------------------------------------
-
 //-----------------------------------------------------------------------------
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ConvertFilter444To422::ConvertFilter444To422(int filter, int paramsMode, int inOffset, int inShift, int *outOffset, int *outShift) {
-  switch (filter){
-          
-    case DCF_MPEG2_TM5_H:  // no horizontal spatial shift (co-sited as per default chroma sample loc type)
-      // MPEG-2 Test Model 5   4:4:4 to 4:2:2 (horizontal) filter: [21, 0, -52, 0, 159, 256, 159, 0, -52, 0, 21 ]
-      m_numberOfTaps   = 11;
-      m_floatFilter    = new float[m_numberOfTaps];
-      m_floatFilter[0] = m_floatFilter[10] = +21.0;
-      m_floatFilter[2] = m_floatFilter[8] = -52.0;
-      m_floatFilter[4] = m_floatFilter[6] = +159.0;
-      m_floatFilter[5] = +256.0;  // center tap
-      m_floatFilter[1] = m_floatFilter[3] = m_floatFilter[7] = m_floatFilter[9] = 0.0;  // zero crossings
-      *outOffset       = 5;
-      *outShift        = 9;
-      break;
-    case DCF_MPEG2_TM5_V:  // vertical shift of half sample as per default chroma sample loc type
-     // MPEG-2 Test Model 5   4:2:2 to 4:2:0 (vertical) filter: [ 5, 11, -21, -37, 70, 228, 228, 70, -37, -21, 11, 5 ]
-        m_numberOfTaps   = 12;
-        m_floatFilter    = new float[m_numberOfTaps];
-        m_floatFilter[0] = m_floatFilter[11] = +5.0;
-        m_floatFilter[1] = m_floatFilter[10] = +11.0;
-        m_floatFilter[2] = m_floatFilter[9] = -21.0;
-        m_floatFilter[3] = m_floatFilter[8] = -37.0;
-        m_floatFilter[4] = m_floatFilter[7] = +70.0;
-        m_floatFilter[5] = m_floatFilter[6] = +228.0;  // center
-        *outOffset       = 5;
-        *outShift        = 9;
-      break;
-    case DCF_F1:
-      m_numberOfTaps   = 3;
-      m_floatFilter    = new float[m_numberOfTaps];
-      m_floatFilter[0] = m_floatFilter[2] = 1.0;
-      m_floatFilter[1] = 2.0;
-      *outOffset       = 2;
-      *outShift        = 2;
-      break;
-    case DCF_F0:
-      m_numberOfTaps   = 3;
-      m_floatFilter    = new float[m_numberOfTaps];
-      m_floatFilter[0] = m_floatFilter[2] = 1.0;
-      m_floatFilter[1] = 6.0;
-      *outOffset       = 4;
-      *outShift        = 3;
-      break;
-    case DCF_BILINEAR:
-    default:
-      m_numberOfTaps   = 2;
-      m_floatFilter    = new float[m_numberOfTaps];
-      m_floatFilter[0] = m_floatFilter[1] = 1.0;
-      *outOffset       = 1;
-      *outShift        = 1;
-      break;
-  }
-  
-  m_i16Filter = new int16[m_numberOfTaps];
-  for (int i = 0; i < m_numberOfTaps; i++) {
-    m_i16Filter[i] = (int16) m_floatFilter[i];
-  }
-
-  // currently we only support powers of 2 for the divisor
-  if (paramsMode == 0) { // zero mode
-    m_i16Offset = 0;
-    m_i16Shift  = 0;
-    m_clip      = FALSE;
-  }
-  else if (paramsMode == 1) { // normal mode
-    m_i16Offset = *outOffset;
-    m_i16Shift  = *outShift;
-    m_clip      = TRUE;
-  }
-  else { // additive mode
-    m_i16Shift  = ( *outShift  + inShift  );
-    m_i16Offset = ( 1 << (m_i16Shift) ) >> 1;
-    m_clip      = TRUE;
-  }
-
-  m_positionOffset = (m_numberOfTaps - 1) >> 1;
-
-  m_floatOffset    = 0.0f;
-  m_floatScale     = 1.0f / ((float) (1 << m_i16Shift));
-}
-
-ConvertFilter444To422::~ConvertFilter444To422() {
-  if ( m_floatFilter != NULL ) {
-    delete [] m_floatFilter;
-    m_floatFilter = NULL;
-  }
-  if ( m_i16Filter != NULL ) {
-    delete [] m_i16Filter;
-    m_i16Filter = NULL;
-  }
-}
-
-
-Conv444to422Generic::Conv444to422Generic(int width, int height, int method) {
+Conv444to422Generic::Conv444to422Generic(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax) {
   int offset, scale;
-  // here we allocate the entire image buffers. To save on memory we could just allocate
-  // these based on filter length, but this is test code so we don't care for now.
+  int hPhase;
   
-  switch (method) {
-   case DF_TM:  // MPEG-2 test model 5
-      m_horFilter = new ConvertFilter444To422(DCF_MPEG2_TM5_H,  1,      0,     0, &offset, &scale);
+  // Currently we only support progressive formats, and thus ignore the bottom chroma location type
+  switch (chromaLocationType[FP_FRAME]) {
+    case CL_FIVE: 
+      hPhase = 1;
       break;
-    case DF_F1:
-      m_horFilter = new ConvertFilter444To422(DCF_F1         ,  1,      0,     0, &offset, &scale);
+    case CL_FOUR: 
+      hPhase = 0;  
       break;
-    case DF_F0:
+    case CL_THREE:
+      hPhase = 1;
+      break;
+    case CL_TWO:
+      hPhase = 0;
+      break;
+    case CL_ONE:
+      hPhase = 1;
+      break;
+    case CL_ZERO:
     default:
-      m_horFilter = new ConvertFilter444To422(DCF_F0         ,  1,      0,     0, &offset, &scale);
+      hPhase = 0;
       break;
+  }
+
+  m_horFilter = new ScaleFilter(method, 0,  2,      0,     0, &offset, &scale, hPhase);
+  
+  m_useMinMax = useMinMax;
+  
+  if (m_useMinMax != 0) {
+    m_horFilterM = new ScaleFilter(DF_F0,  0,  2,      0,     0, &offset, &scale, hPhase);
+  }
+  else {
+    m_horFilterM = NULL;
   }
 }
 
 Conv444to422Generic::~Conv444to422Generic() {
   delete m_horFilter;
-}
-
-float Conv444to422Generic::filterHorizontal(const float *inp, const ConvertFilter444To422 *filter, int pos_x, int width, float minValue, float maxValue) {
-  int i;
-  float value = 0.0;
-  for (i = 0; i < filter->m_numberOfTaps; i++) {
-    value += filter->m_floatFilter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+  m_horFilter = NULL;
+  
+  if (m_horFilterM != NULL) {
+    delete m_horFilterM;
+    m_horFilterM = NULL;
   }
+}
 
+float Conv444to422Generic::filterHorizontalMinMax(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
+  int i;
+  double value = 0.0;
+  double dMin = 1e20;
+  double dMax = -1e20;
+  double dCurPixel;
+  
+  for (i = 0; i < filter->m_numberOfTaps; i++) {
+    dCurPixel = (double) inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+    value += (double) filter->m_floatFilter[i] * dCurPixel;
+    if (dMin > dCurPixel)
+      dMin = dCurPixel;
+    if (dMax < dCurPixel)
+      dMax = dCurPixel;
+  }
+  double dScaledValue = ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale);
+  
+  if (dScaledValue > dMax || dScaledValue < dMin ) {
+    value = 0.0;    
+    for (i = 0; i < m_horFilterM->m_numberOfTaps; i++) {
+      dCurPixel = (double) inp[iClip(pos_x + i - m_horFilterM->m_positionOffset, 0, width)];
+      value += (double) m_horFilterM->m_floatFilter[i] * dCurPixel;
+    }
+    dScaledValue = ((value + (double) m_horFilterM->m_floatOffset) * (double) m_horFilterM->m_floatScale);    
+  }
+    
   if (filter->m_clip == TRUE)
-    return fClip((value + filter->m_floatOffset) * filter->m_floatScale, minValue, maxValue);
+    return fClip((float) dScaledValue, minValue, maxValue);
   else
-    return (value + filter->m_floatOffset) * filter->m_floatScale;
+    return (float) dScaledValue;
 }
 
 
-int Conv444to422Generic::filterHorizontal(const uint16 *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int minValue, int maxValue) {
+
+float Conv444to422Generic::filterHorizontalMinMax2(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
   int i;
-  int value = 0;
+  double value = 0.0;
+  double dMin = 1e20;
+  double dMax = -1e20;
+  double dCurPixel;
+  
   for (i = 0; i < filter->m_numberOfTaps; i++) {
-    value += filter->m_i16Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+    dCurPixel = (double) inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+    value += (double) filter->m_floatFilter[i] * dCurPixel;
+  }
+  
+  
+  double dScaledValue = ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale);
+  
+  //printf("value %10.8f %10.8f  %10.8f", dScaledValue, dMax, dMin);
+  value = 0.0;    
+  for (i = 0; i < m_horFilterM->m_numberOfTaps; i++) {
+    dCurPixel = (double) inp[iClip(pos_x + i - m_horFilterM->m_positionOffset, 0, width)];
+    value += (double) m_horFilterM->m_floatFilter[i] * dCurPixel;
+    if (dMin > dCurPixel)
+      dMin = dCurPixel;
+    if (dMax < dCurPixel)
+      dMax = dCurPixel;
+  }
+  if (dScaledValue > dMax || dScaledValue < dMin ) {
+    dScaledValue = ((value + (double) m_horFilterM->m_floatOffset) * (double) m_horFilterM->m_floatScale);    
   }
   
   if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i16Offset) >> filter->m_i16Shift, minValue, maxValue);
+    return fClip((float) dScaledValue, minValue, maxValue);
   else
-    return (value + filter->m_i16Offset) >> filter->m_i16Shift;
+    return (float) dScaledValue;
 }
 
-int Conv444to422Generic::filterHorizontal(const int32 *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int minValue, int maxValue) {
+
+float Conv444to422Generic::filterHorizontalMinMax3(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
   int i;
-  int value = 0;
+  double value = 0.0;
+  double dMin = 1e20;
+  double dMax = -1e20;
+  double dCurPixel;
+  
   for (i = 0; i < filter->m_numberOfTaps; i++) {
-    value += filter->m_i16Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+    dCurPixel = (double) inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+    value += (double) filter->m_floatFilter[i] * dCurPixel;
   }
-
-  if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i16Offset) >> filter->m_i16Shift, minValue, maxValue);
-  else
-    return (value + filter->m_i16Offset) >> filter->m_i16Shift;
-}
-
-
-int Conv444to422Generic::filterHorizontal(const imgpel *inp, const ConvertFilter444To422 *filter, int pos_x, int width, int minValue, int maxValue) {
-  int i;
-  int value = 0;
-  for (i = 0; i < filter->m_numberOfTaps; i++) {
-    value += filter->m_i16Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+  
+  
+  double dScaledValue = ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale);
+  
+  for (i = 0; i < m_horFilterM->m_numberOfTaps; i++) {
+    dCurPixel = (double) inp[iClip(pos_x + i - m_horFilterM->m_positionOffset, 0, width)];
+    if (dMin > dCurPixel)
+      dMin = dCurPixel;
+    if (dMax < dCurPixel)
+      dMax = dCurPixel;
+  }
+  if (dScaledValue > dMax) {
+    dScaledValue = dMax;    
+  }
+  if (dScaledValue < dMin) {
+    dScaledValue = dMin;    
   }
   
   if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i16Offset) >> filter->m_i16Shift, minValue, maxValue);
+    return fClip((float) dScaledValue, minValue, maxValue);
   else
-    return (value + filter->m_i16Offset) >> filter->m_i16Shift;
+    return (float) dScaledValue;
+}
+
+float Conv444to422Generic::filterHorizontal(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
+  int i;
+  double value = 0.0;
+  for (i = 0; i < filter->m_numberOfTaps; i++) {
+    value += (double) filter->m_floatFilter[i] * (double) inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+    //printf("value %7.3f %7.3f\n", value, inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)]);
+  }
+  
+  //printf("value %7.3f %7.3f %7.3f %7.3f %7.3f %d\n", value, filter->m_floatOffset, filter->m_floatScale, minValue, maxValue, filter->m_clip);
+  
+  if (filter->m_clip == TRUE)
+    return fClip((float) ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale), -0.5, 0.5);
+  else
+    return (float) ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale);
+}
+
+int Conv444to422Generic::filterHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+  int i;
+  int value = 0;
+  for (i = 0; i < filter->m_numberOfTaps; i++) {
+    value += filter->m_i32Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+  }
+  
+  if (filter->m_clip == TRUE)
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
+  else
+    return (value + filter->m_i32Offset) >> filter->m_i32Shift;
+}
+
+int Conv444to422Generic::filterHorizontal(const int32 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+  int i;
+  int value = 0;
+  for (i = 0; i < filter->m_numberOfTaps; i++) {
+    value += filter->m_i32Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+  }
+
+  if (filter->m_clip == TRUE)
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
+  else
+    return (value + filter->m_i32Offset) >> filter->m_i32Shift;
+}
+
+
+int Conv444to422Generic::filterHorizontal(const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+  int i;
+  int value = 0;
+  for (i = 0; i < filter->m_numberOfTaps; i++) {
+    value += filter->m_i32Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
+  }
+  
+  if (filter->m_clip == TRUE)
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
+  else
+    return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
 
 
@@ -246,9 +283,32 @@ void Conv444to422Generic::filter(float *out, const float *inp, int width, int he
   int inp_width  = 2 * width;
   int inputHeight = height;
 
-  for (j = 0; j < inputHeight; j++) {
-    for (i = 0; i < width; i++) {
-      out[ j * width + i ] = filterHorizontal(&inp[ j * inp_width], m_horFilter, 2 * i, inp_width - 1, minValue, maxValue);
+  if (m_useMinMax == 1) {
+    for (j = 0; j < inputHeight; j++) {
+      for (i = 0; i < width; i++) {
+        out[ j * width + i ] = filterHorizontalMinMax(&inp[ j * inp_width], m_horFilter, 2 * i, inp_width - 1, minValue, maxValue);
+      }
+    }
+  }
+  else if (m_useMinMax == 2) {
+    for (j = 0; j < inputHeight; j++) {
+      for (i = 0; i < width; i++) {
+        out[ j * width + i ] = filterHorizontalMinMax2(&inp[ j * inp_width], m_horFilter, 2 * i, inp_width - 1, minValue, maxValue);
+      }
+    }
+  }
+  else if (m_useMinMax == 3) {
+    for (j = 0; j < inputHeight; j++) {
+      for (i = 0; i < width; i++) {
+        out[ j * width + i ] = filterHorizontalMinMax3(&inp[ j * inp_width], m_horFilter, 2 * i, inp_width - 1, minValue, maxValue);
+      }
+    }
+  }
+  else {
+    for (j = 0; j < inputHeight; j++) {
+      for (i = 0; i < width; i++) {
+        out[ j * width + i ] = filterHorizontal(&inp[ j * inp_width], m_horFilter, 2 * i, inp_width - 1, minValue, maxValue);
+      }
     }
   }
 }
