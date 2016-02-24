@@ -347,6 +347,31 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
     m_colorSpaceFrame  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, TF_NULL, 1.0);
     m_colorSpaceFrame->clear();
   }
+  else   if (m_iFrameStore->m_colorSpace == CM_ICtCp) { // If YCbCr we need to first go to RGB
+    if (m_oFrameStore->m_colorSpace == CM_ICtCp && m_iFrameStore->m_colorPrimaries == m_oFrameStore->m_colorPrimaries && input->m_iConstantLuminance == output->m_iConstantLuminance) {
+      m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, input->m_iConstantLuminance, output->m_iConstantLuminance);
+      m_changeColorPrimaries = FALSE;
+    }
+    else {
+      m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, CM_RGB, m_iFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL, input->m_iConstantLuminance, 0);
+      m_changeColorPrimaries = TRUE;
+    }
+    if (m_oFrameStore->m_colorSpace != CM_ICtCp) {
+      m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);
+    }
+    else {
+      m_colorSpaceConvert = ColorTransform::create(CM_RGB, m_iFrameStore->m_colorPrimaries, CM_RGB, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);      
+      m_colorSpaceConvertMC = ColorTransform::create(CM_RGB, m_oFrameStore->m_colorPrimaries, CM_ICtCp, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion, 0, output->m_iConstantLuminance);      
+    }
+    
+    // frame store for color format conversion
+    //m_pFrameStore[2]  = new Frame(m_width, m_height, output->m_isFloat, CM_RGB, m_iFrameStore->m_colorPrimaries, output->m_chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
+    m_pFrameStore[2]  = new Frame(m_width, m_height, TRUE, CM_RGB, m_iFrameStore->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, m_inputFrame->m_transferFunction, m_inputFrame->m_systemGamma);
+    m_pFrameStore[2]->clear();
+    
+    m_colorSpaceFrame  = new Frame(m_width, m_height, TRUE, output->m_colorSpace, output->m_colorPrimaries, chromaFormat, output->m_sampleRange, output->m_bitDepthComp[Y_COMP], output->m_isInterlaced, TF_NULL, 1.0);
+    m_colorSpaceFrame->clear();
+  }
   else {
     m_colorTransform = ColorTransform::create(m_iFrameStore->m_colorSpace, m_iFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, CLT_NULL);
     m_colorSpaceConvert = ColorTransform::create(m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, m_oFrameStore->m_colorSpace, m_oFrameStore->m_colorPrimaries, inputParams->m_transformPrecision, inputParams->m_useHighPrecisionTransform, inputParams->m_closedLoopConversion);
@@ -526,7 +551,7 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
     // Output to m_pFrameStore memory with appropriate color space conversion
     // Note that the name of "forward" may be a bit of a misnomer.
     
-    if (!(input->m_iConstantLuminance != 0 && input->m_colorSpace == CM_YCbCr)) {
+    if (!(input->m_iConstantLuminance != 0 && (input->m_colorSpace == CM_YCbCr || input->m_colorSpace == CM_ICtCp))) {
       m_colorTransform->process(m_pFrameStore[2], m_convertFrameStore);
       if ( m_useSingleTransferStep == FALSE ) {
         m_inputTransferFunction->forward(m_pFrameStore[3], m_pFrameStore[2]);
@@ -547,7 +572,7 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
       m_colorSpaceConvert->process(m_colorSpaceFrame, m_pFrameStore[1]);
       
       m_outDisplayGammaAdjust->inverse(m_colorSpaceFrame);
-      if (m_oFrameStore->m_colorSpace == CM_YCbCr) {
+      if (m_oFrameStore->m_colorSpace == CM_YCbCr || m_oFrameStore->m_colorSpace == CM_ICtCp) {
         m_outputTransferFunction->inverse(m_pFrameStore[6], m_colorSpaceFrame);
         m_colorSpaceConvertMC->process(m_pFrameStore[4], m_pFrameStore[6]);
       }

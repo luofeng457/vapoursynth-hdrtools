@@ -241,6 +241,7 @@ ColorTransformYAdjustLFast::ColorTransformYAdjustLFast(
   m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0);
   
   m_mapSize = 10000000; // should be a big enough size to handle the range from 0.001 to 10000
+  //m_mapSize =    1048576; // reduced size just to test performance with lower precision
   m_scaleFactor = (double) m_mapSize;
   // Using double precision LUTs. A bit big, but it should be okay
   m_invTransformMap = new double[m_mapSize + 1];

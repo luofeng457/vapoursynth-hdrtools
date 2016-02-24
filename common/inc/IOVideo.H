@@ -56,8 +56,8 @@
 #include "FrameFormat.H"
 
 
-static const char COLOR_SPACE       [11][20] = { "Unknown", "YUV", "RGB", "XYZ", "YDZDX", "YCbCr_CL", "YFBFRV1", "YFBFRV2", "YFBFRV3", "YFBFRV4", "Yu'v'"};
-static const char COLOR_PRIMARIES   [11][20] = { "Unknown", "BT.709", "BT.2020", "P3D60", "P3D65", "XYZ", "NONE", "AMT", "YCoCg", "EXT" };
+static const char COLOR_SPACE       [12][20] = { "Unknown", "YCbCr", "RGB", "XYZ", "YDZDX", "YCbCr_CL", "YFBFRV1", "YFBFRV2", "YFBFRV3", "YFBFRV4", "Yu'v'", "ICtCp"};
+static const char COLOR_PRIMARIES   [12][20] = { "Unknown", "BT.709", "BT.2020", "P3D60", "P3D65", "XYZ", "NONE", "AMT", "YCoCg", "EXT", "LMSD" };
 static const char COLOR_FORMAT      [ 5][20] = { "Unknown", "4:0:0", "4:2:0", "4:2:2", "4:4:4"};
 static const char PIXEL_TYPE        [ 3][20] = { "UINT", "HALF", "SINGLE"};
 static const char INTERLACED_TYPE   [ 2][2 ] = { "p", "i"};

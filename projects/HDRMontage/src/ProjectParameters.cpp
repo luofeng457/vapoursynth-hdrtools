@@ -96,7 +96,7 @@ IntegerParameter intParameterList[] = {
   { "Input0BitDepthCmp0",     &src0->m_bitDepthComp[Y_COMP],                         8,           8,         16,    "1st Input Bitdepth Cmp0"                 },
   { "Input0BitDepthCmp1",     &src0->m_bitDepthComp[U_COMP],                         8,           8,         16,    "1st Input Bitdepth Cmp1"                 },
   { "Input0BitDepthCmp2",     &src0->m_bitDepthComp[V_COMP],                         8,           8,         16,    "1st Input Bitdepth Cmp2"                 },
-  { "Input0ColorSpace",       (int *) &src0->m_colorSpace,                    CM_YCbCr,    CM_YCbCr,     CM_XYZ,    "1st Input Color Space"                   },
+  { "Input0ColorSpace",       (int *) &src0->m_colorSpace,                    CM_YCbCr,    CM_YCbCr, CM_TOTAL-1,    "1st Input Color Space"                   },
   { "Input0ColorPrimaries",   (int *) &src0->m_colorPrimaries,                  CP_709,      CP_709, CP_TOTAL-1,    "1st Input Color Primaries"               },
   { "Input0TransferFunction", (int *) &src0->m_transferFunction,                 TF_PQ,     TF_NULL, TF_TOTAL-1,    "1st Input Transfer Function"              },
 
@@ -118,7 +118,7 @@ IntegerParameter intParameterList[] = {
   { "Input1BitDepthCmp0",     &src1->m_bitDepthComp[Y_COMP],                         8,           8,         16,    "2nd Input Bitdepth Cmp0"                 },
   { "Input1BitDepthCmp1",     &src1->m_bitDepthComp[U_COMP],                         8,           8,         16,    "2nd Input Bitdepth Cmp1"                 },
   { "Input1BitDepthCmp2",     &src1->m_bitDepthComp[V_COMP],                         8,           8,         16,    "2nd Input Bitdepth Cmp2"                 },
-  { "Input1ColorSpace",       (int *) &src1->m_colorSpace,                    CM_YCbCr,    CM_YCbCr,     CM_XYZ,    "2nd Input Color Space"                   },
+  { "Input1ColorSpace",       (int *) &src1->m_colorSpace,                    CM_YCbCr,    CM_YCbCr, CM_TOTAL-1,    "2nd Input Color Space"                   },
   { "Input1ColorPrimaries",   (int *) &src1->m_colorPrimaries,                  CP_709,      CP_709, CP_TOTAL-1,    "2nd Input Color Primaries"               },
   { "Input1TransferFunction", (int *) &src1->m_transferFunction,                 TF_PQ,     TF_NULL, TF_TOTAL-1,    "2nd Input Transfer Function"              },
 
@@ -140,7 +140,7 @@ IntegerParameter intParameterList[] = {
   { "OutputBitDepthCmp0",     &out->m_bitDepthComp[Y_COMP],                          8,           8,           16,    "Output Bitdepth Cmp0"                  },
   { "OutputBitDepthCmp1",     &out->m_bitDepthComp[U_COMP],                          8,           8,           16,    "Output Bitdepth Cmp1"                  },
   { "OutputBitDepthCmp2",     &out->m_bitDepthComp[V_COMP],                          8,           8,           16,    "Output Bitdepth Cmp2"                  },
-  { "OutputColorSpace",       (int *) &out->m_colorSpace,                     CM_YCbCr,    CM_YCbCr,       CM_XYZ,    "Output Color Space"                    },
+  { "OutputColorSpace",       (int *) &out->m_colorSpace,                     CM_YCbCr,    CM_YCbCr,   CM_TOTAL-1,    "Output Color Space"                    },
   { "OutputColorPrimaries",   (int *) &out->m_colorPrimaries,                   CP_709,      CP_709,   CP_TOTAL-1,    "Output Color Primaries"                },
   { "OutputTransferFunction", (int *) &out->m_transferFunction,                  TF_PQ,     TF_NULL,   TF_TOTAL-1,    "Output Transfer Function"              },
   { "OutputSampleRange",      (int *) &out->m_sampleRange,                 SR_STANDARD, SR_STANDARD,       SR_SDI,    "Output Sample Range"                   },

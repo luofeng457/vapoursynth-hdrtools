@@ -4,10 +4,10 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Apple Inc, Ericsson
+ * <ORGANIZATION> = Apple Inc
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Apple Inc, Ericsson
+ * Copyright (c) 2015, Apple Inc
  * All rights reserved.
  
  *
@@ -38,15 +38,16 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustXYZ.cpp
+ * \file ColorTransformClosedLoopFRGB.cpp
  *
  * \brief
- *    ColorTransformYAdjustXYZ Class
+ *    ColorTransformClosedLoopFRGB Class
+ *    Concept is based on Closed Loop Optimization and Ericsson's Micrograding
+ *    however the optimization is based on RGB and not Y (luminance). Thus we 
+ *    do not sacrifice color performance in favor of one component.
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
- *     - Jacob Strom                     <jacob.strom@ericsson.com>
- *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
  *
  *************************************************************************************
  */
@@ -56,7 +57,7 @@
 //-----------------------------------------------------------------------------
 
 #include "Global.H"
-#include "ColorTransformYAdjustXYZ.H"
+#include "ColorTransformClosedLoopFRGB.H"
 
 //-----------------------------------------------------------------------------
 // Macros / Constants
@@ -66,7 +67,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ( 
+ColorTransformClosedLoopFRGB::ColorTransformClosedLoopFRGB( 
                                               ColorSpace        iColorSpace, 
                                               ColorPrimaries    iColorPrimaries, 
                                               ColorSpace        oColorSpace, 
@@ -93,7 +94,7 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
 
   m_floatData = NULL;
   m_size = 0;
-  m_tfDistance = TRUE;
+  m_tfDistance = FALSE;
   m_useFloatPrecision = useFloatPrecision;
   m_oColorSpace = oColorSpace;
   m_oColorPrimaries = oColorPrimaries;
@@ -102,11 +103,6 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
   
   m_useAdaptiveDownsampler = useAdaptiveDownsampler;
   m_useAdaptiveUpsampler   = useAdaptiveUpsampler;
-
-  // These are the weights for the distortion computation
-  m_xWeight = 1.0;
-  m_yWeight = 1.0;
-  m_zWeight = 1.0;
 
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
@@ -205,9 +201,7 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
   m_invTransform2 = INV_TRANSFORM[m_invMode][V_COMP];
   
   // Transform coefficients for conversion to Y in XYZ
-  m_transformRGBtoX = FWD_TRANSFORM[m_modeRGB2XYZ][0];
   m_transformRGBtoY = FWD_TRANSFORM[m_modeRGB2XYZ][1];
-  m_transformRGBtoZ = FWD_TRANSFORM[m_modeRGB2XYZ][2];
 
   m_fwdColorFormat = NULL;
   m_invColorFormat = NULL;
@@ -240,14 +234,15 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
     m_chromaWeight = (double) (1 << (m_bitDepth - 8)) * 253.0;
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
-
-  m_iLumaWeight = (int) m_lumaWeight;
-  m_interval    = iMax(4, (int) dRound(m_lumaWeight / 16));
-
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0);
+  
+  // Weights for the different components
+  m_weight[0] = 0.3349;
+  m_weight[1] = 0.6650;
+  m_weight[2] = 0.0001;
+  
 }
 
-ColorTransformYAdjustXYZ::~ColorTransformYAdjustXYZ() {
+ColorTransformClosedLoopFRGB::~ColorTransformClosedLoopFRGB() {
   if (m_floatData != NULL) {
     delete[] m_floatData;
     m_floatData = NULL;
@@ -276,12 +271,7 @@ ColorTransformYAdjustXYZ::~ColorTransformYAdjustXYZ() {
     delete m_invFrameStore;
     m_invFrameStore = NULL;
   }
-  
-  if (m_transferFunction) {
-    delete m_transferFunction;
-    m_transferFunction = NULL;
-  }
-  
+    
   // Delete buffers for integer processing if they were allocated
   if(m_fwdConvertProcess) {
     delete m_fwdConvertProcess;
@@ -304,7 +294,7 @@ ColorTransformYAdjustXYZ::~ColorTransformYAdjustXYZ() {
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-void ColorTransformYAdjustXYZ::allocateMemory(Frame* out, const Frame *inp) {
+void ColorTransformClosedLoopFRGB::allocateMemory(Frame* out, const Frame *inp) {
   m_width [Y_COMP] = inp->m_width[ Y_COMP];
   m_width [Y_COMP] = inp->m_width[ U_COMP];
   m_width [Y_COMP] = inp->m_width[ V_COMP];
@@ -318,7 +308,7 @@ void ColorTransformYAdjustXYZ::allocateMemory(Frame* out, const Frame *inp) {
   
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
   if (NULL == (m_floatData = new float[(int) m_size])) {
-    fprintf(stderr, "ColorTransformYAdjustXYZ: Not enough memory to create array m_floatData, of size %d", (int) m_size);
+    fprintf(stderr, "ColorTransformClosedLoopFRGB: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }
   
@@ -358,92 +348,11 @@ void ColorTransformYAdjustXYZ::allocateMemory(Frame* out, const Frame *inp) {
   m_memoryAllocated = TRUE;
 }
 
-void ColorTransformYAdjustXYZ::computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor) {
-  *rColor = m_invTransform0[1] * uComp + m_invTransform0[2] * vComp;
-  *gColor = m_invTransform1[1] * uComp + m_invTransform1[2] * vComp;
-  *bColor = m_invTransform2[1] * uComp + m_invTransform2[2] * vComp;
-}
-
-void ColorTransformYAdjustXYZ::computeColorImpactBasic(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor) {
-  // all the values used apart from vComp and uComp are constants and thus we could precompute those (resulting in just 4 multiplies and 1 addition
-  // TBD
-  *rColor = 2 * (1 - m_transform0[0]) * vComp;
-  *bColor = 2 * (1 - m_transform0[2]) * uComp;
-  *gColor = ((*bColor * m_transform0[2] +  *rColor * m_transform0[0]) / (1 - m_transform0[0] - m_transform0[2]));
-}
-
-void ColorTransformYAdjustXYZ::convertToXYZLinear(double rComp, double gComp, double bComp, double *xComp,  double *yComp, double *zComp) {
-  rComp = m_transferFunction->forward(rComp);
-  gComp = m_transferFunction->forward(gComp);
-  bComp = m_transferFunction->forward(bComp);
-  *xComp = (m_transformRGBtoX[0] * rComp + m_transformRGBtoX[1] * gComp + m_transformRGBtoX[2] * bComp);
-  *yComp = (m_transformRGBtoY[0] * rComp + m_transformRGBtoY[1] * gComp + m_transformRGBtoY[2] * bComp);
-  *zComp = (m_transformRGBtoZ[0] * rComp + m_transformRGBtoZ[1] * gComp + m_transformRGBtoZ[2] * bComp);
-}
-
-void  ColorTransformYAdjustXYZ::convertToYCbCr(double rComp, double gComp, double bComp, float *yComp,  float *uComp, float *vComp) {
-  *yComp = (float) (m_transform0[0] * rComp + m_transform0[1] * gComp + m_transform0[2] * bComp);
-  *uComp = (float) (m_transform1[0] * rComp + m_transform1[1] * gComp + m_transform1[2] * bComp);
-  *vComp = (float) (m_transform2[0] * rComp + m_transform2[1] * gComp + m_transform2[2] * bComp);
-}
-
-void ColorTransformYAdjustXYZ::convertToXYZ(double rComp, double gComp, double bComp, double *xComp,  double *yComp, double *zComp) {
-  *xComp = (m_transformRGBtoX[0] * rComp + m_transformRGBtoX[1] * gComp + m_transformRGBtoX[2] * bComp);
-  *yComp = (m_transformRGBtoY[0] * rComp + m_transformRGBtoY[1] * gComp + m_transformRGBtoY[2] * bComp);
-  *zComp = (m_transformRGBtoZ[0] * rComp + m_transformRGBtoZ[1] * gComp + m_transformRGBtoZ[2] * bComp);
-}
-
-void ColorTransformYAdjustXYZ::convertToXYZLinear(const double yValue, const double rColor, const double gColor, const double bColor, double *xComp,  double *yComp, double *zComp) {
-  if (yValue == 0.0) {
-    *xComp = 0.0;
-    *yComp = 0.0;
-    *zComp = 0.0;
-        }
-  else  {
-    const double rComp = m_transferFunction->forward(dClip((m_invTransform0[0] * yValue + rColor), 0.0, 1.0));
-    const double gComp = m_transferFunction->forward(dClip((m_invTransform1[0] * yValue + gColor), 0.0, 1.0));
-    const double bComp = m_transferFunction->forward(dClip((m_invTransform2[0] * yValue + bColor), 0.0, 1.0));
-    
-    *xComp = (m_transformRGBtoX[0] * rComp + m_transformRGBtoX[1] * gComp + m_transformRGBtoX[2] * bComp);
-    *yComp = (m_transformRGBtoY[0] * rComp + m_transformRGBtoY[1] * gComp + m_transformRGBtoY[2] * bComp);
-    *zComp = (m_transformRGBtoZ[0] * rComp + m_transformRGBtoZ[1] * gComp + m_transformRGBtoZ[2] * bComp);
-  }
-}
-
-void ColorTransformYAdjustXYZ::calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor)
-{
-  double yTF = m_transferFunction->inverse(yLinear);
-  double boundR = m_invTransform0[0] * yTF - rColor;
-  double boundG = m_invTransform1[0] * yTF - gColor;
-  double boundB = m_invTransform2[0] * yTF - bColor;
-  
-  double ypLowest0To1 = dMin(dMin(boundR, boundG), boundB);
-  int ypLowestQuant = iClip(double2IntFloor(m_lumaWeight * ypLowest0To1), 0, m_iLumaWeight);
-  
-  // Calculate ypHighest0To1 = yTF, but we have to go to integer, round up and go back again.
-  int ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * yTF), 0, m_iLumaWeight);
-  double ypHighest0To1 = (double) ypHighestQuant / m_lumaWeight;
-  
-  double testYpHighestR = m_invTransform0[0] * ypHighest0To1 - rColor;
-  double testYpHighestG = m_invTransform1[0] * ypHighest0To1 - gColor;
-  double testYpHighestB = m_invTransform2[0] * ypHighest0To1 - bColor;
-  
-  if(testYpHighestR > 1.0 || testYpHighestG > 1.0 || testYpHighestB > 1.0)  {
-    // Instead use a "looser" bound that is safe.
-    double ypLargest0To1 = dMax(dMax(boundR, boundG), boundB);
-    ypHighestQuant = iClip(double2IntCeil(m_lumaWeight * ypLargest0To1), 0, m_iLumaWeight);
-  }
-  
-  // The lowest possible and highest possible value for Yprime
-  ypBufLowPix  = ypLowestQuant;
-  ypBufHighPix = ypHighestQuant;
-}
-
 //-----------------------------------------------------------------------------
 // Public methods
 //-----------------------------------------------------------------------------
 
-void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
+void ColorTransformClosedLoopFRGB::process ( Frame* out, const Frame *inp) {
   out->m_frameNo = inp->m_frameNo;
   out->m_isAvailable = TRUE;
   
@@ -453,33 +362,10 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
   
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])  {
     if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {
-      double xLinear, yLinear, zLinear;
-      double xConv, yConv, zConv;
-      double rColor, gColor, bColor;
       double uComp, vComp;
-      //double rComp, gComp, bComp;
-      int    iYComp, iYCompMin, iYCompMax; 
-      float *floatComp[3];
-      double scale = 1.0;
-      void (ColorTransformYAdjustXYZ::*pt2Convert)(double, double, double, double*, double*, double*) = NULL;
       float *red   = inp->m_floatComp[0];
       float *green = inp->m_floatComp[1];
       float *blue  = inp->m_floatComp[2];
-
-      if (inp->m_hasAlternate == TRUE) {
-        floatComp[0] = inp->m_altFrame->m_floatComp[0];
-        floatComp[1] = inp->m_altFrame->m_floatComp[1];
-        floatComp[2] = inp->m_altFrame->m_floatComp[2];
-        scale       = 1.0 / inp->m_altFrameNorm;
-        pt2Convert  = &ColorTransformYAdjustXYZ::convertToXYZ;
-      }
-      else {
-        floatComp[0] = inp->m_floatComp[0];
-        floatComp[1] = inp->m_floatComp[1];
-        floatComp[2] = inp->m_floatComp[2];   
-        scale        = 1.0;        
-        pt2Convert  = &ColorTransformYAdjustXYZ::convertToXYZLinear;     
-      }
 
       // Allocate memory. Note that current code does not permit change of resolution. TBDL
       if (m_memoryAllocated == FALSE) { 
@@ -488,7 +374,9 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
       
       // First convert all components as per the described transform process 
       for (int i = 0; i < inp->m_compSize[0]; i++) {
-        convertToYCbCr((double) inp->m_floatComp[0][i], (double) inp->m_floatComp[1][i], (double) inp->m_floatComp[2][i], &(out->m_floatComp[0][i]), &(out->m_floatComp[1][i]), &(out->m_floatComp[2][i]));
+        out->m_floatComp[0][i] = (float) (m_transform0[0] * (double) red[i] + m_transform0[1] * (double) green[i] + m_transform0[2] * (double) blue[i]);
+        out->m_floatComp[1][i] = (float) (m_transform1[0] * (double) red[i] + m_transform1[1] * (double) green[i] + m_transform1[2] * (double) blue[i]);
+        out->m_floatComp[2][i] = (float) (m_transform2[0] * (double) red[i] + m_transform2[1] * (double) green[i] + m_transform2[2] * (double) blue[i]);
       }
       
       if (m_useFloatPrecision == FALSE) {       // Integer conversion
@@ -526,91 +414,22 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
         m_invColorFormat->process (m_invFrameStore, m_fwdFrameStore);
       }
       
-      double uvDenom = 1 / (1 - m_transform0[0] - m_transform0[2]);
+      double uvDenom = 1 / m_transform0[1];
       double uScale  = (2.0 * (1 - m_transform0[2]));
       double vScale  = (2.0 * (1 - m_transform0[0]));
       
       for (int i = 0; i < inp->m_compSize[0]; i++) {
-
         uComp  = (double) m_invFrameStore->m_floatComp[1][i];
         vComp  = (double) m_invFrameStore->m_floatComp[2][i];       
-        
+                
         double vOffset = vComp * vScale;
         double uOffset = uComp * uScale;
         double gOffset = ((uOffset * m_transform0[2] +  vOffset * m_transform0[0]) * uvDenom);
-
         
-        double yValueR = red  [i] - vOffset;
-        double yValueB = blue [i] - uOffset;
-        double yValueG = green[i] + gOffset;
-        
-        int yValueRQ = (int) dRound(yValueR * m_lumaWeight);
-        int yValueBQ = (int) dRound(yValueB * m_lumaWeight);
-        int yValueGQ = (int) dRound(yValueG * m_lumaWeight);
-        
-        // If all values agree, no need to perform a refinement
-        if (yValueRQ == yValueGQ && yValueRQ == yValueBQ) {
-          out->m_floatComp[0][i] = (float) ((double) yValueRQ / m_lumaWeight);
-        }
-        else {          
-          // Compute the linear value of the target Y (given original data)
-          (*this.*pt2Convert)((double)floatComp[0][i] * scale, (double) floatComp[1][i] * scale,(double) floatComp[2][i] * scale, &xLinear, &yLinear, &zLinear);
+        int yFinalRQ = (int) dRound((m_weight[0]  * (red[i] - vOffset) + m_weight[2] * (blue[i] - uOffset) + m_weight[1] * (green[i] + gOffset)) * m_lumaWeight);
+        //int yFinalRQ = (int) dRound((m_weight[0] * dMax(0.0, (red[i] - vOffset)) + m_weight[2] * dMax(0.0, (blue[i] - uOffset)) + m_weight[1] * dMax(0.0, (green[i] + gOffset))) * m_lumaWeight);
 
-          int yValueMin = iMin(yValueRQ, iMin(yValueBQ, yValueGQ));
-          int yValueMax = iMax(yValueRQ, iMax(yValueBQ, yValueGQ));
-          
-          computeColorImpact(uComp, vComp, &rColor, &gColor, &bColor);          
-          
-          calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
-
-          iYCompMin = iMax(iYCompMin, yValueMin);
-          iYCompMax = iMin(iYCompMax, yValueMax);
-          if (iYCompMin == iYCompMax) {
-            //convertToXYZLinear((double) iYCompMin / m_lumaWeight, rColor, gColor, bColor, &xConvMin, &yConvMin, &zConvMin);
-            out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);            
-          }
-          else {
-            int    bestYComp = 0;
-            double bestD = 1e30;
-            double currD = 1e30;
-            // Given reconstruction convert also inverse data
-            if(m_tfDistance == TRUE) {
-              double xTF = m_transferFunction->inverse(xLinear);
-              double yTF = m_transferFunction->inverse(yLinear);
-              double zTF = m_transferFunction->inverse(zLinear);
-              for (iYComp = iYCompMin; iYComp <= iYCompMax; iYComp++) {
-                convertToXYZLinear((double) iYComp / m_lumaWeight, rColor, gColor, bColor, &xConv, &yConv, &zConv);
-                // Y distortion
-                currD = m_yWeight * dAbs2(m_transferFunction->inverse(yConv) - yTF);
-                if (currD < bestD) { 
-                // X distortion
-                  currD += m_xWeight * dAbs2(m_transferFunction->inverse(xConv) - xTF);
-                  if (currD < bestD) { 
-                  // Z distortion
-                    currD += m_zWeight * dAbs2(m_transferFunction->inverse(zConv) - zTF);                    
-                    if (currD < bestD) { 
-                      bestYComp  = iYComp;
-                      bestD = currD;
-                    }
-                  }
-                }
-              }
-            }
-            else {
-              for (int iYComp = iYCompMin; iYComp <= iYCompMax; iYComp++) {
-                convertToXYZLinear((double) iYComp / m_lumaWeight, rColor, gColor, bColor, &xConv, &yConv, &zConv);
-                currD = m_xWeight * dAbs2(xConv - xLinear) + m_yWeight * dAbs2(yConv - yLinear) + m_zWeight * dAbs2(zConv - zLinear);
-                
-                if (currD < bestD) { 
-                  bestYComp  = iYComp;
-                  bestD = currD;
-                }
-              }              
-            }
-                        
-            out->m_floatComp[0][i] = (float) ((double) bestYComp / m_lumaWeight);            
-          }
-        }
+        out->m_floatComp[0][i] = (float) ((double) yFinalRQ / m_lumaWeight);
       }
     }
     else { 

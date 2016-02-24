@@ -483,7 +483,6 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
   
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])  {
     if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {
-      int    iYCompMin, iYCompMax; 
       double uComp, vComp;
       float *red   = inp->m_floatComp[0];
       float *green = inp->m_floatComp[1];
@@ -556,14 +555,14 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
         int yValueRQ = (int) dRound(yValueR);
         int yValueBQ = (int) dRound(yValueB);
         int yValueGQ = (int) dRound(yValueG);
-        
+
         if (yValueRQ == yValueBQ && yValueBQ == yValueGQ) {
           out->m_floatComp[0][i] = (float) ((double) yValueRQ / m_lumaWeight);
         }
         else {
-          double errorR, errorB, errorG;
           // First compute the linear value of the target Y (given original data)
           //yLinear = (*this.*pt2Convert)((double)floatComp[0][i] * scale, (double) floatComp[1][i] * scale,(double) floatComp[2][i] * scale);
+          //printf("hello there too\n");
           
           
           // The conversion below basically puts us back to the original space.          
@@ -571,13 +570,32 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
           int yValueMax = iMax(yValueRQ, iMax(yValueBQ, yValueGQ));
           
           int iYComp = yValueMin;
+                    
+#if 1
+         // if (iYCompMin != iYCompMax) {
+            double curError;
+            double minError = computeYDistortion(yValueR, yValueG , yValueB, (double) iYComp);
+            for (int j = iMax(0, yValueMin - 1); j <= iMin(yValueMax + 1, (int) m_lumaWeight); j++) {
+                        
+              curError = computeYDistortion(yValueR, yValueG , yValueB, (double) j);
+
+              if (curError < minError) {
+                minError = curError;
+                iYComp = j;
+              }
+            }
+          //}            
+          
+          out->m_floatComp[0][i] = (float) ((double) iYComp / m_lumaWeight);
+#else
           //computeColorImpact(uComp, vComp, &rColor, &gColor, &bColor);          
           
           //calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
           //calcBounds(iYCompMin, iYCompMax, yLinear, uComp, vComp);
-          iYCompMin = yValueMin;
-          iYCompMax = yValueMax;
-                    
+          int iYCompMin = yValueMin;
+          int iYCompMax = yValueMax;
+          double errorR, errorB, errorG;
+
           // Compute bound errors
           double minBoundError, maxBoundError;
 
@@ -592,19 +610,25 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
               iYCompMin = yValueRQ;
               minBoundError = errorR;
               if (errorG < errorB) {
-                iYCompMax = yValueGQ;
-                maxBoundError = errorG;  
-              }
-              else {
+                //iYCompMax = yValueGQ;
+                //maxBoundError = errorG;  
                 iYCompMax = yValueBQ;
                 maxBoundError = errorB;                  
+              }
+              else {
+                //iYCompMax = yValueBQ;
+                //maxBoundError = errorB;                  
+                iYCompMax = yValueGQ;
+                maxBoundError = errorG;  
               }
             }
             else {
               iYCompMin = yValueGQ;
               minBoundError = errorG;
-              iYCompMax = yValueRQ;
-              maxBoundError = errorR;                
+              //iYCompMax = yValueRQ;
+              //maxBoundError = errorR;                
+              iYCompMax = yValueBQ;
+              maxBoundError = errorB;                  
             }
           }
           else {
@@ -612,19 +636,25 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
               iYCompMin = yValueBQ;
               minBoundError = errorB;
               if (errorG < errorR) {
-                iYCompMax = yValueGQ;
-                maxBoundError = errorG;  
+                //iYCompMax = yValueGQ;
+                //maxBoundError = errorG;  
+                iYCompMax = yValueRQ;
+                maxBoundError = errorR;
               }
               else {
-                iYCompMax = yValueRQ;
-                maxBoundError = errorR;                  
+                //iYCompMax = yValueRQ;
+                //maxBoundError = errorR;                  
+                iYCompMax = yValueGQ;
+                maxBoundError = errorG;  
               }
             }
             else {
               iYCompMin = yValueGQ;
               minBoundError = errorG;
-              iYCompMax = yValueBQ;
-              maxBoundError = errorB;                
+              //iYCompMax = yValueBQ;
+              //maxBoundError = errorB;                
+              iYCompMax = yValueRQ;
+              maxBoundError = errorR;
             }
           }
 
@@ -665,6 +695,7 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
             out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);
           else
             out->m_floatComp[0][i] = (float) ((double) iYCompMax / m_lumaWeight);
+#endif
         }
       }
     }

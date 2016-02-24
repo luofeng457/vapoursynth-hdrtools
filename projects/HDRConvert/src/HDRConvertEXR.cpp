@@ -542,7 +542,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
       m_outputTransferFunction->inverse(m_pDFrameStore[0], m_dFrameStore);
       m_colorTransform->process(m_pDFrameStore[1], m_pDFrameStore[0]);
       
-      if (!(output->m_iConstantLuminance != 0 && output->m_colorSpace == CM_YCbCr)) {
+      if (!(output->m_iConstantLuminance != 0 && (output->m_colorSpace == CM_YCbCr || output->m_colorSpace == CM_ICtCp))) {
         // Apply transfer function
         if ( m_useSingleTransferStep == FALSE ) {
           processFrame = m_pFrameStore[1];
@@ -582,7 +582,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
     }
     else {  //  (m_linearDownConversion == FALSE)
       if (m_rgbDownConversion == TRUE) {
-        if (!(output->m_iConstantLuminance != 0 && output->m_colorSpace == CM_YCbCr)) {
+        if (!(output->m_iConstantLuminance != 0 && (output->m_colorSpace == CM_YCbCr || output->m_colorSpace == CM_ICtCp))) {
           // Apply transfer function
           if ( m_useSingleTransferStep == FALSE ) {
             processFrame = m_pFrameStore[1];
@@ -628,7 +628,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
         m_convertProcess->process(processFrame, currentFrame);        
       }
       else {
-        if (!(output->m_iConstantLuminance != 0 && output->m_colorSpace == CM_YCbCr)) {
+        if (!(output->m_iConstantLuminance != 0 && (output->m_colorSpace == CM_YCbCr || output->m_colorSpace == CM_ICtCp))) {
           // Apply transfer function
           if ( m_useSingleTransferStep == FALSE ) {
             processFrame = m_pFrameStore[1];

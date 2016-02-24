@@ -514,7 +514,7 @@ void HDRConvertTIFF::process( ProjectParameters *inputParams ) {
     linearFrame = currentFrame;
     
     // Apply transfer function
-    if (!(output->m_iConstantLuminance != 0 && output->m_colorSpace == CM_YCbCr)) {
+    if (!(output->m_iConstantLuminance != 0 && (output->m_colorSpace == CM_YCbCr || output->m_colorSpace == CM_ICtCp))) {
       if ( m_useSingleTransferStep == FALSE ) {
         processFrame = m_pFrameStore[3];
         m_normalizeFunction->inverse(processFrame, currentFrame);

@@ -77,6 +77,7 @@ typedef enum {
   CM_YFBFRV3   =  7,
   CM_YFBFRV4   =  8,
   CM_YUpVp     =  9,
+  CM_ICtCp     = 10,
   CM_TOTAL
 } ColorSpace;
 
@@ -92,6 +93,7 @@ typedef enum {
   CP_AMT     = 6,
   CP_YCOCG   = 7,
   CP_EXT     = 8,
+  CP_LMSD    = 9, // LMS Dolby primaries
   CP_TOTAL      
 } ColorPrimaries;
 
@@ -262,6 +264,7 @@ typedef enum {
   CLT_XYZ      = 11,
   CLT_YADJLFST = 12,
   CLT_YADJTELE = 13,
+  CLT_FRGB     = 14,
   CLT_TOTAL
 } ClosedLoopTrans;
 

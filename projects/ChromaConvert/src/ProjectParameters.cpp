@@ -92,7 +92,7 @@ IntegerParameter intParameterList[] = {
   { "SourceBitDepthCmp0",     (int *) &src->m_bitDepthComp[Y_COMP],           8,           8,           16,    "Source Bitdepth Cmp0"              },
   { "SourceBitDepthCmp1",     (int *) &src->m_bitDepthComp[U_COMP],           8,           8,           16,    "Source Bitdepth Cmp1"              },
   { "SourceBitDepthCmp2",     (int *) &src->m_bitDepthComp[V_COMP],           8,           8,           16,    "Source Bitdepth Cmp2"              },
-  { "SourceColorSpace",       (int *) &src->m_colorSpace,              CM_YCbCr,    CM_YCbCr,     CM_YUpVp,    "Source Color Space"                },
+  { "SourceColorSpace",       (int *) &src->m_colorSpace,              CM_YCbCr,    CM_YCbCr,   CM_TOTAL-1,    "Source Color Space"                },
   { "SourceColorPrimaries",   (int *) &src->m_colorPrimaries,            CP_709,      CP_709,   CP_TOTAL-1,    "Source Color Primaries"            },
   { "SourceSampleRange",      (int *) &src->m_sampleRange,          SR_STANDARD, SR_STANDARD,       SR_SDI,    "Source Sample Range"               },
 

@@ -268,6 +268,9 @@ void DistortionMetricDeltaE::computeMetric (Frame* inp0, Frame* inp1)
   else if (inp0->m_colorSpace == CM_YCbCr ||  inp1->m_colorSpace == CM_YCbCr) {
     printf("DeltaE not supported for YUV data.\n");
   }
+  else if (inp0->m_colorSpace == CM_ICtCp ||  inp1->m_colorSpace == CM_ICtCp) {
+    printf("DeltaE not supported for ICtCp data.\n");
+  }
   else if (inp0->m_colorSpace >= CM_YFBFRV1 ||  inp1->m_colorSpace >= CM_YFBFRV1) {
     printf("DeltaE not supported for YFBFR data.\n");
   }

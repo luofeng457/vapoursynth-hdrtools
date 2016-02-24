@@ -102,6 +102,9 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
     else if (iColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_XYZ;
     }
+    else if (oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_LMSD_2_XYZ;
+    }
   }
   else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr_CL && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
     m_mode = CTF_RGB2020_2_YUV2020CL;
@@ -140,9 +143,27 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
     else if (oColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
     }
-    else if ( oColorPrimaries == CP_YCOCG) {
+    else if (oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     }
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_YCbCrLMS;
+    } 
+  }
+  else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
+    if (oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_ICtCp;
+    } 
+  }
+  else if (iColorSpace == CM_ICtCp && oColorSpace == CM_RGB) {
+    if (iColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_ICtCp;
+    } 
+    m_isForward = FALSE;
+    m_clip = 1;
   }
   else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB) {
     
@@ -170,6 +191,10 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
     else if (iColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     } 
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_YCbCrLMS;
+    } 
     m_isForward = FALSE;
     m_clip = TRUE;
   }
@@ -185,6 +210,9 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
     }
     else if (oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_XYZ;
+    }
+    else if (oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_LMSD_2_XYZ;
     }
     m_isForward = FALSE;
     m_clip = TRUE;
@@ -246,6 +274,20 @@ ColorTransformClosedLoop::ColorTransformClosedLoop(ColorSpace iColorSpace, Color
     }
     else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_RGBEXT;
+      m_isForward = FALSE;
+    }
+    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_RGB2020_2_LMSD;
+    }
+    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_RGBP3D65_2_LMSD;
+    }
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_2020) {
+      m_mode = CTF_RGB2020_2_LMSD;
+      m_isForward = FALSE;
+    }
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_P3D65) {
+      m_mode = CTF_RGBP3D65_2_LMSD;
       m_isForward = FALSE;
     }
   }

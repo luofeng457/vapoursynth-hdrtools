@@ -127,7 +127,7 @@ void ConvFixedToFloat::convertComponent (const uint16 *iComp, float *oComp, int 
 float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sampleRange, ColorSpace colorSpace, int bitDepth, int component) {
   
   if (sampleRange == SR_FULL) {
-    if (colorSpace == CM_YCbCr) {
+    if (colorSpace == CM_YCbCr || colorSpace == CM_ICtCp) {
       switch (component) {
         case Y_COMP:
         default:
@@ -142,7 +142,7 @@ float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sample
     }
   }
   else if (sampleRange == SR_STANDARD) {
-    if (colorSpace == CM_YCbCr) {
+    if (colorSpace == CM_YCbCr || colorSpace == CM_ICtCp) {
       switch (component) {
         case Y_COMP:
         default:
@@ -157,7 +157,7 @@ float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sample
     }
   }
   else if (sampleRange == SR_RESTRICTED) {
-    if (colorSpace == CM_YCbCr) {
+    if (colorSpace == CM_YCbCr || colorSpace == CM_ICtCp) {
       switch (component) {
         case Y_COMP:
         default: {
@@ -182,7 +182,7 @@ float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sample
   else if (sampleRange == SR_SDI_SCALED) {
     // SDI fixed mode for PQ encoded data, scaled by 16. Data were originally graded in "12" bits given the display, but stored
     // in the end in 16 bits. 
-    if (colorSpace == CM_YCbCr) {
+    if (colorSpace == CM_YCbCr || colorSpace == CM_ICtCp) {
       switch (component) {
         case Y_COMP:
         default: {
@@ -207,7 +207,7 @@ float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sample
   else if (sampleRange == SR_SDI) {
     // SDI specifies values in the range of Floor(1015 * D * N + 4 * D + 0.5), where N is the nonlinear color value from zero to unity, and D = 2^(B-10).
     // Note that we are cheating a bit here since SDI only allows values from 10-16 but we modified the function a bit to also handle bitdepths of 8 and 9 (although likely we will not use those).
-    if (colorSpace == CM_YCbCr) {
+    if (colorSpace == CM_YCbCr || colorSpace == CM_ICtCp) {
       switch (component) {
         case Y_COMP:
         default: {
@@ -235,7 +235,7 @@ float ConvFixedToFloat::convertUi16CompValue(uint16 inpValue, SampleRange sample
 void ConvFixedToFloat::convertCompData(Frame* out, const Frame *inp) {
   switch (inp->m_sampleRange) {
     case SR_FULL:
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), (const uint16) 0,  0.0f, 1.0f);
         convertComponent (inp->m_comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[U_COMP]-1))), -0.5f, 0.5f);
         convertComponent (inp->m_comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[V_COMP]-1))), -0.5f, 0.5f);
@@ -249,7 +249,7 @@ void ConvFixedToFloat::convertCompData(Frame* out, const Frame *inp) {
       // SR_RESTRICTED, SR_SDI_SCALED, and SR_SDI not supported for 8 bit data, so lets keep those the same as SR_STANDARD range
     case SR_STANDARD:
     default:
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         convertComponent (inp->m_comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0), (const uint16) (1 << (inp->m_bitDepthComp[Y_COMP]-4)),  0.0f, 1.0f);
         convertComponent (inp->m_comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[U_COMP]-1)), -0.5f, 0.5f);
         convertComponent (inp->m_comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[V_COMP]-1)), -0.5f, 0.5f);
@@ -270,7 +270,7 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
   
   switch (inp->m_sampleRange) {
     case SR_FULL:
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP])) - 1.0), (const uint16) 0,  0.0f, 1.0f);
         convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[U_COMP]-1))), -0.5f, 0.5f);
         convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP])) - 1.0), (const uint16) ((1 << (inp->m_bitDepthComp[V_COMP]-1))), -0.5f, 0.5f);
@@ -283,7 +283,7 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
       break;
     case SR_STANDARD:
     default:
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[Y_COMP]-8)) * 219.0), (const uint16) (1 << (inp->m_bitDepthComp[Y_COMP]-4)),  0.0f, 1.0f);
         convertComponent (inp->m_ui16Comp[U_COMP], out->m_floatComp[U_COMP], inp->m_compSize[U_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[U_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[U_COMP]-1)), -0.5f, 0.5f);
         convertComponent (inp->m_ui16Comp[V_COMP], out->m_floatComp[V_COMP], inp->m_compSize[V_COMP], 1.0 / ((1 << (inp->m_bitDepthComp[V_COMP]-8)) * 224.0), (const uint16) (1 << (inp->m_bitDepthComp[V_COMP]-1)), -0.5f, 0.5f);
@@ -296,7 +296,7 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
       break;
     case SR_RESTRICTED:
       // implemented by considering min = 1 << (bitdepth - 8) and max = (1 << bitdepth) - min - 1 and range = max - min + 1 =  (1 << bitdepth) - (1 << (bitdepth - 7))
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         weight = 1.0 / (double) ((1 << inp->m_bitDepthComp[Y_COMP]) - (1 << (inp->m_bitDepthComp[Y_COMP]-7)));
         offset = (double) (1 << (inp->m_bitDepthComp[Y_COMP]-8)) * weight;
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], weight,  offset,  0.0f, 1.0f);
@@ -322,7 +322,7 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
     case SR_SDI_SCALED:
       // SDI fixed mode for PQ encoded data, scaled by 16. Data were originally graded in "12" bits given the display, but stored
       // in the end in 16 bits. 
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         weight = 1.0 / 4060.0;
         offset = 16.0;
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], 4, inp->m_compSize[Y_COMP], weight,  offset,  0.0f, 1.0f);
@@ -348,7 +348,7 @@ void ConvFixedToFloat::convertUi16CompData(Frame* out, const Frame *inp) {
     case SR_SDI:
       // SDI specifies values in the range of Floor(1015 * D * N + 4 * D + 0.5), where N is the nonlinear color value from zero to unity, and D = 2^(B-10).
       // Note that we are cheating a bit here since SDI only allows values from 10-16 but we modified the function a bit to also handle bitdepths of 8 and 9 (although likely we will not use those).
-      if (inp->m_colorSpace == CM_YCbCr) {
+      if (inp->m_colorSpace == CM_YCbCr || inp->m_colorSpace == CM_ICtCp) {
         weight = 1.0 / (253.75 * (double) (1 << (inp->m_bitDepthComp[Y_COMP] - 8)));
         offset = (double) (1 << (inp->m_bitDepthComp[Y_COMP]-8)) * weight;
         convertComponent (inp->m_ui16Comp[Y_COMP], out->m_floatComp[Y_COMP], inp->m_compSize[Y_COMP], weight,  offset,  0.0f, 1.0f);

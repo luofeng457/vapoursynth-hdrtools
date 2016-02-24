@@ -90,6 +90,9 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     else if (iColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_XYZ;
     }
+    else if (oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_LMSD_2_XYZ;
+    }
   }
   else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr_CL && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
     m_mode = CTF_RGB2020_2_YUV2020CL;
@@ -131,9 +134,26 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     else if ( oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     }
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_YCbCrLMS;
+    } 
+  }
+  else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
+    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_ICtCp;
+    } 
+  }
+  else if (iColorSpace == CM_ICtCp && oColorSpace == CM_RGB) {
+    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_ICtCp;
+    } 
+    m_isForward = FALSE;
+    m_sClip = 1;
   }
   else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB) {
-
     if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
     }
@@ -158,6 +178,10 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     else if (iColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     } 
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Experimental mode\n");
+      m_mode = CTF_LMSD_2_YCbCrLMS;
+    } 
     m_isForward = FALSE;
     m_sClip = 1;
   }
@@ -173,6 +197,9 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     }
     else if (oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_XYZ;
+    }
+    else if (oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_LMSD_2_XYZ;
     }
     m_isForward = FALSE;
     m_sClip = 1;
@@ -234,6 +261,20 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     }
     else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_RGBEXT;
+      m_isForward = FALSE;
+    }
+    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_RGB2020_2_LMSD;
+    }
+    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_RGBP3D65_2_LMSD;
+    }
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_2020) {
+      m_mode = CTF_RGB2020_2_LMSD;
+      m_isForward = FALSE;
+    }
+    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_P3D65) {
+      m_mode = CTF_RGBP3D65_2_LMSD;
       m_isForward = FALSE;
     }
     //m_sClip = 2;
@@ -394,13 +435,21 @@ void ColorTransformGeneric::setColorConversion(int colorPrimaries, const double 
   *transform0 = FWD_TRANSFORM[mode][Y_COMP];
   *transform1 = FWD_TRANSFORM[mode][U_COMP];
   *transform2 = FWD_TRANSFORM[mode][V_COMP];
+  
 }
 
 
 void ColorTransformGeneric::process ( Frame* out, const Frame *inp) {
   out->m_frameNo = inp->m_frameNo;
   out->m_isAvailable = TRUE;
-  
+
+#if 0
+  printf("Transform used\n");
+  printf("[ %10.7f %10.7f %10.7f\n", m_transform0[0], m_transform0[1], m_transform0[2]);
+  printf("  %10.7f %10.7f %10.7f\n", m_transform1[0], m_transform1[1], m_transform1[2]);
+  printf("  %10.7f %10.7f %10.7f]\n", m_transform2[0], m_transform2[1], m_transform2[2]);
+#endif
+
   // Current condition to perform this is that Frames are of same size and in 4:4:4
   // Can add more code to do the interpolation on the fly (and save memory/improve speed),
   // but this keeps our code more flexible for now.
