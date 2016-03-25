@@ -54,10 +54,11 @@
 //-----------------------------------------------------------------------------
 
 #include "Input.H"
-#include "InputY4M.H"
-#include "InputYUV.H"
+#include "InputDPX.H"
 #include "InputEXR.H"
 #include "InputTIFF.H"
+#include "InputY4M.H"
+#include "InputYUV.H"
 #include "Global.H"
 
 #include <stdlib.h>
@@ -491,6 +492,9 @@ Input *Input::create(IOVideo *inputFile, FrameFormat *format, Parameters *inputP
         fprintf(stderr, "Only concatenated file types currently supported\n");
         exit(EXIT_FAILURE);
       }
+      break;
+    case VIDEO_DPX:
+      result = new InputDPX(inputFile, format);
       break;
     case VIDEO_EXR:
       result = new InputEXR(inputFile, format);

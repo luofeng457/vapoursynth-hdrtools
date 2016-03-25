@@ -400,6 +400,11 @@ VideoFileType IOFunctions::parseVideoType (IOVideo *inputFile) {
     inputFile->m_format.m_chromaFormat = CF_420;
     inputFile->m_avi = NULL;
   }
+  else if (strcasecmp (format, "dpx") == 0) {
+    inputFile->m_videoType = VIDEO_DPX;
+    inputFile->m_format.m_chromaFormat = CF_444;
+    inputFile->m_avi = NULL;
+  }
   else if (strcasecmp (format, "rgb") == 0) {
     inputFile->m_videoType = VIDEO_RGB;
     inputFile->m_format.m_chromaFormat = CF_444;

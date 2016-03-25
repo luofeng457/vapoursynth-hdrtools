@@ -80,6 +80,7 @@ public:
   bool              m_isFloat;                      //!< Floating point input
   bool              m_isInterleaved;                //!< Interleaced input
   bool              m_isInterlaced;                 //!< Interlaced input
+  int               m_components;
   int64             m_size;                         //!< number of samples
   int               m_compSize[4];                  //!< number of samples in specific component
   int               m_height[4];                    //!< height of a specific component in pixels
