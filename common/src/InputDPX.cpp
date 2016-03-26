@@ -462,14 +462,14 @@ int InputDPX::readImageData (DPXFileData * t)
   uint32 imageOffset = t->m_fileFormat.m_fileHeader.m_imageOffset;
   byte   isPacked = t->m_fileFormat.m_imageHeader.m_imageElement[0].m_packing == 0 ? true : false;
   byte   bitSize = t->m_fileFormat.m_imageHeader.m_imageElement[0].m_bitSize;
-  uint32 width = t->m_fileFormat.m_imageHeader.m_pixelsPerLine;
+  uint32 width  = t->m_fileFormat.m_imageHeader.m_pixelsPerLine;
   uint32 height = t->m_fileFormat.m_imageHeader.m_linesPerElement;
-  int    bitCount  = 0;
-  int    dataCount = 0;
-  int    byteCount = 0;
-  int    bitOffset = 0;
-  uint16 byteData;
   if (isPacked) {
+    int    bitCount  = 0;
+    int    dataCount = 0;
+    int    byteCount = 0;
+    int    bitOffset = 0;
+    uint16 byteData;
     uint32 size = (width * height * m_components * bitSize + 7) >> 3;
     
     t->m_img.resize(size);
@@ -515,7 +515,6 @@ int InputDPX::readImageData (DPXFileData * t)
     uint32 size = ((width * height * 4) * m_components + samplesPerDWord - 1) / samplesPerDWord;
     uint32 sizeDWord = (size + 3) / 4;
     uint32 curDWord;
-    
 
     switch (bitSize) {
       case 8:
@@ -536,6 +535,18 @@ int InputDPX::readImageData (DPXFileData * t)
           *p++ = (uint16) ((curDWord >> 20) & 0x3FF);
           *p++ = (uint16) ((curDWord >> 10) & 0x3FF);
           *p++ = (uint16) ((curDWord >>  0) & 0x3FF);
+        }
+        t->m_mp = mp;                       // restore memory pointer
+        break;
+      case 12:
+        t->m_img.resize(size * 2);
+        mp = t->m_mp;                       // save memory pointer
+        p = (uint16 *) &t->m_img[0];
+        t->m_mp = (uint8 *) &t->m_buffer[imageOffset];
+        for (j=0; j < sizeDWord; ++j) {
+          curDWord = t->getU32( t) >> 4;
+          *p++ = (uint16) ((curDWord >> 16) & 0xFFF);
+          *p++ = (uint16) ((curDWord >>  0) & 0xFFF);
         }
         t->m_mp = mp;                       // restore memory pointer
         break;

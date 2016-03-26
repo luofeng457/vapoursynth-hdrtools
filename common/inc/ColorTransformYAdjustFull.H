@@ -4,11 +4,12 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Apple Inc, Ericsson
+ * <ORGANIZATION> = Ericsson, Apple Inc
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Apple Inc, Ericsson
+ * Copyright (c) 2015, Ericsson, Apple Inc
  * All rights reserved.
+ 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,22 +38,22 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYAdjustLFast.H
+ * \file ColorTransformYAdjustFull.H
  *
  * \brief
- *    ColorTransformYAdjustLFast Class Header (Lookup based)
+ *    ColorTransformYAdjustFull Class Header
  *
  * \author
- *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
+ *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformYAdjustLFast_H__
-#define __ColorTransformYAdjustLFast_H__
+#ifndef __ColorTransformYAdjustFull_H__
+#define __ColorTransformYAdjustFull_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -62,7 +63,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformYAdjustLFast : public ColorTransform {
+class ColorTransformYAdjustFull : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -83,19 +84,12 @@ private:
   bool                m_memoryAllocated;
   bool                m_tfDistance;
   bool                m_useFloatPrecision;
-  bool                m_isICtCp;
-
-  
-  int                 m_mapSize;
-  double              m_scaleFactor;
-  double             *m_invTransformMap;
-  double             *m_fwdTransformMap;
   
   int                 m_mode;
   int                 m_invMode;
-
   int                 m_modeRGB2XYZ;
-
+  bool                m_isICtCp;
+  
   SampleRange         m_range;
   int                 m_bitDepth;
   ConvertColorFormat *m_fwdColorFormat;
@@ -104,71 +98,61 @@ private:
   int                 m_upMethod;
   int                 m_maxIterations;
   ChromaFormat        m_oChromaFormat;
-  ChromaLocation      m_oChromaLocation[FP_TOTAL];
+  
+  
   ColorSpace          m_oColorSpace;
   ColorPrimaries      m_oColorPrimaries;
+  ChromaLocation      m_oChromaLocation[FP_TOTAL];
   
   Convert            *m_fwdConvertProcess; 
   Convert            *m_invConvertProcess;
-  
+   
   Frame              *m_fwdFrameStore2; 
   Frame              *m_invFrameStore2; 
-
   Frame              *m_fwdFrameStore;
   Frame              *m_invFrameStore;
   double              m_lumaWeight;
   double              m_chromaWeight;
   double              m_lumaOffset;
   double              m_chromaOffset;
-  int                 m_iLumaWeight;
-  int                 m_interval;
-
+  TransferFunction   *m_transferFunction;
+  TransferFunctions   m_transferFunctions;
   int                 m_useAdaptiveDownsampler;
   int                 m_useAdaptiveUpsampler;
-
-  TransferFunctions   m_transferFunctions;
-  TransferFunction   *m_transferFunction;
-  void                calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);
-  void                calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
-  void                calcBoundsFastBasic(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
+  
 
   void                allocateMemory(Frame* out, const Frame *inp);
-  double              invTransform(double value);
-  double              fwdTransform(double value);
-  
-  double              convertToYLinear(const double yComp, const double rColor, const double gColor, const double bColor);
-  double              convertToYLinearBasic(const double yComp, const double rColor, const double gColor, const double bColor);
   double              convertToYLinear(const double rComp, const double gComp, const double bComp);
   double              convertToY      (const double rComp, const double gComp, const double bComp);
-  double              convertToYLinearDirect(const double yComp, const double uComp, const double vComp);
+  void                calcBoundsSloppy(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);
+  void                calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);
   void                convertToRGB(const double yComp, const double uComp, const double vComp, double *rComp, double *gComp, double *bComp);
-  void                computeColorImpact(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
-  void                computeColorImpactBasic(const double uComp, const double vComp, double *rColor, double *gColor, double *bColor);
 
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustLFast( ColorSpace        iColorSpace, 
-                            ColorPrimaries    iColorPrimaries, 
-                            ColorSpace        oColorSpace, 
-                            ColorPrimaries    oColorPrimaries, 
-                            int               useHighPrecision,
-                            TransferFunctions transferFunctions = TF_PQ,
-                            int               downMethod = 2,
-                            int               upMethod = 4,
-                            int               useAdaptiveDownsampler = 0,
-                            int               useAdaptiveUpsampler = 0,
-                            int               useMinMax = 3,
-                            int               bitDepth = 10, 
-                            SampleRange       range = SR_FULL, 
-                            int               maxIterations = 20,
-                            ChromaFormat      oChromaFormat = CF_420,
-                            ChromaLocation    *oChromaLocationType = NULL,
-                            bool              useFloatPrecision = TRUE
-                           );
+  ColorTransformYAdjustFull( ColorSpace        iColorSpace, 
+                         ColorPrimaries    iColorPrimaries, 
+                         ColorSpace        oColorSpace, 
+                         ColorPrimaries    oColorPrimaries, 
+                         int               useHighPrecision,
+                         TransferFunctions transferFunction = TF_PQ,
+                         int               downMethod = 2,
+                         int               upMethod = 4,
+                         int               useAdaptiveDownsampler = 0,
+                         int               useAdaptiveUpsampler = 0,
+                         int               useMinMax = 3,
+                         int               bitDepth = 10, 
+                         SampleRange       range = SR_FULL, 
+                         int               maxIterations = 20,
+                         ChromaFormat      oChromaFormat = CF_420,
+                         ChromaLocation    *oChromaLocationType = NULL,
+                         bool              useFloatPrecision = TRUE
+                         );
                         
-  virtual ~ColorTransformYAdjustLFast();
+  virtual ~ColorTransformYAdjustFull();
   
   virtual void process(Frame *out,  const Frame *inp);
+  
 };
 
 #endif

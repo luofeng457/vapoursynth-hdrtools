@@ -89,6 +89,7 @@ private:
   
   int                 m_mode;
   int                 m_invMode;
+  bool                m_isICtCp;
 
   int                 m_modeRGB2XYZ;
 

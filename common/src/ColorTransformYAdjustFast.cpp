@@ -185,9 +185,24 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast(
       }
     }
   }
+  else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
+    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Conversion not supported for ICtCp space\n");
+
+      m_mode = CTF_LMSD_2_ICtCp;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
+    }
+    else {
+      m_mode = CTF_IDENTITY;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_IDENTITY;
+    }
+  }
   else {
     m_mode = CTF_IDENTITY;
     m_invMode = m_mode;
+    m_modeRGB2XYZ = CTF_IDENTITY;
   }
   
   // Forward Transform coefficients 

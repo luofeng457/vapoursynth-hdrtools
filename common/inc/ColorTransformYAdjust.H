@@ -88,6 +88,7 @@ private:
   int                 m_mode;
   int                 m_invMode;
   int                 m_modeRGB2XYZ;
+  bool                m_isICtCp;
   
   SampleRange         m_range;
   int                 m_bitDepth;

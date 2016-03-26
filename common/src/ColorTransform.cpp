@@ -65,6 +65,7 @@
 #include "ColorTransformYAdjust.H"
 #include "ColorTransformYAdjustAlt.H"
 #include "ColorTransformYAdjustFast.H"
+#include "ColorTransformYAdjustFull.H"
 #include "ColorTransformYAdjustLFast.H"
 #include "ColorTransformYAdjustTele.H"
 #include "ColorTransformYAdjustXYZ.H"
@@ -124,6 +125,8 @@ ColorTransform *ColorTransform::create(
   }
   else if (closedLoopTransform == CLT_YADJ)
     result = new ColorTransformYAdjust(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
+  else if (closedLoopTransform == CLT_YADJFULL)
+    result = new ColorTransformYAdjustFull(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
   else if (closedLoopTransform == CLT_YADJALT)
     result = new ColorTransformYAdjustAlt(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, downMethod, upMethod, useAdaptiveDownsampler, useAdaptiveUpsampler, useMinMax, bitDepth, range, maxIterations, oChromaFormat, oChromaLocationType, useFloatPrecision);
   else if (closedLoopTransform == CLT_CHROMA)

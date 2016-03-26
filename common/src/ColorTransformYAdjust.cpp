@@ -104,16 +104,18 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
   
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
-    
-    m_compSize[index] = 0;       // number of samples in each color component
-    m_height[index] = 0;         // height of each color component
-    m_width[index] = 0;          // width of each color component
+    m_compSize [index] = 0;       // number of samples in each color component
+    m_height   [index] = 0;       // height of each color component
+    m_width    [index] = 0;       // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_oChromaFormat = oChromaFormat;
-  m_useMinMax     = useMinMax;
+  m_oChromaFormat   = oChromaFormat;
+  m_useMinMax       = useMinMax;
+  m_isICtCp         = FALSE;
   
-  // Method is only allowed for RGB to YCbCr conversion
+  
+  // Method supports mainly RGB to YCbCr conversion. LMS to ICtCp is partially supported but
+  // due to monotonicity issues it might not always result in best performance.
   if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
     if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
@@ -183,9 +185,24 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorSpace        iColorSpace,
       }
     }
   }
+  else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
+    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      m_mode = CTF_LMSD_2_ICtCp;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
+      m_isICtCp = TRUE;
+    }
+    else {
+    // Not supported properly yet
+      m_mode = CTF_IDENTITY;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_IDENTITY;
+    }
+  }
   else {
     m_mode = CTF_IDENTITY;
     m_invMode = m_mode;
+    m_modeRGB2XYZ = CTF_IDENTITY;
   }
 
   // Forward Transform coefficients 
@@ -502,8 +519,9 @@ void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
         
         uComp = (double) m_invFrameStore->m_floatComp[1][i];
         vComp = (double) m_invFrameStore->m_floatComp[2][i];
-        
-        calcBounds(yPrimeMin, yPrimeMax, yLinear, uComp, vComp);
+
+        if (m_isICtCp == FALSE)
+          calcBounds(yPrimeMin, yPrimeMax, yLinear, uComp, vComp);
         
         // Give dummy values. If these values are still left after search, then replace them.
         yConvMin = -1.0;
@@ -540,6 +558,7 @@ void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
           convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
           yConvMax = convertToYLinear(rComp, gComp, bComp);
         }
+        
         
         if(m_tfDistance == FALSE) {
           if (dAbs(yConvMin - yLinear) < dAbs(yConvMax - yLinear))

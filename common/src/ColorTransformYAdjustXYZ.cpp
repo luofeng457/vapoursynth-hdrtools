@@ -104,9 +104,11 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
   m_useAdaptiveUpsampler   = useAdaptiveUpsampler;
 
   // These are the weights for the distortion computation
-  m_xWeight = 1.0;
+  m_xWeight = 0.0;
   m_yWeight = 1.0;
-  m_zWeight = 1.0;
+  m_zWeight = 0.0;
+  
+  m_isICtCp = FALSE;
 
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
@@ -119,7 +121,9 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
   m_oChromaFormat = oChromaFormat;
   m_useMinMax     = useMinMax;
   
-  // Method is only allowed for RGB to YCbCr conversion
+  // Method is only allowed for RGB to YCbCr conversion.
+  // This is not properly supported for ICtCp given the different behavior of the 
+  // transform. Please do not use.
   if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
     if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
@@ -189,9 +193,24 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
       }
     }
   }
+  else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
+    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+      printf("Conversion not supported for ICtCp space\n");
+      m_mode = CTF_LMSD_2_ICtCp;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
+      m_isICtCp     = TRUE;
+    }
+    else {
+      m_mode = CTF_IDENTITY;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_IDENTITY;
+    }
+  }
   else {
     m_mode = CTF_IDENTITY;
     m_invMode = m_mode;
+    m_modeRGB2XYZ = CTF_IDENTITY;
   }
   
   // Forward Transform coefficients 
@@ -560,11 +579,17 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
           int yValueMax = iMax(yValueRQ, iMax(yValueBQ, yValueGQ));
           
           computeColorImpact(uComp, vComp, &rColor, &gColor, &bColor);          
+          if (m_isICtCp == FALSE) {
+            calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
+            
+            iYCompMin = iMax(iYCompMin, yValueMin);
+            iYCompMax = iMin(iYCompMax, yValueMax);
+          }
+          else {
+            iYCompMin = 0;
+            iYCompMax = (int) m_lumaWeight;
+          }
           
-          calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
-
-          iYCompMin = iMax(iYCompMin, yValueMin);
-          iYCompMax = iMin(iYCompMax, yValueMax);
           if (iYCompMin == iYCompMax) {
             //convertToXYZLinear((double) iYCompMin / m_lumaWeight, rColor, gColor, bColor, &xConvMin, &yConvMin, &zConvMin);
             out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);            
