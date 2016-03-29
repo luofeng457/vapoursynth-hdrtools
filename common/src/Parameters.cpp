@@ -313,7 +313,6 @@ int Parameters::parseCommandLineParams( char **cl_params, int numCLParams ) {
         matched = TRUE;
         // printout message
         printf ("Parsing command line string '%s'\n", line);
-        break;
       }
     }
     for (i = 0; boolParameterList[i].ptr != NULL; i++) {
@@ -328,7 +327,6 @@ int Parameters::parseCommandLineParams( char **cl_params, int numCLParams ) {
         matched = TRUE;
         // printout message
         printf ("Parsing command line string '%s'\n", line);
-        break;
       }
     }
     for (i = 0; floatParameterList[i].ptr != NULL; i++) {
