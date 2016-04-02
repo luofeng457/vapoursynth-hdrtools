@@ -1,5 +1,14 @@
-Changes in Version HDRTools 0.10 (since 0.9)
--------------------------------------------
+Changes in HDRTools Version 0.11 (since 0.10)
+---------------------------------------------
+- Additional luma adjustment methods
+- Implementation of Adaptive downsampling
+- VQM support
+- limited DPX file input support
+- extended AVI support
+
+
+Changes in HDRTools Version 0.10 (since 0.9)
+---------------------------------------------
 - Additional (adaptive) Transfer Functions
 - Additional downsampling and upsampling filters
 - Post deblocking
@@ -17,7 +26,7 @@ Changes in Version HDRTools 0.10 (since 0.9)
   Scheme could be vastly improved in terms of speed, especially using LUTs for TF
   computation.
  
-Changes in Version HDRTools 0.9 (since 0.8)
+Changes in HDRTools Version 0.9 (since 0.8)
 -------------------------------------------
 - First version of HDRMontage tool; Support  for both “copy” and “butterfly” modes (AT)
 - tPSNR computation buf fixes and enhancements
@@ -38,7 +47,7 @@ Changes in Version HDRTools 0.9 (since 0.8)
 - Max DeltaE support; Optional selection of White Point in DeltaE computation (AT)
 - Various bug fixes/cleanups (AT)
 
-Changes in Version HDRTools 0.8 (since 0.7)
+Changes in HDRTools Version 0.8 (since 0.7)
 -------------------------------------------
 - TIFF support fixes; Support for TIFF output (AT)
 - Initial implementation of MS-SSIM (AT)
@@ -62,7 +71,7 @@ Changes in Version HDRTools 0.8 (since 0.7)
 - Frame rate bug fixes (AT)
 
 
-Changes in Version HDRTools 0.7 (since 0.6)
+Changes in HDRTools Version 0.7 (since 0.6)
 -------------------------------------------
 - first version of sigma compare (CF/AT)
 - revised implementation of mPSNR (both normal and fast versions) (JS/AT))
@@ -74,7 +83,7 @@ Changes in Version HDRTools 0.7 (since 0.6)
 - TM5 interpolation filters (CF)
 - Various code improvements and extensions (AT)
 
-Changes in Version HDRTools 0.6 (since 0.5)
+Changes in HDRTools Version 0.6 (since 0.5)
 -------------------------------------------
 - Creation of a window based data copy function in the Frame class. (AT)
 - Addition of optional rectangular window based distortion computation. (AT)
@@ -83,7 +92,7 @@ Changes in Version HDRTools 0.6 (since 0.5)
 - Other "cosmetic" enhancements (AT)
 - Cleanups and enhancements to deltaE2K (CC)
 
-Changes in Version HDRTools 0.5 (since 0.4)
+Changes in HDRTools Version 0.5 (since 0.4)
 -------------------------------------------
 - Addition of deltaE2K computation (CC/EF)
 - Addition of first version of mPSNR (JS/AT))
@@ -92,7 +101,7 @@ Changes in Version HDRTools 0.5 (since 0.4)
 - Full cleanup of the code for Visual Studio (zero warning target) (AT)
 - Other cosmetic enhancements and bug fixes (AT)
 
-Changes in Version HDRTools 0.4 (since 0.2)
+Changes in HDRTools Version 0.4 (since 0.2)
 -------------------------------------------
 - Resolves 32bit compilation issue (AT/CR)
 - Addition of HDRMetrics with support for PSNR/MSE (AT)
@@ -103,7 +112,7 @@ Changes in Version HDRTools 0.4 (since 0.2)
 - Support for both half and single precision floats in OpenEXR (AT)
 - Output OpenEXR support (AT)
 
-Changes in Version HDRTools 0.2 (since 0.1)
+Changes in HDRTools Version 0.2 (since 0.1)
 -------------------------------------------
 - Alpha plane support (AT)
 - Support for single precision floating data OpenEXR files (uncompressed) (AT)

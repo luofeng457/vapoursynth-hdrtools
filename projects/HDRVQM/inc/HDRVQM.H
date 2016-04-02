@@ -36,39 +36,38 @@
  */
 
 /*!
- **************************************************************************
- *  \file FastMemory.H
+ *************************************************************************************
+ * \file HDRVQM.H
  *
- *  \brief
- *     Memory handling operations
+ * \brief
+ *    HDRVQM class (main) definitions 
  *
- *  \author
+ * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *
- **************************************************************************
+ *************************************************************************************
  */
 
-#ifndef _FAST_MEMORY_H_
-#define _FAST_MEMORY_H_
+#ifndef __HDRVQM_H__
+#define __HDRVQM_H__
 
-#include "Global.H"
-#include <string.h> 
-#include <stdint.h>
+#include "ProjectParameters.H"
+#define HDR_METRIC_VERSION "0.6"
 
-static inline void fast_memset(void *dst,int value,int width)
-{
-  memset(dst,value,width);
-}
+class HDRVQM {
+protected:
+  IOVideo **m_inputFile;
 
-static inline void fast_memcpy(void *dst,void *src,int width)
-{
-  memcpy(dst,src,width);
-}
+public:
+  
+  static HDRVQM *create(ProjectParameters *inputParams);
 
-static inline void fast_memset_zero(void *dst, int width)
-{
-  memset(dst,0,width);
-}
+  virtual ~HDRVQM() {};
+  virtual void outputHeader (ProjectParameters *inputParams) = 0;
+  virtual void outputFooter (ProjectParameters *inputParams) = 0;
+  virtual void init         (ProjectParameters *inputParams) = 0;
+  virtual void process      (ProjectParameters *inputParams) = 0;
+  virtual void destroy() = 0;
+};
 
-#endif 
-
+#endif

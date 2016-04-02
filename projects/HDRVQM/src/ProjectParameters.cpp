@@ -40,7 +40,7 @@
  * \file ProjectParameters.cpp
  *
  * \brief
- *    ProjectParameters class functions for HDRMetrics project
+ *    ProjectParameters class functions for HDRVQM project
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -58,8 +58,6 @@
 #include "ProjectParameters.H"
 #include "Global.H"
 #include "IOFunctions.H"
-#include "TransferFunction.H"
-#include "ConvertColorFormat.H"
 
 //-----------------------------------------------------------------------------
 // Local classes
@@ -111,7 +109,7 @@ IntegerParameter intParameterList[] = {
   { "Input1BitDepthCmp0",     &src1->m_bitDepthComp[Y_COMP],                         8,           8,         16,    "2nd Input Bitdepth Cmp0"              },
   { "Input1BitDepthCmp1",     &src1->m_bitDepthComp[U_COMP],                         8,           8,         16,    "2nd Input Bitdepth Cmp1"              },
   { "Input1BitDepthCmp2",     &src1->m_bitDepthComp[V_COMP],                         8,           8,         16,    "2nd Input Bitdepth Cmp2"              },
-  { "Input1ColorSpace",       (int *) &src1->m_colorSpace,                    CM_YCbCr,    CM_YCbCr, CM_TOTAL-1,    "2nd Input Color Space"                },
+  { "Input1ColorSpace",       (int *) &src1->m_colorSpace,                    CM_YCbCr,    CM_YCbCr,   CM_YUpVp,    "2nd Input Color Space"                },
   { "Input1ColorPrimaries",   (int *) &src1->m_colorPrimaries,                  CP_709,      CP_709, CP_TOTAL-1,    "2nd Input Color Primaries"            },
   { "Input1SampleRange",      (int *) &src1->m_sampleRange,                SR_STANDARD, SR_STANDARD,     SR_SDI,    "2nd Input Sample Range"               },
   { "Input1FileHeader",       &pParams->m_inputFile[1].m_fileHeader,                 0,           0,    INT_INF,    "2nd Input Header (bytes)"             },
@@ -128,18 +126,17 @@ IntegerParameter intParameterList[] = {
   { "WindowMinPosY",          &pParams->m_windowMinPosY,                             0,      -65536,      65536,    "Minimum Window Y position"            },
   { "WindowMaxPosY",          &pParams->m_windowMaxPosY,                             0,      -65536,      65536,    "Maximum Window Y position"            },
   { "NumberOfFrames",         &pParams->m_numberOfFrames,                            1,           1,    INT_INF,    "Number of Frames to process"          },
-  // SSIM parameters
-  { "SSIMBlockDistance",      &pParams->m_distortionParameters.m_ssimBlockDistance,  1,           1,        128,    "Block Distance for SSIM computation"  },
-  { "SSIMBlockSizeX",         &pParams->m_distortionParameters.m_ssimBlockSizeX,     4,           4,        128,    "Block Width for SSIM computation"     },
-  { "SSIMBlockSizeY",         &pParams->m_distortionParameters.m_ssimBlockSizeY,     4,           4,        128,    "Block Height for SSIM computation"    },
-  
-  { "TFPSNRDistortion",       (int *) &pParams->m_distortionParameters.m_tfPSNRDistortion,   DIF_PQPH10K,  DIF_PQPH10K, DIF_TOTAL - 1,    "Transfer function for tPSNR and other related metrics" },
-  { "DeltaEPointsEnable",      &pParams->m_distortionParameters.m_deltaEPointsEnable, 1,           1,          7,    "Delta E points to Enable"             },
-  { "RPSNRBlockDistanceX",     &pParams->m_distortionParameters.m_rPSNROverlapX,      4,           1,     65536,    "Block Horizontal Distance for rPSNR computation"  },
-  { "RPSNRBlockDistanceY",     &pParams->m_distortionParameters.m_rPSNROverlapY,      4,           1,     65536,    "Block Vertical Distance for rPSNR computation"  },
-  { "RPSNRBlockSizeX",         &pParams->m_distortionParameters.m_rPSNRBlockSizeX,    4,           4,     65536,    "Block Width for rPSNR computation"     },
-  { "RPSNRBlockSizeY",         &pParams->m_distortionParameters.m_rPSNRBlockSizeY,    4,           4,     65536,    "Block Height for rPSNR computation"    },
-  
+  //VQM parameters
+  { "Area_Display",           &pParams->m_distortionParameters.m_vqmDisplayArea, 6100, 6100, 6100, "Display Area"},
+  { "Rows_Display",           &pParams->m_distortionParameters.m_vqmRowsDisplay, 1080, 512, 1080, "Display Rows"},
+  { "Cols_Display",           &pParams->m_distortionParameters.m_vqmColsDisplay, 1920, 896, 1920, "Display Columns"},
+  { "Viewing_Dist",           &pParams->m_distortionParameters.m_vqmViewingDistance, 178, 178, 178, "Viewer's distance from the display in centimetres"},
+  { "NumberOfScales",         &pParams->m_distortionParameters.m_vqmNumberOfScale, 5, 5, 5, "No. of scales used for log gabor filters"},
+  { "NumberOfOrientations",   &pParams->m_distortionParameters.m_vqmNumberOfOrient, 4, 4, 4, "No. of scales used for log gabor filters"},
+  { "DisplayAdapt",			  &pParams->m_distortionParameters.m_vqm_displayAdapt, 1, 0, 1, "No. of scales used for log gabor filters"},
+  //TBD???
+  { "NumberOfFrames",         &pParams->m_distortionParameters.m_vqm_numberofFrames,      1,           1,    INT_INF,    "Number of Frames to process"          },
+
   { "",                       NULL,                                                  0,           0,          0,    "Integer Termination entry"            }
 };
 
@@ -149,59 +146,28 @@ BoolParameter boolParameterList[] = {
   { "Input0Interlaced",          &src0->m_isInterlaced,                                   FALSE,      FALSE,      TRUE,    "1st Input Interleaved Source"                  },
   { "Input1Interlaced",          &src1->m_isInterlaced,                                   FALSE,      FALSE,      TRUE,    "2nd Input Interleaved Source"                  },
   { "SilentMode",                &pParams->m_silentMode,                                   TRUE,      FALSE,      TRUE,    "Silent mode"                                   },
-  { "EnablePSNR",                &pParams->m_enableMetric[DIST_PSNR],                      TRUE,      FALSE,      TRUE,    "Enable PSNR Computation"                       },
-  { "EnableRPSNR",               &pParams->m_enableMetric[DIST_RPSNR],                    FALSE,      FALSE,      TRUE,    "Enable RPSNR Computation"                      },
-  { "EnableTFPSNR",              &pParams->m_enableMetric[DIST_TFPSNR],                   FALSE,      FALSE,      TRUE,    "Enable TF PSNR Computation"                    },
-  { "EnableRTFPSNR",             &pParams->m_enableMetric[DIST_RTFPSNR],                  FALSE,      FALSE,      TRUE,    "Enable TF RPSNR Computation"                   },
-  { "EnablemPSNR",               &pParams->m_enableMetric[DIST_MPSNR],                    FALSE,      FALSE,      TRUE,    "Enable mPSNR Computation"                      },
-  { "EnableMSSSIM",              &pParams->m_enableMetric[DIST_MSSSIM],                   FALSE,      FALSE,      TRUE,    "Enable MS-SSIM Computation"                    },
-  { "EnableTFMSSSIM",            &pParams->m_enableMetric[DIST_TFMSSSIM],                 FALSE,      FALSE,      TRUE,    "Enable TF MS-SSIM Computation"                 },
-  { "EnablemPSNRfast",           &pParams->m_enableMetric[DIST_MPSNRFAST],                FALSE,      FALSE,      TRUE,    "Enable mPSNR Fast Computation"                 },
-  { "EnableDELTAE",              &pParams->m_enableMetric[DIST_DELTAE],                   FALSE,      FALSE,      TRUE,    "Enable deltaE2000 Computation"                 },
-  { "EnableSigmaCompare",        &pParams->m_enableMetric[DIST_SIGMACOMPARE],             FALSE,      FALSE,      TRUE,    "Enable Sigma-Compare Computation"              },
-  { "EnableJ341Block",           &pParams->m_enableMetric[DIST_BLKJ341],                  FALSE,      FALSE,      TRUE,    "Enable J341 Blockiness Computation"            },
-  { "EnableBlockiness",          &pParams->m_enableMetric[DIST_BLK],                     FALSE,      FALSE,      TRUE,    "Enable Blockiness Computation"            },
-  { "EnableWindowPSNR",          &pParams->m_enableWindowMetric[DIST_PSNR],               FALSE,      FALSE,      TRUE,    "Enable Window PSNR Computation"                },
-  { "EnableWindowRPSNR",         &pParams->m_enableWindowMetric[DIST_RPSNR],              FALSE,      FALSE,      TRUE,    "Enable Window RPSNR Computation"               },
-  { "EnableWindowTFPSNR",        &pParams->m_enableWindowMetric[DIST_TFPSNR],             FALSE,      FALSE,      TRUE,    "Enable Window TFPSNR Computation"              },
-  { "EnableWindowRTFPSNR",       &pParams->m_enableWindowMetric[DIST_RTFPSNR],            FALSE,      FALSE,      TRUE,    "Enable Window RTFPSNR Computation"             },
-  { "EnableWindowmPSNR",         &pParams->m_enableWindowMetric[DIST_MPSNR],              FALSE,      FALSE,      TRUE,    "Enable Window mPSNR Computation"               },
-  { "EnableWindowmPSNRfast",     &pParams->m_enableWindowMetric[DIST_MPSNRFAST],          FALSE,      FALSE,      TRUE,    "Enable Window mPSNR fast Computation"          },
-  { "EnableWindowDELTAE",        &pParams->m_enableWindowMetric[DIST_DELTAE],             FALSE,      FALSE,      TRUE,    "Enable Window deltaE2000 Computation"          },
-  { "EnableWindowSigmaCompare",  &pParams->m_enableWindowMetric[DIST_SIGMACOMPARE],       FALSE,      FALSE,      TRUE,    "Enable Window SigmaCompare Computation"        },
-  { "EnableWindowMSSSIM",        &pParams->m_enableWindowMetric[DIST_MSSSIM],             FALSE,      FALSE,      TRUE,    "Enable Window MS-SSIM Computation"             },
-  { "EnableWindowTFMSSSIM",      &pParams->m_enableWindowMetric[DIST_TFMSSSIM],           FALSE,      FALSE,      TRUE,    "Enable Window MTF S-SSIM Computation"          },
-  { "EnableWindowJ341Block",     &pParams->m_enableWindowMetric[DIST_BLKJ341],            FALSE,      FALSE,      TRUE,    "Enable Window J341 Blockiness Computation"     },
-  { "EnableWindowBlockiness",    &pParams->m_enableWindowMetric[DIST_BLK],                FALSE,      FALSE,      TRUE,    "Enable Window Blockiness Computation"          },
-  { "EnableShowMSE",             &pParams->m_distortionParameters.m_enableShowMSE,        FALSE,      FALSE,      TRUE,    "Enable MSE presentation for PSNR"              },
-  { "ComputeYCbCrPSNR",          &pParams->m_distortionParameters.m_computePsnrInYCbCr,   FALSE,      FALSE,      TRUE,    "Enable YCbCr tPSNR"                            },
-  { "ComputeRGBPSNR",            &pParams->m_distortionParameters.m_computePsnrInRgb,     FALSE,      FALSE,      TRUE,    "Enable RGB tPSNR"                              },
-  { "ComputeXYZPSNR",            &pParams->m_distortionParameters.m_computePsnrInXYZ,      TRUE,      FALSE,      TRUE,    "Enable XYZ tPSNR"                              },
-  { "ComputeYUpVpPSNR",          &pParams->m_distortionParameters.m_computePsnrInYUpVp,   FALSE,      FALSE,      TRUE,    "Enable YUpVp tPSNR"                            },
   { "ClipInputValues",           &pParams->m_distortionParameters.m_clipInputValues,      FALSE,      FALSE,      TRUE,    "Clip input during distortion comp."            },
-  { "EnableComponentmPSNR",      &pParams->m_distortionParameters.m_enableCompmPSNR,      FALSE,      FALSE,      TRUE,    "Enable per component mPSNR"                    },
-  { "EnableComponentmPSNRfast",  &pParams->m_distortionParameters.m_enableCompmPSNRfast,  FALSE,      FALSE,      TRUE,    "Enable per component mPSNR (fast)"             },
-  { "EnableSymmetricmPSNRfast",  &pParams->m_distortionParameters.m_enableSymmetry,       FALSE,      FALSE,      TRUE,    "Enable symmetric mPSNR computation(fast)"      },
-  { "EnableLogSSIM",             &pParams->m_distortionParameters.m_useLogSSIM,           FALSE,      FALSE,      TRUE,    "Enable log reporting of SSIM results"          },
-  
+ { "EnableHDRVQM",              &pParams->m_enableMetric[DIST_VQM],                      TRUE,      TRUE,      TRUE,    "Enable HDRVQM reporting"                       },
+
   { "",                          NULL,                                                    FALSE,      FALSE,     FALSE,    "Boolean Termination entry"                     }
 };
 
 DoubleParameter doubleParameterList[] = {
   { "MaxSampleValue",        &pParams->m_distortionParameters.m_maxSampleValue,      10000.0,      0.001, 99999999.0,    "Maximum sample value for floats"                             },
-  { "WhitePointDeltaE1",     &pParams->m_distortionParameters.m_whitePointDeltaE[0],   100.0,        1.0,    10000.0,    "1st reference white point value"                             },
-  { "WhitePointDeltaE2",     &pParams->m_distortionParameters.m_whitePointDeltaE[1],  1000.0,        1.0,    10000.0,    "2nd reference white point value"                             },
-  { "WhitePointDeltaE3",     &pParams->m_distortionParameters.m_whitePointDeltaE[2],  5000.0,        1.0,    10000.0,    "3rd reference white point value"                             },
-  // 429496.729500000  is the largest value of luminance in Mastering Display Color Volume SEI
-  { "AmplitudeFactor",       &pParams->m_distortionParameters.m_amplitudeFactor,         1.0,  1.0/429496.7295, 429496.7295, "Scale factor to convert real-valued samples <--> cd/m^2" },
-  { "SSIMK1",                &pParams->m_distortionParameters.m_ssimK1,                 0.01,  0.0000001,        1.0,    "SSIM/MSSSIM K1 parameter"                              },
-  { "SSIMK2",                &pParams->m_distortionParameters.m_ssimK2,                 0.03,  0.0000001,        1.0,    "SSIM/MSSSIM K2 parameter"                              },
   { "",                      NULL,                                                       0.0,        0.0,        0.0,    "Double Termination entry"                                    }
 };
 
 FloatParameter floatParameterList[] = {
-  { "Input0Rate",            &src0->m_frameRate,                        24.00F,    0.01F,     120.00F,    "1st Input Source Frame Rate"            },
-  { "Input1Rate",            &src1->m_frameRate,                        24.00F,    0.01F,     120.00F,    "2nd Input Source Frame Rate"            },
+  { "Input0Rate",            &src0->m_frameRate,                                  24.00F,    0.01F,     120.00F,    "1st Input Source Frame Rate"            },
+  { "Input1Rate",            &src1->m_frameRate,                                  24.00F,    0.01F,     120.00F,    "2nd Input Source Frame Rate"            },
+  //VQM paramters
+  { "Pool_perc",             &pParams->m_distortionParameters.m_vqmPoolingPerc, 0.3F, 0.1F, 1.0F, "Pooling Percentage for HDRVQM Calculation"},
+  { "Max_Display",           &pParams->m_distortionParameters.m_vqmMaxDisplay, 4500.0F,  1000.0F, 10000.0F, "Maximum luminance that can be displayed"},
+  { "Min_Display",           &pParams->m_distortionParameters.m_vqmMinDisplay, 0.03F, 0.01F, 1.0F, "Minimum luminance that can be displayed"},
+  { "Fixation_Time",         &pParams->m_distortionParameters.m_vqmFixationTime, 0.6F, 0.6F, 0.6F, "Fixation Duration in seconds for calculation of spatio-temporal tubes"},
+  //TBD
+  { "Input0Rate",            &pParams->m_distortionParameters.m_vqmFrameRate, 24.00F, 0.01F, 120.00F, "1st Input Source Frame Rate"            },
+
   { "",                      NULL,                                      0.00F,     0.00F,       0.00F,    "Float Termination entry"                 }
 };
 

@@ -66,7 +66,7 @@
 #include "DistortionMetricTFMSSSIM.H"
 #include "DistortionMetricBlockinessJ341.H"
 #include "DistortionMetricBlockAct.H"
-
+#include "DistortionMetricVQM.H"
 
 //-----------------------------------------------------------------------------
 // Constructor/Destructor
@@ -197,6 +197,9 @@ DistortionMetric *DistortionMetric::create(const FrameFormat *format, int distor
       result = new DistortionMetricBlockAct(distortionParameters->m_maxSampleValue,
                                                   distortionParameters->m_tfPSNRDistortion);
       break;
+	case DIST_VQM:
+	  result = new DistortionMetricVQM(format, distortionParameters);
+	  break;
   }
 
   result->m_clipInputValues = distortionParameters->m_clipInputValues;

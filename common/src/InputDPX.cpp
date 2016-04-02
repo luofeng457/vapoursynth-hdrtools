@@ -478,7 +478,7 @@ int InputDPX::readImageData (DPXFileData * t)
       case 8:
         p = (uint16 *) &t->m_img[0];
         s = (uint8 *) &t->m_buffer[imageOffset];
-        for (j=0; j < size; ++j) {
+        for (j = 0; j < (int) size; ++j) {
           *p++ = *s++;
         }
         break;
@@ -501,7 +501,7 @@ int InputDPX::readImageData (DPXFileData * t)
         mp = t->m_mp;                       // save memory pointer
         p = (uint16 *) &t->m_img[0];
         t->m_mp = (uint8 *) &t->m_buffer[imageOffset];
-        for (j=0; j < size; ++j) {
+        for (j = 0; j < (int) size; ++j) {
           *p++ = (uint16) t->getU16( t);
         }
         t->m_mp = mp;                       // restore memory pointer
@@ -521,7 +521,7 @@ int InputDPX::readImageData (DPXFileData * t)
         t->m_img.resize(size);
         p = (uint16 *) &t->m_img[0];
         s = (uint8 *) &t->m_buffer[imageOffset];
-        for (j=0; j < size; ++j) {
+        for (j = 0; j < (int) size; ++j) {
           *p++ = *s++;
         }
         break;
@@ -530,7 +530,7 @@ int InputDPX::readImageData (DPXFileData * t)
         mp = t->m_mp;                       // save memory pointer
         p = (uint16 *) &t->m_img[0];
         t->m_mp = (uint8 *) &t->m_buffer[imageOffset];
-        for (j=0; j < sizeDWord; ++j) {
+        for (j = 0; j < (int) sizeDWord; ++j) {
           curDWord = t->getU32( t) >> 2;
           *p++ = (uint16) ((curDWord >> 20) & 0x3FF);
           *p++ = (uint16) ((curDWord >> 10) & 0x3FF);
@@ -543,7 +543,7 @@ int InputDPX::readImageData (DPXFileData * t)
         mp = t->m_mp;                       // save memory pointer
         p = (uint16 *) &t->m_img[0];
         t->m_mp = (uint8 *) &t->m_buffer[imageOffset];
-        for (j=0; j < sizeDWord; ++j) {
+        for (j = 0; j < (int) sizeDWord; ++j) {
           curDWord = t->getU32( t) >> 4;
           *p++ = (uint16) ((curDWord >> 16) & 0xFFF);
           *p++ = (uint16) ((curDWord >>  0) & 0xFFF);
@@ -555,7 +555,7 @@ int InputDPX::readImageData (DPXFileData * t)
         mp = t->m_mp;                       // save memory pointer
         p = (uint16 *) &t->m_img[0];
         t->m_mp = (uint8 *) &t->m_buffer[imageOffset];
-        for (j=0; j < size; ++j) {
+        for ( j =0; j < (int) size; ++j) {
           *p++ = (uint16) t->getU16( t);
         }
         t->m_mp = mp;                       // restore memory pointer

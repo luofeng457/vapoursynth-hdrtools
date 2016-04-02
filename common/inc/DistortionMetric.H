@@ -73,6 +73,7 @@ enum DistortionMetrics{
   DIST_TFMSSSIM     = 13, // TF Multi-Scale Structural Similarity Index (tMS-SSIM)
   DIST_BLKJ341      = 14,
   DIST_BLK          = 15,
+  DIST_VQM			= 16, //HDR Video Quality Metric
   DIST_METRICS
 };
 
@@ -139,6 +140,20 @@ public:
   int                m_rPSNRBlockSizeY;
   int                m_rPSNROverlapX;
   int                m_rPSNROverlapY;
+  //VQM parameters
+  float	  m_vqmPoolingPerc;
+  int     m_vqmRowsDisplay;
+  int     m_vqmColsDisplay;
+  int     m_vqmDisplayArea;
+  float   m_vqmMaxDisplay;
+  float   m_vqmMinDisplay;
+  int     m_vqmViewingDistance;
+  float   m_vqmFixationTime;
+  int     m_vqmNumberOfScale;
+  int     m_vqmNumberOfOrient;
+  float   m_vqmFrameRate;
+  int     m_vqm_numberofFrames;
+  int	  m_vqm_displayAdapt;
   
   DistortionParameters() {
     for (int index = 0; index < NB_REF_WHITE; index ++)
@@ -166,6 +181,21 @@ public:
     m_rPSNRBlockSizeY           = 64;
     m_rPSNROverlapX             = 4;
     m_rPSNROverlapY             = 4;
+
+  //VQM parameters
+    m_vqmPoolingPerc            = 0.0f;
+    m_vqmRowsDisplay            = 16;
+    m_vqmColsDisplay            = 16;
+    m_vqmDisplayArea            = 256;
+    m_vqmMaxDisplay             = 1.0f;
+    m_vqmMinDisplay             = 0.0f;
+    m_vqmViewingDistance        = 1;
+    m_vqmFixationTime           = 0.2f;
+    m_vqmNumberOfScale          = 1;
+    m_vqmNumberOfOrient         = 1;
+    m_vqmFrameRate              = 60.0f;
+    m_vqm_numberofFrames        = 1;
+    m_vqm_displayAdapt          = 1;
   }
 };
 
@@ -177,6 +207,9 @@ public:
   int                  m_totalFrames;
   bool                 m_clipInputValues;
   bool                 m_isWindow;
+  //edit by Sarvesh
+  bool                 m_allFrames;		// This is required by the VQM implementation. VQM requires two passes.
+                                        // This flag informs the VQM module that the first pass is over.
 
   // Construct/Deconstruct
   DistortionMetric();
