@@ -192,13 +192,11 @@ DistortionMetric *DistortionMetric::create(const FrameFormat *format, int distor
                                                   distortionParameters->m_tfPSNRDistortion);
       break;
     case DIST_BLK:
-      //result = new DistortionMetricBlockAct(distortionParameters->m_maxSampleValue,
-      //                                        distortionParameters->m_tfPSNRDistortion);
       result = new DistortionMetricBlockAct(distortionParameters->m_maxSampleValue,
                                                   distortionParameters->m_tfPSNRDistortion);
       break;
 	case DIST_VQM:
-	  result = new DistortionMetricVQM(format, distortionParameters);
+	  result = new DistortionMetricVQM(format, &distortionParameters->m_VQM);
 	  break;
   }
 

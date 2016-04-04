@@ -43,6 +43,14 @@
  * \brief
  *    Distortion VQM Metric class Header
  *
+ *    Computes HDRVQM score for input video sequences
+ *    The code is based on the following work:
+ *    M. Narwaria, M. P. Da Silva, and P. Le. Callet, 
+ *    “HDR-VQM: An Objective Quality Measure for High Dynamic Range Video", 
+ *    Signal Processing: Image Communication, 2015. 
+ *    https://sites.google.com/site/narwariam/HDR-VQM_SPIC.pdf?attredirects=0&d=1
+ *    https://sites.google.com/site/narwariam/hdr-vqm/
+ *
  * \author
  *     - Sarvesh Sahota         <sa.sahota@samsung.com>
  *     - Kulbhushan Pachauri	  <kb.pachauri@samsung.com>
@@ -59,10 +67,14 @@
 #include <vector>
 
 
+#define VQM_DUMP_STATS 0
+
 static const double PI_VQM = 3.1415926535;
+
 
 class DistortionMetricVQM : public DistortionMetric {
 private:
+
 	//Gabor variables
   std::vector<Complex> m_fftIn0;
   std::vector<Complex> m_fftIn1;
@@ -70,8 +82,8 @@ private:
   std::vector<Complex> m_fftOut0;
   std::vector<Complex> m_fftOut1;
 
-	std::vector<float> m_rszIn0;
-	std::vector<float> m_rszIn1;
+	std::vector<float>   m_rszIn0;
+	std::vector<float>   m_rszIn1;
 
 	std::vector< std::vector<float> > m_filters;
 	std::vector< std::vector<float> > m_subBandError;
@@ -85,37 +97,40 @@ private:
 	float m_maxLuma;
 	float m_sortPerc;
 
-	int m_numberOfFramesFixate;
-	int m_bSize;
-	int m_numberOfFrames;
-	int m_numberOfOrient;
-	int m_numberOfScale;
-	int m_resizeWidth;
-	int m_resizeHeight;
-  int m_resizeSize;
-	int m_poolFrameCnt;
-	int m_stTubeCnt;
+	int   m_numberOfFramesFixate;
+	int   m_bSize;
+	int   m_numberOfFrames;
+	int   m_numberOfOrient;
+	int   m_numberOfScale;
+	int   m_resizeWidth;
+	int   m_resizeHeight;
+  int   m_resizeSize;
+	int   m_poolFrameCnt;
+	int   m_stTubeCnt;
+	bool  m_displayAdapt;
 
-	int m_displayAdapt;
+  int    vqmRound(double value);
 
-	void initLogGabor();
-	void fftShift(float * mat, int sizeY, int sizeX);
+	void   initLogGabor();
+	void   fftShift(float * mat, int sizeY, int sizeX);
 
+  void   normalizeIntensity(Frame *inp);
 	void   adaptDisplay (Frame * in, float percMax, int index);
 	int    binarySearch (const double * arrayIn, double valueIn, int start, int end);
 	double interp1      (const double * arrayIn, const double * arrayOut, double valueIn);
 	void   clipLuminance(Frame * in);
 	void   puEncode     (Frame * in);
+  void   setColorConversion(int colorPrimaries, const double **transform);
 	
-	void biCubic(float * in, int in_width, int in_height, float * out, int out_width, int out_height);
+	void   biCubic(float * in, int in_width, int in_height, float * out, int out_width, int out_height);
 	
-	void calcLogGabor();
-	void spatioTemporalPooling();
-	void longTermPooling();
+	void   calcLogGabor();
+	void   spatioTemporalPooling();
+	void   longTermPooling();
 
 public:
 	// Construct/Deconstruct
-	DistortionMetricVQM(const FrameFormat *format, DistortionParameters * dp);
+	DistortionMetricVQM(const FrameFormat *format, VQMParams *vqmParams);
 	virtual ~DistortionMetricVQM();
 
 	virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

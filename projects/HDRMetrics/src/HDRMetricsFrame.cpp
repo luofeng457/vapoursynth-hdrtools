@@ -40,7 +40,7 @@
  * \file HDRMetricsFrame.cpp
  *
  * \brief
- *    HDRMetricsFrame class source files for performing HDR (EXR) format conversion
+ *    HDRMetricsFrame class source files for computing various distortion metrics
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>

@@ -3,11 +3,11 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * <OWNER> = Apple Inc.
- * <ORGANIZATION> = Apple Inc.
- * <YEAR> = 2014
+ * <OWNER> = Samsung Electronics, Apple Inc.
+ * <ORGANIZATION> = Samsung Electronics, Apple Inc.
+ * <YEAR> = 2016
  *
- * Copyright (c) 2014, Apple Inc.
+ * Copyright (c) 2016, Samsung Electronics, Apple Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -179,7 +179,7 @@ int main(int argc, char **argv) {
   
   if (params->m_silentMode == FALSE) {
     printf("---------------------------------------------------------\n");
-    printf(" HDR Video Quality Analysis tool - Version %s (%s)\n",HDR_METRIC_VERSION,VERSION);
+    printf(" HDR VQM tool - Version %s (%s)\n",HDR_VQM_VERSION,VERSION);
     printf("---------------------------------------------------------\n");
   }
   

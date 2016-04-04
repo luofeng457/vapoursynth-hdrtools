@@ -3,11 +3,11 @@
 * and contributor rights, including patent rights, and no such rights are
 * granted under this license.
 *
-* <OWNER> = Apple Inc.
-* <ORGANIZATION> = Apple Inc.
-* <YEAR> = 2014
+* <OWNER> = Samsung Electronics, Apple Inc.
+* <ORGANIZATION> = Samsung Electronics, Apple Inc.
+* <YEAR> = 2016
 *
-* Copyright (c) 2014, Apple Inc.
+* Copyright (c) 2016, Samsung Electronics, Apple Inc.
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
 * \file HDRVQMFrame.cpp
 *
 * \brief
-*    HDRVQMFrame class source files for performing HDR (EXR) format conversion
+*    HDRVQMFrame class source files for computing VQM for a frame
 *
 * \author
 *     - Kulbhushan Pachauri             <kb.pachauri@samsung.com>
@@ -53,8 +53,6 @@
 #include <math.h>
 #include <vector>
 #include "HDRVQMFrame.H"
-
-#define CALC_VQM		1
 
 //-----------------------------------------------------------------------------
 // constructor /de-constructor
@@ -314,31 +312,25 @@ void HDRVQMFrame::process( ProjectParameters *inputParams ) {
   int iCurrentFrameToProcess = 0;
 
   std::vector <Frame *>  currentFrame(m_numberOfClips);
+  VQMParams *paramsVQM = &inputParams->m_distortionParameters.m_VQM;
 
   int index;
 
   clock_t clk;  
   bool errorRead = FALSE;
-
-#if defined(CALC_VQM)
-  //addition of VQM calculation
-
-  bool single_pass = false;										//tells if single pass is done or not
+  bool single_pass = FALSE;										// tells if single pass is done or not
   int mult_factor;
 
-  if(!inputParams->m_distortionParameters.m_vqm_displayAdapt)
-  {
-    single_pass = true;
-    mult_factor = (int) ceil(inputParams->m_distortionParameters.m_vqmFrameRate * inputParams->m_distortionParameters.m_vqmFixationTime);
+  if(paramsVQM->m_displayAdapt == FALSE) {
+    single_pass = TRUE;
+    mult_factor = (int) ceil(paramsVQM->m_frameRate * paramsVQM->m_fixationTime);
   }
-  else
-  {
+  else  {
     mult_factor = 1;
   }
 
 
   for (frameNumber = 0; frameNumber < inputParams->m_numberOfFrames; frameNumber = frameNumber + mult_factor) {
-
     for(int iters = 0; (iters < mult_factor) && (frameNumber + iters < inputParams->m_numberOfFrames); iters++) {
       clk = clock();
 
@@ -395,6 +387,7 @@ void HDRVQMFrame::process( ProjectParameters *inputParams ) {
         m_distortionMetric[DIST_VQM]->m_allFrames = true;
         //m_distortionMetric[DIST_VQM]->computeMetric(currentFrame[0], currentFrame[1]);
         //change this too. Mult_factor is for running the for-loop for 15frames to account for pooling
+        
         single_pass = true;
         frameNumber = -1;
       }
@@ -411,90 +404,11 @@ void HDRVQMFrame::process( ProjectParameters *inputParams ) {
     }
     if(single_pass)
     {
-      mult_factor = (int) ceil(inputParams->m_distortionParameters.m_vqmFrameRate * inputParams->m_distortionParameters.m_vqmFixationTime);
+      mult_factor = (int) ceil(paramsVQM->m_frameRate * paramsVQM->m_fixationTime);
       if(frameNumber%mult_factor != 0)
         frameNumber = -mult_factor;
     }
   }
-#else
-  // Now process all frames
-  for (frameNumber = 0; frameNumber < inputParams->m_numberOfFrames; frameNumber ++) {
-    clk = clock();
-    // read frames
-    for (index = 0; index < m_numberOfClips; index++) {
-      // Current frame to process depends on frame rate of current sequence versus frame rate of the first sequence
-      iCurrentFrameToProcess = int(frameNumber * inputParams->m_source[index].m_frameRate / inputParams->m_source[0].m_frameRate);
-      if (m_inputFrame[index]->readOneFrame(m_inputFile[index], iCurrentFrameToProcess, m_inputFile[index]->m_fileHeader, m_startFrame[index]) == TRUE) {
-        // If the size of the images has changed, then reallocate space appropriately
-        if ((m_inputFrame[index]->m_width[Y_COMP] != m_frameStore[index]->m_width[Y_COMP]) || (m_inputFrame[index]->m_height[Y_COMP] != m_frameStore[index]->m_height[Y_COMP])) {
-          allocateFrameStores(m_inputFrame[index], &m_frameStore[index]);
-        }
-
-        // Now copy input frame buffer to processing frame buffer for any subsequent processing
-        m_frameStore[index]->m_frameNo = frameNumber;
-        m_inputFrame[index]->copyFrame(m_frameStore[index]);
-        currentFrame[index] = m_frameStore[index];
-        if (m_cropFrameStore[index] != NULL) {
-          m_cropFrameStore[index]->copy(m_frameStore[index], m_cropOffsetLeft[index], m_cropOffsetTop[index], m_frameStore[index]->m_width[Y_COMP] + m_cropOffsetRight[index], m_frameStore[index]->m_height[Y_COMP] + m_cropOffsetBottom[index], 0, 0);
-          currentFrame[index] = m_cropFrameStore[index];
-        }
-        if (m_enableWindow == TRUE) {
-          m_windowFrameStore[index]->copy(currentFrame[index], m_windowMinPosX, m_windowMinPosY, m_windowMaxPosX, m_windowMaxPosY, 0, 0);
-        }
-      }
-      else {
-        inputParams->m_numberOfFrames = frameNumber;
-        errorRead = TRUE;
-        break;
-      }
-    }
-
-
-    if (currentFrame[0]->equalType(currentFrame[1]) == FALSE) {
-      fprintf(stderr, "Error. Input sources of different type.\n");
-      errorRead = TRUE;
-      break;
-    }
-
-    if (errorRead == TRUE) {
-      break;
-    }
-    else if (inputParams->m_silentMode == FALSE) {
-      printf("%06d ", frameNumber );
-    }
-
-    for (int index = DIST_NULL; index < DIST_METRICS; index++) {
-      if (m_enableMetric[index] == TRUE) {
-        m_distortionMetric[index]->computeMetric(currentFrame[0], currentFrame[1]);
-        if (inputParams->m_silentMode == FALSE) {
-          m_distortionMetric[index]->reportMetric();
-        }
-      }
-    }
-    // Window statistics
-    if (m_enableWindow == TRUE) {
-      printf("  |");
-      for (int index = DIST_NULL; index < DIST_METRICS; index++) {
-        if (m_enableWindowMetric[index] == TRUE) {
-          m_windowDistortionMetric[index]->computeMetric(m_windowFrameStore[0], m_windowFrameStore[1]);
-          if (inputParams->m_silentMode == FALSE) {
-            m_windowDistortionMetric[index]->reportMetric();
-          }
-        }
-      }
-    }
-    clk = clock() - clk;
-    if (inputParams->m_silentMode == FALSE){
-      printf("%7.3f", 1.0 * clk / CLOCKS_PER_SEC);
-      printf("\n");
-      fflush(stdout);
-    }
-    else {
-      printf("Processing Frame : %d\r", frameNumber);
-      fflush(stdout);
-    }
-  } //end for frameNumber
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -592,7 +506,7 @@ void HDRVQMFrame::outputFooter(ProjectParameters *inputParams) {
     printf("---------------------------------------------------------\n");
 
     //printf("%06d ", inputParams->m_numberOfFrames);
-    printf("HDR-VQM ");
+    printf("HDR-VQM   ");
 
     for (j = DIST_NULL; j < DIST_METRICS; j++) {
       if (m_enableMetric[j] == TRUE)

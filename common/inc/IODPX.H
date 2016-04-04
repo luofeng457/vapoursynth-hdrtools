@@ -50,6 +50,8 @@
 
 #ifndef __IODPX_H__
 #define __IODPX_H__
+#include <string.h>
+
 
 typedef enum {
   DPX_DS_USER        = 0,   // User-defined

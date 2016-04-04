@@ -521,7 +521,7 @@ void ColorTransformYAdjustFull::process ( Frame* out, const Frame *inp) {
         
         double minDistortion = 1e99;
         double curDistortion;
-        double yConvBest;
+        //double yConvBest;
         int    yBest = yPrimeMin;
         // Given reconstruction convert also inverse data
         for (int j = yPrimeMin; (j <= yPrimeMax) ; j++) 
@@ -536,7 +536,7 @@ void ColorTransformYAdjustFull::process ( Frame* out, const Frame *inp) {
           //curDistortion = dAbs2(yLinear - yConv);
           curDistortion = dAbs2(yTF - yTFConv);
           if (curDistortion < minDistortion) {
-            yConvBest = yConv;
+            //yConvBest = yConv;
             yBest = yPrimeCandidate;
             minDistortion = curDistortion;
           }

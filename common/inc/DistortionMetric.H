@@ -113,6 +113,46 @@ public:
   }
 };
 
+class VQMParams {
+public:
+  float	  m_poolingPerc;
+  int     m_rowsDisplay;
+  int     m_colsDisplay;
+  int     m_displayArea;
+  float   m_maxDisplay;
+  float   m_minDisplay;
+  int     m_viewingDistance;
+  float   m_fixationTime;
+  int     m_numberOfScale;
+  int     m_numberOfOrient;
+  float   m_frameRate;
+  int     m_numberOfFrames;
+  bool    m_displayAdapt;
+  
+  int     m_columnsFFT;
+  int     m_rowsFFT;
+  
+  VQMParams() {
+    m_poolingPerc      = 0.0f;
+    m_rowsDisplay      = 16;
+    m_colsDisplay      = 16;
+    m_displayArea      = 256;
+    m_maxDisplay       = 1.0f;
+    m_minDisplay       = 0.0f;
+    m_viewingDistance  = 1;
+    m_fixationTime     = 0.2f;
+    m_numberOfScale    = 1;
+    m_numberOfOrient   = 1;
+    m_frameRate        = 60.0f;
+    m_numberOfFrames   = 1;
+    m_displayAdapt     = TRUE;
+    
+    m_columnsFFT       = 1024;
+    m_rowsFFT          = 512;
+  }
+};
+
+
 class DistortionParameters {
 public:
   bool    m_enableShowMSE;
@@ -141,19 +181,7 @@ public:
   int                m_rPSNROverlapX;
   int                m_rPSNROverlapY;
   //VQM parameters
-  float	  m_vqmPoolingPerc;
-  int     m_vqmRowsDisplay;
-  int     m_vqmColsDisplay;
-  int     m_vqmDisplayArea;
-  float   m_vqmMaxDisplay;
-  float   m_vqmMinDisplay;
-  int     m_vqmViewingDistance;
-  float   m_vqmFixationTime;
-  int     m_vqmNumberOfScale;
-  int     m_vqmNumberOfOrient;
-  float   m_vqmFrameRate;
-  int     m_vqm_numberofFrames;
-  int	  m_vqm_displayAdapt;
+  VQMParams          m_VQM;
   
   DistortionParameters() {
     for (int index = 0; index < NB_REF_WHITE; index ++)
@@ -181,21 +209,6 @@ public:
     m_rPSNRBlockSizeY           = 64;
     m_rPSNROverlapX             = 4;
     m_rPSNROverlapY             = 4;
-
-  //VQM parameters
-    m_vqmPoolingPerc            = 0.0f;
-    m_vqmRowsDisplay            = 16;
-    m_vqmColsDisplay            = 16;
-    m_vqmDisplayArea            = 256;
-    m_vqmMaxDisplay             = 1.0f;
-    m_vqmMinDisplay             = 0.0f;
-    m_vqmViewingDistance        = 1;
-    m_vqmFixationTime           = 0.2f;
-    m_vqmNumberOfScale          = 1;
-    m_vqmNumberOfOrient         = 1;
-    m_vqmFrameRate              = 60.0f;
-    m_vqm_numberofFrames        = 1;
-    m_vqm_displayAdapt          = 1;
   }
 };
 

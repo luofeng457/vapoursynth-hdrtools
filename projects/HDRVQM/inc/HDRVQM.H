@@ -52,7 +52,7 @@
 #define __HDRVQM_H__
 
 #include "ProjectParameters.H"
-#define HDR_METRIC_VERSION "0.6"
+#define HDR_VQM_VERSION "0.1"
 
 class HDRVQM {
 protected:

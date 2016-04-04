@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
   
   if (params->m_silentMode == FALSE) {
     printf("---------------------------------------------------------\n");
-    printf(" HDR Video Quality Analysis tool - Version %s (%s)\n",HDR_METRIC_VERSION,VERSION);
+    printf(" HDR Video Quality Analysis tool - Version %s (%s)\n",HDR_METRIC_VERSION, VERSION);
     printf("---------------------------------------------------------\n");
   }
   
