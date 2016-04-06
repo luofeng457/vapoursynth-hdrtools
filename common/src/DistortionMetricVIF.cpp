@@ -94,11 +94,11 @@ void DistortionMetricVIF::mean (std::vector<std::vector<double> >  &input, int w
 }
 
 
-void DistortionMetricVIF::reshape (std::vector<std::vector<double> >  &input, int new_w, int new_h ,  std::vector<std::vector<double> >  &s)
+void DistortionMetricVIF::reshape (std::vector<std::vector<double> >  &input, int newW, int newH ,  std::vector<std::vector<double> >  &s)
 {
   int k=0;
-  for (int i = 0; i < new_w; i++)	{
-    for (int j = 0; j < new_h; j++) {
+  for (int i = 0; i < newW; i++)	{
+    for (int j = 0; j < newH; j++) {
       s[i][j] = input[0][k++];
     }
   }
@@ -208,8 +208,8 @@ double DistortionMetricVIF::SMPTE_ST_2084(double x, bool Inverse, double MaxLum)
     //Remove values outside [0-1] for example caused by overflow in coding
     x = dClip(x, 0.0, 1.0);
     // % Apply the EOTF on the input image
-    double y0 = ((pow(x,(1/m2))- c1) / (c2 - c3 * pow(x,(1/m2))));
-    double y= pow(y0, 1/m1);
+    double y0 = ((pow(x,(1 / m2))- c1) / (c2 - c3 * pow(x,(1 / m2))));
+    double y  = pow(y0, 1/m1);
     // Scale the output to the maximum luminance
     y = y * MaxLum; 
   }
@@ -297,8 +297,8 @@ double DistortionMetricVIF::sumSumLog2GGSSLambdaDivVV(std::vector<std::vector<do
 // temp2=temp2+sum(sum((log2(1+ss.*lambda(j)./(sigma_nsq))))); % reference image information in VIF matlab code
 double DistortionMetricVIF::sumSumLog2SSLambdaDivSigma(std::vector<std::vector<double> > &ss, int w1, int h1,double lambda, double eps)
 {
-  double sum=0;
-  for (int i = 0;i < w1; i++) {
+  double sum = 0.0;
+  for (int i = 0 ;i < w1; i++) {
     for (int j = 0; j < h1; j++) {
       sum+= log(1.0 + ss[i][j] * lambda/(eps))/log(2.0);  //reference image information
     }
@@ -311,9 +311,9 @@ void DistortionMetricVIF::sumSSTempMM(std::vector<std::vector<double> >  &input1
 {
   output[0].resize(h1);
   for (int j = 0; j < h1; j++)	{
-    double sum = 0;
+    double sum = 0.0;
     for (int i = 0;i < w1; i++)	{
-      sum+=(input1[i][j]*input2[i][j])/input3;
+      sum+=(input1[i][j] * input2[i][j]) / input3;
     }
     output[0][j]=sum;
   }
@@ -345,14 +345,16 @@ void DistortionMetricVIF::repmat (double* input, int w, int h, std::vector<std::
 
 //
 //output (input < compVal) = setVal;
-void DistortionMetricVIF::setCompare (double* input, int size, double compVal, double setVal, bool iseq, double * output )
+void DistortionMetricVIF::setCompare (double* input, int size, double compVal, double setVal, bool iseq, double *output )
 {
-  for (int i = 0; i < size; i++)	{
-    if ( iseq)	{
+  if ( iseq)	{
+    for (int i = 0; i < size; i++)	{
       if (input[i] <= compVal)
         output[i] = setVal; 
     }
-    else	{
+  }
+  else	{
+    for (int i = 0; i < size; i++)	{
       if (input[i] < compVal)
         output[i] = setVal;  
     }
@@ -360,14 +362,16 @@ void DistortionMetricVIF::setCompare (double* input, int size, double compVal, d
 }
 
 //output (input < compVal) = setInput (input < compVal);
-void DistortionMetricVIF::setCompareWithOther (double* compInput, double* setInput, int size, double compVal, bool iseq, double * output )
+void DistortionMetricVIF::setCompareWithOther (double *compInput, double *setInput, int size, double compVal, bool iseq, double *output )
 {
-  for (int i = 0; i < size; i++)	{
-    if ( iseq)		{
+  if (iseq == TRUE) {
+    for (int i = 0; i < size; i++)	{
       if (compInput[i] <= compVal)
         output[i] = setInput[i]; 
     }
-    else		{
+  }
+  else {
+    for (int i = 0; i < size; i++)	{
       if (compInput[i] < compVal)
         output[i] = setInput[i]; 
     }
@@ -411,11 +415,11 @@ void DistortionMetricVIF::multiply (double* input1, double* input2, int size, do
 
 void  DistortionMetricVIF::convertOneRowVar ( const double** input, double * output)
 {
-  int x_fdim_input = sizeof(input) / sizeof(*input);
-  for (int i = 0; i <  x_fdim_input ; i ++)	{
-    for (int j =0; j <x_fdim_input ; j ++)		{
+  int xFDimInput = sizeof(input) / sizeof(*input);
+  for (int i = 0; i < xFDimInput; i ++)	{
+    for (int j = 0; j < xFDimInput; j ++)		{
       //reshape the filter into matrice
-      output[j+i*x_fdim_input]=	input[j][i] ;
+      output[j + i * xFDimInput] =	input[j][i] ;
     }
   }
 }
@@ -439,11 +443,11 @@ void DistortionMetricVIF::refParamsVecGSM (std::vector<std::vector<double> > &or
   Eigenvalue eg1;
   
   for (int subi=0;subi<sizeSubBand;subi++)	{
-    int   sub=subbands[subi];
+    int   sub = subbands[subi];
     
     //force subband size to be multiple of M
-    int newSizeYWidth  = (int) ((floor(lenWh[sub][0] /((double) M))) *(double) M);
-    int newSizeYHeight = (int) ((floor(lenWh[sub][1] /((double) M))) *(double) M);
+    int newSizeYWidth  = (int) ((floor(lenWh[sub][0] /((double) M))) * (double) M);
+    int newSizeYHeight = (int) ((floor(lenWh[sub][1] /((double) M))) * (double) M);
     
     std::vector<std::vector<double> > yMM(newSizeYWidth);
     for (int w = 0; w < newSizeYWidth; w++) {
@@ -517,9 +521,10 @@ void DistortionMetricVIF::refParamsVecGSM (std::vector<std::vector<double> > &or
       }
     }
     
-    //Calculate the S filed
+    //Calculate the S field
     std::vector<std::vector<double> > inCuCo(M * M);    
-    for (int i=0;i<M * M;i++)	{
+    
+    for (int i = 0; i < M * M;i++)	{
       inCuCo[i].resize(M * M); 
     }
     InverseGauss::inverseMatrix(cuArr[sub], M * M, inCuCo);
@@ -576,7 +581,7 @@ void DistortionMetricVIF::vifSubEstM (std::vector<std::vector<double> >  &org,
     //compute the size of the window used in the distortion channel estimation
     int  lev = (int) ceil((sub-1)/6.0);
     int winSize= (1 << lev) + 1; // pow(2.0, lev) + 1; 
-    //    double offset=(winSize-1)/2.0;
+                                 //    double offset=(winSize-1)/2.0;
     std::vector<double> win       (winSize * winSize);
     std::vector<double> winNormal(winSize * winSize);
     
@@ -848,7 +853,7 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
 {
   
   double sigma_nsq=0.4;
-  int M=3;
+  int M = 3;
   //int subbands []={4 ,7, 10, 13, 16, 19, 22, 25}; //Matlab Subbands
 #if spFilters5
   int subbands []={3 ,6, 9, 12, 15, 18, 21, 24}; //C++ sub bands
@@ -880,12 +885,12 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   int y_fdim_lo0 = xFDimLo0;
   int xStart = 0;
   int yStart = 0;
-  int xStep = 1; 
-  int yStep = 1;
-  int xStop = inp0->m_width[Y_COMP];
-  int yStop = inp0->m_height[Y_COMP];
-  int xDim  = inp0->m_width[Y_COMP];
-  int yDim  = inp0->m_height[Y_COMP];
+  int xStep  = 1; 
+  int yStep  = 1;
+  int xStop  = inp0->m_width[Y_COMP];
+  int yStop  = inp0->m_height[Y_COMP];
+  int xDim   = inp0->m_width[Y_COMP];
+  int yDim   = inp0->m_height[Y_COMP];
   int li0FiltSize = sizeof(lo0filt) / sizeof(*lo0filt);
   int bFiltsZ2    = sizeof(bfilts)  / sizeof(*bfilts); 
   std::vector<std::vector<int> > lenWh(pYrSize * bFiltsZ2 + 2);
@@ -1137,5 +1142,5 @@ void DistortionMetricVIF::printHeader()
 }
 
 void DistortionMetricVIF::printSeparator(){
-    printf("-------------");
+  printf("-------------");
 }

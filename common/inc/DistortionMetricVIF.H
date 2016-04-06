@@ -233,7 +233,7 @@ private:
   void vectorMultiplyFixNum        (std::vector<std::vector<double> > &input1, int w1, int h1, double input2,  std::vector<std::vector<double> > &output);
   void vectorAddFixNum             (std::vector<std::vector<double> > &input1, int w1, int h1, double input2,  std::vector<std::vector<double> > &output);
   void invertVector                (std::vector<std::vector<double> > &input1, int w, int h, std::vector<std::vector<double> > &output);
-  void reshape                     (std::vector<std::vector<double> > &input, int new_w, int new_h , std::vector<std::vector<double> >  &s);
+  void reshape                     (std::vector<std::vector<double> > &input, int newW, int newH , std::vector<std::vector<double> >  &s);
   double SMPTE_ST_2084             (double x, bool Inverse, double MaxLum);
   int maxPyrHt                     (int imsize_w, int imsize_h,int filtsize); 
   int buildSpyrLevs                (double* lo0, int ht, int w, int h, std::vector<std::vector<double> > &pyr, int max_ht,  int pyrElement, std::vector<std::vector<double> >  &pyr_arr, std::vector<bool> &subbandUsed); 
