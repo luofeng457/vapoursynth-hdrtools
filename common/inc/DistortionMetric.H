@@ -73,7 +73,8 @@ enum DistortionMetrics{
   DIST_TFMSSSIM     = 13, // TF Multi-Scale Structural Similarity Index (tMS-SSIM)
   DIST_BLKJ341      = 14,
   DIST_BLK          = 15,
-  DIST_VQM			= 16, //HDR Video Quality Metric
+  DIST_VQM			    = 16, // HDR Video Quality Metric
+  DIST_VIF          = 17, // VIF Distortion Metric
   DIST_METRICS
 };
 
@@ -105,11 +106,19 @@ public:
   double  m_ssimK2;
   SSIMParams () {
     m_ssimBlockDistance = 1;
-    m_ssimBlockSizeX = 8;
-    m_ssimBlockSizeY = 8;
+    m_ssimBlockSizeX = 4;
+    m_ssimBlockSizeY = 4;
     m_useLogSSIM = FALSE;
     m_ssimK1 = 0.01f;
     m_ssimK2 = 0.03f;    
+  }
+};
+
+class VIFParams {
+public:
+  int m_vifBitDepth;
+  VIFParams() {
+    m_vifBitDepth = 10;
   }
 };
 
@@ -180,8 +189,9 @@ public:
   int                m_rPSNRBlockSizeY;
   int                m_rPSNROverlapX;
   int                m_rPSNROverlapY;
-  //VQM parameters
-  VQMParams          m_VQM;
+  VQMParams          m_VQM; 
+  VIFParams          m_VIF;
+  SSIMParams         m_SSIM;
   
   DistortionParameters() {
     for (int index = 0; index < NB_REF_WHITE; index ++)

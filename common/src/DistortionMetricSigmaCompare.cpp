@@ -836,14 +836,14 @@ void DistortionMetricSigmaCompare::measureFrameSigmaPass2( f32_stats_t*sig,  flo
           for(int k=0; k < SIGMA_MULTIPLES; k++) {
             short multiple = kMultiple(k);
             
-            if (fabsf(dif) > (multiple * sig->pos[j].sigma))    {
+            if (fAbs(dif) > (multiple * sig->pos[j].sigma))    {
               sig->pos[j].countMultipleSigma[k]++;
               
               if(k== (SIGMA_MULTIPLES-1)) {
                 //  printf(" c=%d j=%d x=%d y=%d col_dif[%d]=%e\n", c, j, x, y, c, col_dif[c]);
-                sig->pos[j].furthestOutlierSum += fabsf(dif);
+                sig->pos[j].furthestOutlierSum += fAbs(dif);
               } /* k== (SIGMA_MULTIPLES-1) */
-            } /* fabsf(col_dif[c]) > (multiple * sigma[j]) */
+            } /* fAbs(col_dif[c]) > (multiple * sigma[j]) */
           } /* k */
         } /* count[j] > 0 */
       } /* bin_value[(c*v_reso + y) * h_reso + x] >= 0 */
@@ -867,14 +867,14 @@ void DistortionMetricSigmaCompare::measureFrameSigmaPass2( u16_stats_t *sig,  ui
           for(int k=0; k < SIGMA_MULTIPLES; k++) {
             short multiple = kMultiple(k);
             
-            if (fabsf(dif) > (multiple * sig->pos[j].sigma))    {
+            if (fAbs(dif) > (multiple * sig->pos[j].sigma))    {
               sig->pos[j].countMultipleSigma[k]++;
               
               if(k== (SIGMA_MULTIPLES-1)) {
                 //  printf(" c=%d j=%d x=%d y=%d col_dif[%d]=%e\n", c, j, x, y, c, col_dif[c]);
-                sig->pos[j].furthestOutlierSum += (int64) fabsf(dif);
+                sig->pos[j].furthestOutlierSum += (int64) fAbs(dif);
               } /* k== (SIGMA_MULTIPLES-1) */
-            } /* fabsf(col_dif[c]) > (multiple * sigma[j]) */
+            } /* fAbs(col_dif[c]) > (multiple * sigma[j]) */
           } /* k */
         } /* count[j] > 0 */
       } /* bin_value[(c*v_reso + y) * h_reso + x] >= 0 */
@@ -898,14 +898,14 @@ void DistortionMetricSigmaCompare::measureFrameSigmaPass2( u16_stats_t *sig,  im
           for(int k=0; k < SIGMA_MULTIPLES; k++) {
             short multiple = kMultiple(k);
             
-            if (fabsf(dif) > (multiple * sig->pos[j].sigma))    {
+            if (fAbs(dif) > (multiple * sig->pos[j].sigma))    {
               sig->pos[j].countMultipleSigma[k]++;
               
               if(k== (SIGMA_MULTIPLES-1)) {
                 //  printf(" c=%d j=%d x=%d y=%d col_dif[%d]=%e\n", c, j, x, y, c, col_dif[c]);
-                sig->pos[j].furthestOutlierSum += (int64) fabsf(dif);
+                sig->pos[j].furthestOutlierSum += (int64) fAbs(dif);
               } /* k== (SIGMA_MULTIPLES-1) */
-            } /* fabsf(col_dif[c]) > (multiple * sigma[j]) */
+            } /* fAbs(col_dif[c]) > (multiple * sigma[j]) */
           } /* k */
         } /* count[j] > 0 */
       } /* bin_value[(c*v_reso + y) * h_reso + x] >= 0 */

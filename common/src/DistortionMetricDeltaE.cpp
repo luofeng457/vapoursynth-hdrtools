@@ -327,10 +327,10 @@ void DistortionMetricDeltaE::computeMetric (Frame* inp0, Frame* inp1)
             //xyz2TrueLab(x1, y1, z1, &l1, &a1, &b1, invYn, invXn, invZn);
             //l0 = 116.0 *  trueLab(y0 * invYn);
             //l1 = 116.0 *  trueLab(y1 * invYn);
-            //meanDeltaL += fabs(l0-l1);
+            //meanDeltaL += dAbs(l0-l1);
             
             // fast version
-            meanDeltaL += fabs(116.0 *  (trueLab(y0 * invYn) - trueLab(y1 * invYn)));
+            meanDeltaL += dAbs(116.0 *  (trueLab(y0 * invYn) - trueLab(y1 * invYn)));
 
           }
           

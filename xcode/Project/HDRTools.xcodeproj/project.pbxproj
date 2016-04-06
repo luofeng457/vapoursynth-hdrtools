@@ -185,6 +185,14 @@
 		C580D7571CAF485000E01A76 /* HDRVQM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7431CAF47DD00E01A76 /* HDRVQM.cpp */; };
 		C580D7581CAF485000E01A76 /* HDRVQMFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7441CAF47DD00E01A76 /* HDRVQMFrame.cpp */; };
 		C580D7591CAF485000E01A76 /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7451CAF47DD00E01A76 /* ProjectParameters.cpp */; };
+		C580D7891CB4668F00E01A76 /* Convolve.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7881CB4668F00E01A76 /* Convolve.cpp */; };
+		C580D78B1CB466A500E01A76 /* Convolve.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D78A1CB466A500E01A76 /* Convolve.H */; };
+		C580D78D1CB490E900E01A76 /* Eigenvalue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */; };
+		C580D78F1CB4937500E01A76 /* Eigenvalue.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D78E1CB4937500E01A76 /* Eigenvalue.H */; };
+		C580D7911CB4952D00E01A76 /* InverseGauss.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7901CB4952D00E01A76 /* InverseGauss.cpp */; };
+		C580D7931CB496AF00E01A76 /* InverseGauss.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7921CB496AF00E01A76 /* InverseGauss.H */; };
+		C580D7951CB4973200E01A76 /* DistortionMetricVIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */; };
+		C580D7971CB4979500E01A76 /* DistortionMetricVIF.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */; };
 		C585BD051B041F9000235FE6 /* TransferFunctionAMPQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C585BD041B041F9000235FE6 /* TransferFunctionAMPQ.cpp */; };
 		C585BD071B041FA000235FE6 /* TransferFunctionAMPQ.H in Headers */ = {isa = PBXBuildFile; fileRef = C585BD061B041FA000235FE6 /* TransferFunctionAMPQ.H */; };
 		C585BD091B05190500235FE6 /* TransferFunctionAPH.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C585BD081B05190500235FE6 /* TransferFunctionAPH.cpp */; };
@@ -500,6 +508,14 @@
 		C580D7441CAF47DD00E01A76 /* HDRVQMFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HDRVQMFrame.cpp; path = ../../projects/HDRVQM/src/HDRVQMFrame.cpp; sourceTree = "<group>"; };
 		C580D7451CAF47DD00E01A76 /* ProjectParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ProjectParameters.cpp; path = ../../projects/HDRVQM/src/ProjectParameters.cpp; sourceTree = "<group>"; };
 		C580D7561CAF47F500E01A76 /* HDRVQM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HDRVQM; sourceTree = BUILT_PRODUCTS_DIR; };
+		C580D7881CB4668F00E01A76 /* Convolve.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Convolve.cpp; path = ../common/src/Convolve.cpp; sourceTree = "<group>"; };
+		C580D78A1CB466A500E01A76 /* Convolve.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Convolve.H; path = ../common/inc/Convolve.H; sourceTree = "<group>"; };
+		C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Eigenvalue.cpp; path = ../common/src/Eigenvalue.cpp; sourceTree = "<group>"; };
+		C580D78E1CB4937500E01A76 /* Eigenvalue.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Eigenvalue.H; path = ../common/inc/Eigenvalue.H; sourceTree = "<group>"; };
+		C580D7901CB4952D00E01A76 /* InverseGauss.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InverseGauss.cpp; path = ../common/src/InverseGauss.cpp; sourceTree = "<group>"; };
+		C580D7921CB496AF00E01A76 /* InverseGauss.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = InverseGauss.H; path = ../common/inc/InverseGauss.H; sourceTree = "<group>"; };
+		C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricVIF.cpp; path = ../common/src/DistortionMetricVIF.cpp; sourceTree = "<group>"; };
+		C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricVIF.H; path = ../common/inc/DistortionMetricVIF.H; sourceTree = "<group>"; };
 		C585BD041B041F9000235FE6 /* TransferFunctionAMPQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionAMPQ.cpp; path = ../common/src/TransferFunctionAMPQ.cpp; sourceTree = "<group>"; };
 		C585BD061B041FA000235FE6 /* TransferFunctionAMPQ.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransferFunctionAMPQ.H; path = ../common/inc/TransferFunctionAMPQ.H; sourceTree = "<group>"; };
 		C585BD081B05190500235FE6 /* TransferFunctionAPH.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionAPH.cpp; path = ../common/src/TransferFunctionAPH.cpp; sourceTree = "<group>"; };
@@ -994,6 +1010,9 @@
 			isa = PBXGroup;
 			children = (
 				C5BD26A819CCAC10003F1B51 /* AddNoise.H */,
+				C580D78A1CB466A500E01A76 /* Convolve.H */,
+				C580D7921CB496AF00E01A76 /* InverseGauss.H */,
+				C580D78E1CB4937500E01A76 /* Eigenvalue.H */,
 				C5BD26AA19CCAC10003F1B51 /* AddNoiseNormal.H */,
 				C5BD26A919CCAC10003F1B51 /* AddNoiseNull.H */,
 				C5DA4E431A5CB7C400DA2F2E /* AVILib.H */,
@@ -1060,6 +1079,7 @@
 				C5CC7E2E1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H */,
 				C5DE3F3219DB5303006FA313 /* DistortionMetricTFPSNR.H */,
 				C580D7211CAF469300E01A76 /* DistortionMetricVQM.H */,
+				C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */,
 				C5CC7E321BB0A90B00EBE780 /* DistortionTransferFunction.H */,
 				C580D7231CAF469300E01A76 /* FFT.H */,
 				C5C2CC3D1B19166500AD96EA /* Filter1D.H */,
@@ -1133,6 +1153,9 @@
 			isa = PBXGroup;
 			children = (
 				C5BD26DC19CCAC17003F1B51 /* AddNoise.cpp */,
+				C580D7881CB4668F00E01A76 /* Convolve.cpp */,
+				C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */,
+				C580D7901CB4952D00E01A76 /* InverseGauss.cpp */,
 				C5BD26DE19CCAC17003F1B51 /* AddNoiseNormal.cpp */,
 				C5BD26DD19CCAC17003F1B51 /* AddNoiseNull.cpp */,
 				C5BD26DF19CCAC17003F1B51 /* BufToImg.cpp */,
@@ -1196,6 +1219,7 @@
 				C5CC7E2C1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp */,
 				C5DE3F3419DB5330006FA313 /* DistortionMetricTFPSNR.cpp */,
 				C580D72F1CAF46D500E01A76 /* DistortionMetricVQM.cpp */,
+				C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */,
 				C5CC7E301BB0A86000EBE780 /* DistortionTransferFunction.cpp */,
 				C580D7301CAF46D500E01A76 /* FFT.cpp */,
 				C5C2CC3B1B19164E00AD96EA /* Filter1D.cpp */,
@@ -1409,6 +1433,7 @@
 				C5528B3E1BEAC27700CCADA5 /* ColorTransformClosedLoopRGB.H in Headers */,
 				C5133DE019CCF59B00D64D48 /* BufToImgEndian.H in Headers */,
 				C5133DE119CCF59B00D64D48 /* ColorTransform.H in Headers */,
+				C580D78B1CB466A500E01A76 /* Convolve.H in Headers */,
 				C5B080431C2B6B50000335A7 /* InputY4M.H in Headers */,
 				C5133E7E19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H in Headers */,
 				C53E9BBF1C0FCF7100448F69 /* Conv444to420CrEdge.H in Headers */,
@@ -1442,6 +1467,7 @@
 				C5133DE819CCF59B00D64D48 /* Conv444to420BI.H in Headers */,
 				C5CC7E2F1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H in Headers */,
 				C5CC7E3B1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H in Headers */,
+				C580D7971CB4979500E01A76 /* DistortionMetricVIF.H in Headers */,
 				C530C3931B7E976D00FD6D7E /* ToneMappingRoll.H in Headers */,
 				C5133DE919CCF59B00D64D48 /* Conv444to420Generic.H in Headers */,
 				C5C2CC381B1906D600AD96EA /* FrameFilter2DSep.H in Headers */,
@@ -1477,6 +1503,7 @@
 				C580D72D1CAF469300E01A76 /* TransferFunctionHGold.H in Headers */,
 				C5133DF619CCF59C00D64D48 /* Frame.H in Headers */,
 				C5133DF719CCF59C00D64D48 /* Global.H in Headers */,
+				C580D78F1CB4937500E01A76 /* Eigenvalue.H in Headers */,
 				C5B0803F1C2B6957000335A7 /* OutputY4M.H in Headers */,
 				C53E9BC51C10C9FA00448F69 /* ColorTransformYAdjustLFast.H in Headers */,
 				C5BE379F1B752C8A00350F6D /* HDRConvScalerTIFF.H in Headers */,
@@ -1498,6 +1525,7 @@
 				C5133E0119CCF59C00D64D48 /* IOVideo.H in Headers */,
 				C5133E0219CCF59C00D64D48 /* OpenEXR.H in Headers */,
 				C5133E0319CCF59C00D64D48 /* IOTIFF.H in Headers */,
+				C580D7931CB496AF00E01A76 /* InverseGauss.H in Headers */,
 				C5DE3F3B19E3B7A1006FA313 /* TransferFunctionHG.H in Headers */,
 				C5DE3F3319DB5303006FA313 /* DistortionMetricTFPSNR.H in Headers */,
 				C5133E0419CCF59C00D64D48 /* Output.H in Headers */,
@@ -1750,6 +1778,7 @@
 				C585BD051B041F9000235FE6 /* TransferFunctionAMPQ.cpp in Sources */,
 				C585BD171B06C55B00235FE6 /* FrameFilterDeblock.cpp in Sources */,
 				C5133E2019CCF5B700D64D48 /* ConvFixedToFloat.cpp in Sources */,
+				C580D7951CB4973200E01A76 /* DistortionMetricVIF.cpp in Sources */,
 				C5B080411C2B6975000335A7 /* InputY4M.cpp in Sources */,
 				C5DE3F3D19E3B877006FA313 /* TransferFunctionHG.cpp in Sources */,
 				C580D7361CAF46D500E01A76 /* ResizeBiCubic.cpp in Sources */,
@@ -1788,6 +1817,7 @@
 				C5BE37CB1B7BE73200350F6D /* DisplayGammaAdjust.cpp in Sources */,
 				C5DA4E421A5CB64800DA2F2E /* OutputAVI.cpp in Sources */,
 				C50BC6B41AE0C5D600F1A398 /* Conv444to420Adaptive.cpp in Sources */,
+				C580D78D1CB490E900E01A76 /* Eigenvalue.cpp in Sources */,
 				C5528B301BE3045300CCADA5 /* TransferFunctionHPQ2.cpp in Sources */,
 				C5133E2D19CCF5B700D64D48 /* InputTIFF.cpp in Sources */,
 				C580D7331CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp in Sources */,
@@ -1809,6 +1839,7 @@
 				C5F63D1F1C61896B004D8B25 /* Conv444to422NN.cpp in Sources */,
 				C5AED38A1BD92B8800682304 /* TransferFunctionHPQ.cpp in Sources */,
 				C5DE3F3719DE9170006FA313 /* DistortionMetricmPSNRfast.cpp in Sources */,
+				C580D7891CB4668F00E01A76 /* Convolve.cpp in Sources */,
 				C5133E3219CCF5B700D64D48 /* OutputYUV.cpp in Sources */,
 				C5DE88DD1A0D76DD00248B84 /* ColorTransformXYZ2YUpVp.cpp in Sources */,
 				C5133E3319CCF5B700D64D48 /* Parameters.cpp in Sources */,
@@ -1818,6 +1849,7 @@
 				C5C79C291AC4E34500FB9A29 /* Conv444to422GenericOld.cpp in Sources */,
 				C5E382EC1AE80FA900FE5693 /* TransferFunctionAPQScaled.cpp in Sources */,
 				9E856AAC19D0145C00C5499A /* DistortionMetricSigmaCompare.cpp in Sources */,
+				C580D7911CB4952D00E01A76 /* InverseGauss.cpp in Sources */,
 				C5C2CC3C1B19164E00AD96EA /* Filter1D.cpp in Sources */,
 				C5133E3619CCF5B700D64D48 /* TransferFunctionNull.cpp in Sources */,
 				C5133E3719CCF5B700D64D48 /* TransferFunctionPH.cpp in Sources */,
