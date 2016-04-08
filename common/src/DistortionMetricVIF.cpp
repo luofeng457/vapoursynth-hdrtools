@@ -724,10 +724,10 @@ int DistortionMetricVIF::buildSpyrLevs(double* lo0, int ht, int w, int h, vector
 {
   
   //variables names were chosen similar to the Matlab code
-  int bfiltsz = 0;
-  int bFiltsZ2 = sizeof(bfilts) / sizeof(*bfilts); 
+  int bfiltsz   = 0;
+  int bFiltsZ2  = sizeof(bfilts) / sizeof(*bfilts); 
   int bfiltsz_1 = sizeof(*bfilts)/ sizeof(double);
-  bfiltsz = (int) sqrt ((double) bfiltsz_1);
+  bfiltsz       = (int) sqrt ((double) bfiltsz_1);
   /*
    double *bands =  new double[ w * h * bFiltsZ2 ];
    double *band  =  new double[ w * h ];

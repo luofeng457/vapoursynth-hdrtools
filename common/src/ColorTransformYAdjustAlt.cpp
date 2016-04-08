@@ -91,7 +91,6 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
   m_bitDepth = bitDepth;
   m_transferFunctions = transferFunctions;
 
-  m_floatData = NULL;
   m_size = 0;
   m_maxIterations = maxIterations;
   m_tfDistance = FALSE;
@@ -242,10 +241,6 @@ ColorTransformYAdjustAlt::ColorTransformYAdjustAlt(
 }
 
 ColorTransformYAdjustAlt::~ColorTransformYAdjustAlt() {
-  if (m_floatData != NULL) {
-    delete[] m_floatData;
-    m_floatData = NULL;
-  }
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -311,12 +306,13 @@ void ColorTransformYAdjustAlt::allocateMemory(Frame* out, const Frame *inp) {
   }
   
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
-  if (NULL == (m_floatData = new float[(int) m_size])) {
+  m_floatData.resize((int) m_size);
+  if (m_floatData.size() != (int) m_size) {
     fprintf(stderr, "ColorTransformYAdjustAlt: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }
   
-  m_floatComp[Y_COMP] = m_floatData;
+  m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[U_COMP];
   

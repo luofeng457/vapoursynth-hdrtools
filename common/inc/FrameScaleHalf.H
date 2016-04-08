@@ -61,13 +61,13 @@
 class FrameScaleHalf : public FrameScale {
 
 private:
-  int32  *m_i32Data;
-  float  *m_floatData;
-  int     m_useMinMax;
-  ScaleFilter *m_horFilter;
-  ScaleFilter *m_verFilter;
-  ScaleFilter *m_horFilterM;
-  ScaleFilter *m_verFilterM;
+  vector<int32>  m_i32Data;
+  vector<float>  m_floatData;
+  int            m_useMinMax;
+  ScaleFilter   *m_horFilter;
+  ScaleFilter   *m_verFilter;
+  ScaleFilter   *m_horFilterM;
+  ScaleFilter   *m_verFilterM;
 
   
   void  filter                  (float  *out, const float  *inp, int width, int height, float minValue, float maxValue);

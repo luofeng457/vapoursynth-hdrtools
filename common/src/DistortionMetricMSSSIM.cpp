@@ -633,19 +633,19 @@ void DistortionMetricMSSSIM::downsample(const uint8* src, uint8* out, int iWidth
   int tmp;
   int *tmpDst, *tmpSrc;
   
-  int *itemp = new int [(iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD)];
-  int *dest  = new int [(iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD)];
+  vector<int> itemp((iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD));
+  vector<int> dest ((iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD));
   int *p_destM1, *p_destM2, *p_destM0, *p_destP1, *p_destP2, *p_destP3;
   uint8 *p_out;
   static const int downSampleFilter[3] = { 1, 3, 28};
   static const int normalize = 6;
   
-  padImage(src, itemp, iWidth, iHeight);
-  horizontalSymmetricExtension(itemp, iWidth, iHeight);
+  padImage(src, &itemp[0], iWidth, iHeight);
+  horizontalSymmetricExtension(&itemp[0], iWidth, iHeight);
   
   for (j = MS_SSIM_PAD2; j < iHeight + MS_SSIM_PAD2; j++) {
-    tmpDst = dest  + j * oWidth + MS_SSIM_PAD2;
-    tmpSrc = itemp + j * iWidth + MS_SSIM_PAD2;
+    tmpDst = &dest [j * oWidth + MS_SSIM_PAD2];
+    tmpSrc = &itemp[j * iWidth + MS_SSIM_PAD2];
     for (i = 0; i < oWidth; i++) {
       ii = (i << 1);
       tmp  =
@@ -658,11 +658,11 @@ void DistortionMetricMSSSIM::downsample(const uint8* src, uint8* out, int iWidth
   }
   
   //Periodic extension
-  verticalSymmetricExtension(dest, oWidth, iHeight);
+  verticalSymmetricExtension(&dest[0], oWidth, iHeight);
   
   for (j = 0; j < oHeight; j++)  {
     jj = (j << 1) + 1;
-    p_destM2 = dest + jj * oWidth + MS_SSIM_PAD2;
+    p_destM2 = &dest[jj * oWidth + MS_SSIM_PAD2];
     p_destM1 = p_destM2 + oWidth;
     p_destM0 = p_destM1 + oWidth;
     p_destP1 = p_destM0 + oWidth;
@@ -677,8 +677,6 @@ void DistortionMetricMSSSIM::downsample(const uint8* src, uint8* out, int iWidth
       p_out[i] = (unsigned char) iShiftRightRound(tmp, normalize);   //Note: Should change for different bit depth
     }
   }
-  delete[] itemp;
-  delete[] dest;
 }
 
 void DistortionMetricMSSSIM::downsample(const uint16* src, uint16* out, int iWidth, int iHeight, int oWidth, int oHeight)
@@ -688,19 +686,19 @@ void DistortionMetricMSSSIM::downsample(const uint16* src, uint16* out, int iWid
   int tmp;
   int *tmpDst, *tmpSrc;
   
-  int *itemp = new int [(iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD)];
-  int *dest  = new int [(iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD)];
+  vector<int> itemp((iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD));
+  vector<int> dest ((iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD));
   int *p_destM1, *p_destM2, *p_destM0, *p_destP1, *p_destP2, *p_destP3;
   uint16 *p_out;
   static const int downSampleFilter[3] = { 1, 3, 28};
   static const int normalize = 6;
   
-  padImage(src, itemp, iWidth, iHeight);
-  horizontalSymmetricExtension(itemp, iWidth, iHeight);
+  padImage(src, &itemp[0], iWidth, iHeight);
+  horizontalSymmetricExtension(&itemp[0], iWidth, iHeight);
   
   for (j = MS_SSIM_PAD2; j < iHeight + MS_SSIM_PAD2; j++) {
-    tmpDst = dest  + j * oWidth + MS_SSIM_PAD2;
-    tmpSrc = itemp + j * iWidth + MS_SSIM_PAD2;
+    tmpDst = &dest [j * oWidth + MS_SSIM_PAD2];
+    tmpSrc = &itemp[j * iWidth + MS_SSIM_PAD2];
     for (i = 0; i < oWidth; i++) {
       ii = (i << 1);
       tmp  =
@@ -713,11 +711,11 @@ void DistortionMetricMSSSIM::downsample(const uint16* src, uint16* out, int iWid
   }
   
   //Periodic extension
-  verticalSymmetricExtension(dest, oWidth, iHeight);
+  verticalSymmetricExtension(&dest[0], oWidth, iHeight);
   
   for (j = 0; j < oHeight; j++)  {
     jj = (j << 1) + 1;
-    p_destM2 = dest + jj * oWidth + MS_SSIM_PAD2;
+    p_destM2 = &dest[jj * oWidth + MS_SSIM_PAD2];
     p_destM1 = p_destM2 + oWidth;
     p_destM0 = p_destM1 + oWidth;
     p_destP1 = p_destM0 + oWidth;
@@ -733,8 +731,6 @@ void DistortionMetricMSSSIM::downsample(const uint16* src, uint16* out, int iWid
       p_out[i] = (unsigned char) iShiftRightRound(tmp, normalize);   //Note: Should change for different bit depth
     }
   }
-  delete[] itemp;
-  delete[] dest;
 }
 
 void DistortionMetricMSSSIM::downsample(const float* src, float* out, int iWidth, int iHeight, int oWidth, int oHeight)
@@ -743,18 +739,18 @@ void DistortionMetricMSSSIM::downsample(const float* src, float* out, int iWidth
   int ii, jj;
   float *tmpDst, *tmpSrc;
   
-  float *itemp = new float [(iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD)];
-  float *dest  = new float [(iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD)];
+  vector<float> itemp((iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD));
+  vector<float> dest ((iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD));
   float *p_destM1, *p_destM2, *p_destM0, *p_destP1, *p_destP2, *p_destP3;
   float *p_out;
   static const float downSampleFilter[3] = { 1.0f/64.0f, 3.0f/64.0f, 28.0f/64.0f};
   
-  padImage(src, itemp, iWidth, iHeight);
-  horizontalSymmetricExtension(itemp, iWidth, iHeight);
+  padImage(src, &itemp[0], iWidth, iHeight);
+  horizontalSymmetricExtension(&itemp[0], iWidth, iHeight);
   
   for (j = MS_SSIM_PAD2; j < iHeight + MS_SSIM_PAD2; j++) {
-    tmpDst = dest  + j * oWidth + MS_SSIM_PAD2;
-    tmpSrc = itemp + j * iWidth + MS_SSIM_PAD2;
+    tmpDst = &dest [j * oWidth + MS_SSIM_PAD2];
+    tmpSrc = &itemp[j * iWidth + MS_SSIM_PAD2];
     for (i = 0; i < oWidth; i++) {
       ii = (i << 1);
       tmpDst[i]  =
@@ -765,11 +761,11 @@ void DistortionMetricMSSSIM::downsample(const float* src, float* out, int iWidth
   }
   
   //Periodic extension
-  verticalSymmetricExtension(dest, oWidth, iHeight);
+  verticalSymmetricExtension(&dest[0], oWidth, iHeight);
   
   for (j = 0; j < oHeight; j++)  {
     jj = (j << 1) + 1;
-    p_destM2 = dest + jj * oWidth + MS_SSIM_PAD2;
+    p_destM2 = &dest[jj * oWidth + MS_SSIM_PAD2];
     p_destM1 = p_destM2 + oWidth;
     p_destM0 = p_destM1 + oWidth;
     p_destP1 = p_destM0 + oWidth;
@@ -783,8 +779,6 @@ void DistortionMetricMSSSIM::downsample(const float* src, float* out, int iWidth
       downSampleFilter[2] * (p_destM0[i] + p_destP1[i]);
     }
   }
-  delete[] itemp;
-  delete[] dest;
 }
 
 float DistortionMetricMSSSIM::compute(uint8 *inp0Data, uint8 *inp1Data, int height, int width, int windowHeight, int windowWidth, int comp, int maxPixelValue)
@@ -794,16 +788,16 @@ float DistortionMetricMSSSIM::compute(uint8 *inp0Data, uint8 *inp1Data, int heig
   float luminance;
   int   l_width  = width >> 1;
   int   l_height = height >> 1;
-  uint8* dsRef = new uint8 [l_height * l_width];
-  uint8* dsEnc = new uint8 [l_height * l_width];
+  vector<uint8> dsRef(l_height * l_width);
+  vector<uint8> dsEnc(l_height * l_width);
   int m;
   static const int max_ssim_levels_minus_one = MAX_SSIM_LEVELS - 1;
   
   structural[0] = computeStructuralComponents(inp0Data, inp1Data, height, width, windowHeight, windowWidth, comp, maxPixelValue);
   distortion = (float) pow(structural[0], m_exponent[0]);
   
-  downsample(inp0Data, dsRef, width, height, l_width, l_height);
-  downsample(inp1Data, dsEnc, width, height, l_width, l_height);
+  downsample(inp0Data, &dsRef[0], width, height, l_width, l_height);
+  downsample(inp1Data, &dsEnc[0], width, height, l_width, l_height);
   
   for (m = 1; m < MAX_SSIM_LEVELS; m++) {
     width  = l_width;
@@ -811,21 +805,18 @@ float DistortionMetricMSSSIM::compute(uint8 *inp0Data, uint8 *inp1Data, int heig
     l_width  = width >> 1;
     l_height = height >> 1;
     
-    structural[m] = computeStructuralComponents(dsRef, dsEnc, height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
+    structural[m] = computeStructuralComponents(&dsRef[0], &dsEnc[0], height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
     distortion *= (float)pow(structural[m], m_exponent[m]);
     
     if (m < max_ssim_levels_minus_one) {
-      downsample(dsRef, dsRef, width, height, l_width, l_height);
-      downsample(dsEnc, dsEnc, width, height, l_width, l_height);
+      downsample(&dsRef[0], &dsRef[0], width, height, l_width, l_height);
+      downsample(&dsEnc[0], &dsEnc[0], width, height, l_width, l_height);
     }
     else {
-      luminance = computeLuminanceComponent(dsRef, dsEnc, height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
+      luminance = computeLuminanceComponent(&dsRef[0], &dsEnc[0], height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
       distortion *= (float)pow(luminance, m_exponent[m]);
     }
-  }
-  
-  delete [] dsRef;
-  delete [] dsEnc;
+  }  
   
   if (m_useLogSSIM)
     return (float) ssimSNR(distortion);
@@ -841,16 +832,16 @@ float DistortionMetricMSSSIM::compute(uint16 *inp0Data, uint16 *inp1Data, int he
   float luminance;
   int   l_width  = width >> 1;
   int   l_height = height >> 1;
-  uint16* dsRef = new uint16 [l_height * l_width];
-  uint16* dsEnc = new uint16 [l_height * l_width];
+  vector<uint16> dsRef(l_height * l_width);
+  vector<uint16> dsEnc(l_height * l_width);
   int m;
   static const int max_ssim_levels_minus_one = MAX_SSIM_LEVELS - 1;
   
   structural[0] = computeStructuralComponents(inp0Data, inp1Data, height, width, windowHeight, windowWidth, comp, maxPixelValue);
   distortion = (float)pow(structural[0], m_exponent[0]);
   
-  downsample(inp0Data, dsRef, width, height, l_width, l_height);
-  downsample(inp1Data, dsEnc, width, height, l_width, l_height);
+  downsample(inp0Data, &dsRef[0], width, height, l_width, l_height);
+  downsample(inp1Data, &dsEnc[0], width, height, l_width, l_height);
   
   for (m = 1; m < MAX_SSIM_LEVELS; m++) {
     width  = l_width;
@@ -858,21 +849,19 @@ float DistortionMetricMSSSIM::compute(uint16 *inp0Data, uint16 *inp1Data, int he
     l_width  = width >> 1;
     l_height = height >> 1;
     
-    structural[m] = computeStructuralComponents(dsRef, dsEnc, height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
+    structural[m] = computeStructuralComponents(&dsRef[0], &dsEnc[0], height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
     distortion *= (float)pow(structural[m], m_exponent[m]);
     
     if (m < max_ssim_levels_minus_one) {
-      downsample(dsRef, dsRef, width, height, l_width, l_height);
-      downsample(dsEnc, dsEnc, width, height, l_width, l_height);
+      downsample(&dsRef[0], &dsRef[0], width, height, l_width, l_height);
+      downsample(&dsEnc[0], &dsEnc[0], width, height, l_width, l_height);
     }
     else {
-      luminance = computeLuminanceComponent(dsRef, dsEnc, height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
+      luminance = computeLuminanceComponent(&dsRef[0], &dsEnc[0], height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
       distortion *= (float)pow(luminance, m_exponent[m]);
     }
   }
   
-  delete [] dsRef;
-  delete [] dsEnc;
   
   if (m_useLogSSIM)
     return (float) ssimSNR(distortion);
@@ -886,16 +875,17 @@ float DistortionMetricMSSSIM::compute(float *inp0Data, float *inp1Data, int heig
   float luminance;
   int   l_width  = width >> 1;
   int   l_height = height >> 1;
-  float* dsRef = new float [l_height * l_width];
-  float* dsEnc = new float [l_height * l_width];
+  vector<float> dsRef(l_height * l_width);
+  vector<float> dsEnc(l_height * l_width);
+
   int m;
   static const int max_ssim_levels_minus_one = MAX_SSIM_LEVELS - 1;
   
   structural[0] = computeStructuralComponents(inp0Data, inp1Data, height, width, windowHeight, windowWidth, comp, maxPixelValue);
   float distortion = (float)pow(structural[0], m_exponent[0]);
   
-  downsample(inp0Data, dsRef, width, height, l_width, l_height);
-  downsample(inp1Data, dsEnc, width, height, l_width, l_height);
+  downsample(inp0Data, &dsRef[0], width, height, l_width, l_height);
+  downsample(inp1Data, &dsEnc[0], width, height, l_width, l_height);
   
   for (m = 1; m < MAX_SSIM_LEVELS; m++)  {
     width  = l_width;
@@ -903,21 +893,18 @@ float DistortionMetricMSSSIM::compute(float *inp0Data, float *inp1Data, int heig
     l_width  = width >> 1;
     l_height = height >> 1;
     
-    structural[m] = computeStructuralComponents(dsRef, dsEnc, height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
+    structural[m] = computeStructuralComponents(&dsRef[0], &dsEnc[0], height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
     distortion *= (float) pow(structural[m], m_exponent[m]);
     
     if (m < max_ssim_levels_minus_one)  {
-      downsample(dsRef, dsRef, width, height, l_width, l_height);
-      downsample(dsEnc, dsEnc, width, height, l_width, l_height);
+      downsample(&dsRef[0], &dsRef[0], width, height, l_width, l_height);
+      downsample(&dsEnc[0], &dsEnc[0], width, height, l_width, l_height);
     }
     else  {
-      luminance = computeLuminanceComponent(dsRef, dsEnc, height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
+      luminance = computeLuminanceComponent(&dsRef[0], &dsEnc[0], height, width, iMin(windowHeight,height), iMin(windowWidth,width), comp, maxPixelValue);
       distortion *= (float)pow(luminance, m_exponent[m]);
     }
   }
-  
-  delete [] dsRef;
-  delete [] dsEnc;
   
   if (m_useLogSSIM)
     return (float) ssimSNR(distortion);

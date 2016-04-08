@@ -69,7 +69,7 @@ private:
   double          m_crDivider;
   double          m_cbDivider;
   
-  float          *m_floatData;
+  vector<float>   m_floatData;
   float          *m_floatComp[4];
   int64           m_size;              // number of samples
   int             m_compSize[4];       // number of samples in each color component

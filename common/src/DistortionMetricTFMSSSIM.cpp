@@ -392,8 +392,8 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
   int ii, jj;
   float *tmpDst, *tmpSrc;
   
-  float *itemp = new float [(iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD)];
-  float *dest  = new float [(iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD)];
+  vector<float> itemp((iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD));
+  vector<float> dest ((iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD));
 
 /*
   if (iWidth + MS_SSIM_PAD > m_tempWidth || iHeight + MS_SSIM_PAD > m_tempHeight ) {
@@ -413,12 +413,12 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
   float *p_out;
   static const float downSampleFilter[3] = { 1.0f/64.0f, 3.0f/64.0f, 28.0f/64.0f};
   
-  padImage(src, itemp, iWidth, iHeight);
-  horizontalSymmetricExtension(itemp, iWidth, iHeight);
+  padImage(src, &itemp[0], iWidth, iHeight);
+  horizontalSymmetricExtension(&itemp[0], iWidth, iHeight);
   
   for (j = MS_SSIM_PAD2; j < iHeight + MS_SSIM_PAD2; j++) {
-    tmpDst = dest  + j * oWidth + MS_SSIM_PAD2;
-    tmpSrc = itemp + j * iWidth + MS_SSIM_PAD2;
+    tmpDst = &dest [j * oWidth + MS_SSIM_PAD2];
+    tmpSrc = &itemp[j * iWidth + MS_SSIM_PAD2];
     for (i = 0; i < oWidth; i++) {
       ii = (i << 1);
       tmpDst[i]  =
@@ -429,11 +429,11 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
   }
   
   //Periodic extension
-  verticalSymmetricExtension(dest, oWidth, iHeight);
+  verticalSymmetricExtension(&dest[0], oWidth, iHeight);
   
   for (j = 0; j < oHeight; j++)  {
     jj = (j << 1) + 1;
-    p_destM2 = dest + jj * oWidth + MS_SSIM_PAD2;
+    p_destM2 = &dest[jj * oWidth + MS_SSIM_PAD2];
     p_destM1 = p_destM2 + oWidth;
     p_destM0 = p_destM1 + oWidth;
     p_destP1 = p_destM0 + oWidth;
@@ -447,8 +447,6 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
       downSampleFilter[2] * (p_destM0[i] + p_destP1[i]);
     }
   }
-  delete[] itemp;
-  delete[] dest;
 }
 
 

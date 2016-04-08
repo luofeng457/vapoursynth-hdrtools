@@ -69,7 +69,7 @@ private:
   const double       *m_invTransform0;
   const double       *m_invTransform1;
   const double       *m_invTransform2;
-  float              *m_floatData;
+  vector<float>       m_floatData;
   float              *m_floatComp[4];
   int64               m_size;              // number of samples
   int                 m_compSize[4];       // number of samples in each color component

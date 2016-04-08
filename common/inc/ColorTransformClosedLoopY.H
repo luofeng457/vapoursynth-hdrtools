@@ -76,7 +76,7 @@ private:
   double              m_weightGreen;
   double              m_weightBlue;
 
-  float              *m_floatData;
+  vector<float>       m_floatData;
   float              *m_floatComp[4];
   int64               m_size;              // number of samples
   int                 m_compSize[4];       // number of samples in each color component

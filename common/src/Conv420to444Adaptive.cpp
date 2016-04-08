@@ -122,7 +122,6 @@ Conv420to444Adaptive::Conv420to444Adaptive(int width, int height, int method, Ch
   m_horFilter[0] = new ScaleFilter(method, 1, 2, offset, scale, &offset, &scale, hPhase[0]); //even
   m_verFilter[1] = new ScaleFilter(method, 1, 0,      0,     0, &offset, &scale, vPhase[1]); //odd
   m_horFilter[1] = new ScaleFilter(method, 1, 2, offset, scale, &offset, &scale, hPhase[1]); //odd
-
 }
 
 Conv420to444Adaptive::~Conv420to444Adaptive() {

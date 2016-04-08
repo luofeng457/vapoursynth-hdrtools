@@ -733,9 +733,9 @@ void Input::imageReformatUInt16 (
       }           
     } 
     else {
-      uint16 *data_temp = new uint16[source->m_width[U_COMP] * source->m_height[U_COMP]];     
+      //uint16 *dataTemp = new uint16[source->m_width[U_COMP] * source->m_height[U_COMP]];     
 
-      delete [] data_temp;
+      //delete [] dataTemp;
     }
   }
 }
