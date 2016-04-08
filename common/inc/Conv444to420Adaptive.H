@@ -61,8 +61,9 @@
 class Conv444to420Adaptive : public ConvertColorFormat {
 
 private:
-  int32  *m_i32Data;
-  float  *m_floatData;
+  vector<int32> m_i32Data;
+  vector<float> m_floatData;
+
   int32  *m_i32DataTemp[5];
   float  *m_floatDataTemp[5];
   ScaleFilter *m_horFilterDown[5];

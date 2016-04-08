@@ -70,8 +70,9 @@ Conv444to420CrEdge::Conv444to420CrEdge(int width, int height, int method, Chroma
 
   // here we allocate the entire image buffers. To save on memory we could just allocate
   // these based on filter length, but this is test code so we don't care for now.
-  m_i32Data       = new int32[ (width >> 1) * height ];
-  m_floatData     = new float[ (width >> 1) * height ];
+  m_i32Data.resize  ( (width >> 1) * height );
+  m_floatData.resize( (width >> 1) * height );
+
   
   // Currently we only support progressive formats, and thus ignore the bottom chroma location type
   
@@ -113,14 +114,6 @@ Conv444to420CrEdge::Conv444to420CrEdge(int width, int height, int method, Chroma
 }
 
 Conv444to420CrEdge::~Conv444to420CrEdge() {
-  if ( m_i32Data != NULL ) {
-    delete [] m_i32Data;
-    m_i32Data = NULL;
-  }
-  if ( m_floatData != NULL ) {
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
   for (int index = 0; index < 5; index++) {
     if (m_horFilterDown[index] != NULL) {
       delete m_horFilterDown[index];
