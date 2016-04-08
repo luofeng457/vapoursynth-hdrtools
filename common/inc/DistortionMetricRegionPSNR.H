@@ -87,7 +87,7 @@ private:
   MetricStatistics  m_maxPSNRStats[T_COMP];
   MetricStatistics  m_minPSNRStats[T_COMP];
   
-  std::vector<double> m_diffData;
+  vector<double> m_diffData;
 
   
   double compute(const float *iComp0, const float *iComp1, int width, int height, int component, double maxValue);

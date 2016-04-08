@@ -538,9 +538,6 @@ Input::Input () {
   m_frameRate         = 24.0;
   m_picUnitSizeOnDisk = 8;
   m_picUnitSizeShift3 = m_picUnitSizeOnDisk >> 3;
-  m_data              = NULL;
-  m_ui16Data          = NULL;
-  m_floatData         = NULL;
   m_bufToImg          = NULL;
   m_comp[0]           = m_comp[1]      = m_comp[2]      = m_comp[3]      = NULL;
   m_ui16Comp[0]       = m_ui16Comp[1]  = m_ui16Comp[2]  = m_ui16Comp[3]  = NULL;
@@ -561,19 +558,19 @@ void Input::clear() {
 // copy data from input to frm target
 void Input::copyFrame(Frame *frm) {
   // we currently only copy the first three components and discard alpha
-  int size = m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
+  //int size = m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
   
   if (m_isFloat) {
     // Copying floating point data from the input buffer to the frame buffer
-    memcpy(frm->m_floatData, m_floatData, (int) size * sizeof(float));
+    frm->m_floatData = m_floatData;
   }
   else if (frm->m_bitDepth == m_bitDepthComp[Y_COMP]) {
     if (m_chromaFormat == frm->m_chromaFormat) {
       // if same chroma type, simply copy the frame
       if (frm->m_bitDepth == 8)
-        memcpy(frm->m_data, m_data, (int) size * sizeof(imgpel));
+        frm->m_data = m_data;
       else
-        memcpy(frm->m_ui16Data, m_ui16Data, (int) size * sizeof(uint16));
+        frm->m_ui16Data = m_ui16Data;
     }
     else {
       // This should never happen. To revisit.

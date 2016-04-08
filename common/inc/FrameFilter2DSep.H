@@ -62,8 +62,8 @@
 //template <class ImgData>
 class FrameFilter2DSep : public FrameFilter {
 private:
-  std::vector<double> m_dImgOutput;
-  std::vector<double> m_floatData;
+  vector<double> m_dImgOutput;
+  vector<double> m_floatData;
   
   int     m_width;
   int     m_height;

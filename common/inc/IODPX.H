@@ -341,8 +341,8 @@ public:
 //! DPX file data
 class DPXFileData {
 public:
-  std::vector<uint16>  m_img;                  //!< Image data
-  std::vector<uint8>   m_buffer;         //!< The file will be read into memory in one gulp here.
+  vector<uint16>  m_img;                  //!< Image data
+  vector<uint8>   m_buffer;         //!< The file will be read into memory in one gulp here.
   uint8               *m_mp;                              //!< Memory pointer.
   int                  m_le;                               //!< Little endian - 0 FALSE, 1 - TRUE
   DPXFileFormat        m_fileFormat;

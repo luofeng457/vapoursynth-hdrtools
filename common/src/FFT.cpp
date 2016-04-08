@@ -231,8 +231,8 @@ int FFT::compute2D(Complex *c, int height, int width, int dir, int stride)
 
   int i, j;
   int m, twopm;
-  std::vector<double> real;
-  std::vector<double> imag;
+  vector<double> real;
+  vector<double> imag;
   Complex *pCurr;
 
   // Transform the rows

@@ -94,8 +94,8 @@ typedef struct TiffImageFileHeader {
 
 //! TIFF file data
 typedef struct Tiff {
-  std::vector<uint16>  img;                  //!< Image data
-  std::vector<uint8>   fileInMemory;         //!< The file will be read into memory in one gulp here.
+  vector<uint16>  img;                  //!< Image data
+  vector<uint8>   fileInMemory;         //!< The file will be read into memory in one gulp here.
   uint8    *mp;                              //!< Memory pointer.
   int      le;                               //!< Little endian - 0 FALSE, 1 - TRUE
   int      nStrips;

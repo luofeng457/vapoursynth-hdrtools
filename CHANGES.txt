@@ -1,30 +1,34 @@
 Changes in HDRTools Version 0.11 (since 0.10)
 ---------------------------------------------
-- Additional luma adjustment methods
-- Implementation of Adaptive downsampling
-- VQM support
-- limited DPX file input support
-- extended AVI support
+- Additional luma adjustment methods (AT)
+- Implementation of Adaptive downsampling (AT)
+- VIF support (HRZ, MA, MTP, PN, AT)
+- VQM support (SS, KP, AT)
+- limited DPX file input support (AT)
+- extended AVI support (AT)
+- Support of HLG (MN, MP, AT)
+- ICtCp support (AT)
+- Various bug fixes, optimizations, and code improvements (AT)
 
 
 Changes in HDRTools Version 0.10 (since 0.9)
 ---------------------------------------------
-- Additional (adaptive) Transfer Functions
-- Additional downsampling and upsampling filters
-- Post deblocking
-- Denoising (Wiener and separable)
-- I/O improvements
-- Various bug fixes relating to dynamic range and other issues
-- Closed loop conversion
-- MinMax filtering
-- Chroma limit aware clipping
-- Constant Luminance Support
+- Additional (adaptive) Transfer Functions (AT)
+- Additional downsampling and upsampling filters (AT)
+- Post deblocking (AT)
+- Denoising (Wiener and separable) (AT)
+- I/O improvements (AT)
+- Various bug fixes relating to dynamic range and other issues (AT)
+- Closed loop conversion (AT)n
+- MinMax filtering (AT)
+- Chroma limit aware clipping (AT)
+- Constant Luminance Support (AT)
 - Distortion Computation improvements
 - Integration of Ericsson's Luma "micrograding" (iterative closed loop conversion)
   process. Two different versions were implemented that utilize two different 
   initial positions. Both result in similar performance but have different complexity.
   Scheme could be vastly improved in terms of speed, especially using LUTs for TF
-  computation.
+  computation. (JS, JSS, AT)
  
 Changes in HDRTools Version 0.9 (since 0.8)
 -------------------------------------------
@@ -130,12 +134,21 @@ CF      Chad Fogg
 CR      Chris Rosewarne
 DL      Daisy Liu
 EF      Edouard Francois
+HRZ     Hamid Reza Tohidypour 
 JRS     Joel Royals Sole
 JS      Jacob Ström	
+JSS     Jonatan Samuelsson
+KP      Kulbhushan Pachauri
+MA      Maryam Azimi
 MK      Madhu Krishnan
 MN      Matteo Naccari
+MP      Manish Pindoria
+MTP     Mahsa T. Pourazad 
+PN      Panos Nasiopoulos
 PY      Peng Yin
 RB      Robert Brondijk
+SS      Sarvesh Sahota
 TL      Taoran Lu
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

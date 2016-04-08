@@ -108,14 +108,14 @@ private:
   char                *m_type;
   int                  m_attributeSize;
   int                  m_valueVectorSize;  // Sets m_value assigned size
-  std::vector<char>    m_value;
+  vector<char>    m_value;
   int                  m_noChannels;
   channelInfo         *m_channels;
   
   box2i                m_dataWindow;
   box2i                m_displayWindow;
   
-  std::vector<uint64>  m_offsetTable;
+  vector<uint64>  m_offsetTable;
   int                  m_offsetTableSize;
   
   // data chunk info.

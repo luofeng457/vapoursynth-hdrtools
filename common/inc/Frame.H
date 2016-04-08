@@ -52,6 +52,8 @@
 
 #include "Global.H"
 #include "IOVideo.H"
+#include <vector>
+
 
 class Frame {
 private:
@@ -95,16 +97,16 @@ public:
   int            m_midPelValue[4];    // middle value for pel component
   int            m_maxPelValue[4];    // maximum value for pel component
 
-  imgpel        *m_data;             // data array
+  vector<imgpel> m_data;              // data array (vector)
   imgpel        *m_comp[4];          // pointer to the different color components
 
   // we could also use templates to do the same thing. TBD
   // For now, sticking with this solution though
-  uint16        *m_ui16Data;        // data array for unsigned short types
+  vector<uint16> m_ui16Data;          // data array (vector) for unsigned short types
   uint16        *m_ui16Comp[4];     // pointer to the different color components (for unsigned short data)
 
   // floating point data for openexr (or other float, i.e. half or single, types)
-  float         *m_floatData;       // data array for unsigned short types
+  vector<float>  m_floatData;        // data array (vector) for single precision float types
   float         *m_floatComp[4];    // pointer to the different color components (for unsigned short data)
   
   bool           m_hasAlternate;

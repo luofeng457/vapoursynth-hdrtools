@@ -119,15 +119,15 @@ void ConvertBitDepth::process ( Frame* out, const Frame *inp) {
   
   if ( inp->m_bitDepth > 8 ) {
     if ( out->m_bitDepth > 8) // both output and input use more than 8 bits
-      convert (inp->m_ui16Data, out->m_ui16Data, (int) inp->m_size, out->m_bitDepth - inp->m_bitDepth);
+      convert (&inp->m_ui16Data[0], &out->m_ui16Data[0], (int) inp->m_size, out->m_bitDepth - inp->m_bitDepth);
     else  // output is in 8 bits
-      convert (inp->m_ui16Data, out->m_data, (int) inp->m_size, out->m_bitDepth - inp->m_bitDepth);
+      convert (&inp->m_ui16Data[0], &out->m_data[0], (int) inp->m_size, out->m_bitDepth - inp->m_bitDepth);
   }
   else {
     if (out->m_bitDepth > 8) // output needs more than 8 bits
-      convert (inp->m_data, out->m_ui16Data, (int) inp->m_size, out->m_bitDepth - inp->m_bitDepth);
+      convert (&inp->m_data[0], &out->m_ui16Data[0], (int) inp->m_size, out->m_bitDepth - inp->m_bitDepth);
     else // both are 8 bit data and thus there is no conversion
-      convert (inp->m_data, out->m_data, (int) inp->m_size);
+      convert (&inp->m_data[0], &out->m_data[0], (int) inp->m_size);
   }
 }
 

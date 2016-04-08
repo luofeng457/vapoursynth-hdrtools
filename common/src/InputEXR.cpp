@@ -82,8 +82,6 @@ InputEXR::InputEXR(IOVideo *videoFile, FrameFormat *format) {
   
   m_buf = NULL;
   
-  m_floatData = NULL;
-  
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -266,16 +264,14 @@ void InputEXR::allocateMemory(FrameFormat *format)
   format->m_pixelType[V_COMP] = m_pixelType[V_COMP] = m_channels[V_COMP].pixelType;
   format->m_pixelType[A_COMP] = m_pixelType[A_COMP] = m_channels[A_COMP].pixelType;
   
-  m_data              = NULL;
   m_comp[Y_COMP]      = NULL;
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
-  m_ui16Data          = NULL;
   m_ui16Comp[Y_COMP]  = NULL;
   m_ui16Comp[U_COMP]  = NULL;
   m_ui16Comp[V_COMP]  = NULL;
-  m_floatData         = new float[(int) m_size];
-  m_floatComp[Y_COMP] = m_floatData;
+  m_floatData.resize(m_size);
+  m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[V_COMP];
   m_floatComp[A_COMP] = m_floatComp[V_COMP] + m_compSize[A_COMP];
@@ -288,15 +284,10 @@ void InputEXR::freeMemory()
     m_buf = NULL;
   }
   
-  if (m_floatData != NULL) {
-    m_floatComp[Y_COMP] = NULL;
-    m_floatComp[U_COMP] = NULL;
-    m_floatComp[V_COMP] = NULL;
-    m_floatComp[A_COMP] = NULL;
-    
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
+  m_floatComp[Y_COMP] = NULL;
+  m_floatComp[U_COMP] = NULL;
+  m_floatComp[V_COMP] = NULL;
+  m_floatComp[A_COMP] = NULL;
 }
 
 int InputEXR::readAttributeInfo( int vfile, FrameFormat *source)

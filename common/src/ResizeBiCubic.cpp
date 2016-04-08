@@ -252,8 +252,7 @@ void ResizeBiCubic::resize( float * src, const int _srcW, const int srcH, float 
 	
 	int bufstep = (int) alignsize(dstW, 16);
 
-  std::vector<float> buffer;
-  buffer.resize(bufstep * kSize);
+  vector<float> buffer(bufstep * kSize);
 
 	const float * alpha = (const float *) _alpha;
 	const float* srows[MAX_ESIZE] = {0};
@@ -325,8 +324,7 @@ void ResizeBiCubic::compute( float * _src, const int srcW, const int srcH, float
 	int kSize  = 4;
 	int kSize2 = kSize >> 1;
 
-  std::vector<byte> buffer;
-  buffer.resize(((width + dstH)*(sizeof(int) + sizeof(float) * kSize)));
+  vector<byte> buffer(((width + dstH)*(sizeof(int) + sizeof(float) * kSize)));
 
 	int*   xofs  = (int*) &buffer[0];
 	int*   yofs  = xofs + width;

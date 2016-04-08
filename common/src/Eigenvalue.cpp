@@ -35,6 +35,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include  "Global.H"
 # include <cstdlib>
 # include <iostream>
 # include <iomanip>
@@ -44,8 +45,6 @@
 # include <vector>
 
 # include "Eigenvalue.H"
-
-using namespace std;
 
 
 
@@ -98,8 +97,8 @@ using namespace std;
 //****************************************************************************80
 void Eigenvalue::jacobiEigenvalue ( int n, double*  a, int itMax,double*  v, double*  d, int &itNum, int &rotNum )
 {
-  std::vector<double> bw(n);
-  std::vector<double> zw(n);
+  vector<double> bw(n);
+  vector<double> zw(n);
   double c, g, h;
   double gapq;
   int i, j, p, q;
@@ -401,7 +400,7 @@ void Eigenvalue::r8MatIdentity ( int n, double* a )
 //****************************************************************************80
 double Eigenvalue::r8MatIsEigenRight ( int n, int k,  double* a, double *x, double *lambda )
 {
-  std::vector<double> c(n * k);
+  vector<double> c(n * k);
   
   
   double errorFrobenius;

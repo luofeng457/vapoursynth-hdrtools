@@ -123,16 +123,10 @@ void TransferFunctionNormalize::forward ( Frame* out, const Frame *inp) {
   }
   else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
     if (inp->m_bitDepth == 8) {
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_data[i] = inp->m_data[i];
-      }
+      out->m_data = inp->m_data;
     }
     else{
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_ui16Data[i] = inp->m_ui16Data[i];
-      }
+      out->m_ui16Data = inp->m_ui16Data;
     }
   }
 }
@@ -174,16 +168,10 @@ void TransferFunctionNormalize::inverse ( Frame* out, const Frame *inp) {
   }
   else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
     if (inp->m_bitDepth == 8) {
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_data[i] = inp->m_data[i];
-      }
+      out->m_data = inp->m_data;
     }
-    else{
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_ui16Data[i] = inp->m_ui16Data[i];
-      }
+    else {
+      out->m_ui16Data = inp->m_ui16Data;
     }
   }
 }

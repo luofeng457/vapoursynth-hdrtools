@@ -184,8 +184,8 @@ void HDRVQMFrame::allocateFrameStores(Input *inputFrame, Frame **frameStore)
 //-----------------------------------------------------------------------------
 void HDRVQMFrame::init (ProjectParameters *inputParams)
 {
-  std::vector <int>  width (m_numberOfClips);
-  std::vector <int>  height(m_numberOfClips);
+  vector <int>  width (m_numberOfClips);
+  vector <int>  height(m_numberOfClips);
 
   for (int index = 0; index < m_numberOfClips; index++) {
     // Input frame objects initialization
@@ -311,7 +311,7 @@ void HDRVQMFrame::process( ProjectParameters *inputParams ) {
   int frameNumber;
   int iCurrentFrameToProcess = 0;
 
-  std::vector <Frame *>  currentFrame(m_numberOfClips);
+  vector <Frame *>  currentFrame(m_numberOfClips);
   VQMParams *paramsVQM = &inputParams->m_distortionParameters.m_VQM;
 
   int index;

@@ -118,29 +118,25 @@ InputYUV::InputYUV(IOVideo *inputFile, FrameFormat *format) {
   m_buf  = new uint8 [(int) m_size * format->m_picUnitSizeShift3];
 
   if (format->m_picUnitSizeShift3 > 1) {
-    m_ui16Data = new uint16[(int) m_size];
-    m_ui16Comp[Y_COMP] = m_ui16Data;
+    m_ui16Data.resize((int) m_size);
+    m_ui16Comp[Y_COMP] = &m_ui16Data[0];
     m_ui16Comp[U_COMP] = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
     m_ui16Comp[V_COMP] = m_ui16Comp[U_COMP] + m_compSize[U_COMP];
-    m_data = NULL;
     m_comp[Y_COMP] = NULL;
     m_comp[U_COMP] = NULL;
     m_comp[V_COMP] = NULL;
-    m_floatData = NULL;
     m_floatComp[Y_COMP] = NULL;
     m_floatComp[U_COMP] = NULL;
     m_floatComp[V_COMP] = NULL;
   }
   else {
-    m_ui16Data = NULL;
     m_ui16Comp[Y_COMP] = NULL;
     m_ui16Comp[U_COMP] = NULL;
     m_ui16Comp[V_COMP] = NULL;
-    m_data = new imgpel[(int) m_size];
-    m_comp[Y_COMP] = m_data;
+    m_data.resize((int) m_size);
+    m_comp[Y_COMP] = &m_data[0];
     m_comp[U_COMP] = m_comp[Y_COMP] + m_compSize[Y_COMP];
     m_comp[V_COMP] = m_comp[U_COMP] + m_compSize[U_COMP];
-    m_floatData = NULL;
     m_floatComp[Y_COMP] = NULL;
     m_floatComp[U_COMP] = NULL;
     m_floatComp[V_COMP] = NULL;
@@ -159,32 +155,19 @@ InputYUV::~InputYUV() {
     delete[] m_buf;
     m_buf = NULL;
   }
-  if (m_data != NULL) {
-    m_comp[Y_COMP] = NULL;
-    m_comp[U_COMP] = NULL;
-    m_comp[V_COMP] = NULL;
-    
-    delete [] m_data;
-    m_data = NULL;
-  }
+  m_comp[Y_COMP] = NULL;
+  m_comp[U_COMP] = NULL;
+  m_comp[V_COMP] = NULL;
   
-  if (m_ui16Data != NULL) {
-    m_ui16Comp[Y_COMP] = NULL;
-    m_ui16Comp[U_COMP] = NULL;
-    m_ui16Comp[V_COMP] = NULL;
-
-    delete [] m_ui16Data;
-    m_ui16Data = NULL;
-  }
+  m_ui16Comp[Y_COMP] = NULL;
+  m_ui16Comp[U_COMP] = NULL;
+  m_ui16Comp[V_COMP] = NULL;
   
-  if (m_floatData != NULL) {
-    m_floatComp[Y_COMP] = NULL;
-    m_floatComp[U_COMP] = NULL;
-    m_floatComp[V_COMP] = NULL;
-    
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
+  
+  m_floatComp[Y_COMP] = NULL;
+  m_floatComp[U_COMP] = NULL;
+  m_floatComp[V_COMP] = NULL;
+  
   clear();
 }
 
@@ -337,7 +320,7 @@ int InputYUV::readOneFrame (IOVideo *inputFile, int frameNumber, int fileHeader,
       deInterleave ( &m_buf, &m_iBuf, format, symbolSizeInBytes);
 
     if (m_bitDepthComp[Y_COMP] == 8)
-      imageReformat ( m_buf, m_data, format, symbolSizeInBytes );
+      imageReformat ( m_buf, &m_data[0], format, symbolSizeInBytes );
     else 
       imageReformatUInt16 ( m_buf, format, symbolSizeInBytes );
   }

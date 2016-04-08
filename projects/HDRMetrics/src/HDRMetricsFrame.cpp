@@ -183,8 +183,8 @@ void HDRMetricsFrame::allocateFrameStores(Input *inputFrame, Frame **frameStore)
 //-----------------------------------------------------------------------------
 void HDRMetricsFrame::init (ProjectParameters *inputParams)
 {
-  std::vector <int>  width (m_numberOfClips);
-  std::vector <int>  height(m_numberOfClips);
+  vector <int>  width (m_numberOfClips);
+  vector <int>  height(m_numberOfClips);
   
   for (int index = 0; index < m_numberOfClips; index++) {
     // Input frame objects initialization
@@ -310,7 +310,7 @@ void HDRMetricsFrame::process( ProjectParameters *inputParams ) {
   int frameNumber;
   int iCurrentFrameToProcess = 0;
   //float fDistance0 = inputParams->m_source[0].m_frameRate / inputParams->m_source[1].m_frameRate;
-  std::vector <Frame *>  currentFrame(m_numberOfClips);
+  vector <Frame *>  currentFrame(m_numberOfClips);
   int index;
   
   clock_t clk;  

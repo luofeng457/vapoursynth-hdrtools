@@ -505,7 +505,7 @@ void DistortionMetricVQM::calcLogGabor()
 void DistortionMetricVQM::spatioTemporalPooling()
 {	
   int totalSamples = m_bSize * m_bSize * m_numberOfFramesFixate;
-  std::vector<float> tStdArr(totalSamples);
+  vector<float> tStdArr(totalSamples);
   
   float * frameSubBandError = NULL;
   double tMean = 0.0, tStdSum = 0.0;
@@ -557,7 +557,7 @@ void DistortionMetricVQM::longTermPooling()
   int tSize1 = vqmRound((tSize-1) * m_sortPerc) + 1;
   
   // Add one to avoid problem with the subsequent tMax computation
-  std::vector<float> tArr(tMax + 1);
+  vector<float> tArr(tMax + 1);
 
   memset(&tArr[0], 0, sizeof(float)*(tMax + 1));
   
@@ -603,15 +603,15 @@ void DistortionMetricVQM::initLogGabor()
   
   int i, j, o, s;
 
-  std::vector<float> x        (m_resizeSize);
-  std::vector<float> y        (m_resizeSize);
-  std::vector<float> logRadius(m_resizeSize);
-	std::vector<float> sinTheta (m_resizeSize);
-	std::vector<float> cosTheta (m_resizeSize);
-  std::vector<float> spread   (m_resizeSize);
-  std::vector<float> logGabor (m_resizeSize);
-  std::vector<float> y_y      (m_resizeWidth);
-  std::vector<float> logWaveLength(m_numberOfScale);
+  vector<float> x        (m_resizeSize);
+  vector<float> y        (m_resizeSize);
+  vector<float> logRadius(m_resizeSize);
+	vector<float> sinTheta (m_resizeSize);
+	vector<float> cosTheta (m_resizeSize);
+  vector<float> spread   (m_resizeSize);
+  vector<float> logGabor (m_resizeSize);
+  vector<float> y_y      (m_resizeWidth);
+  vector<float> logWaveLength(m_numberOfScale);
   double ds;
   double dc;
 

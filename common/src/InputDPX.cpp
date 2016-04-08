@@ -78,15 +78,12 @@ InputDPX::InputDPX(IOVideo *videoFile, FrameFormat *format) {
   m_prevSize  = -1;
   
   m_buf       = NULL;
-  m_floatData = NULL;
   
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
   m_floatComp[A_COMP] = NULL;
-  
-  m_ui16Data = NULL;
-  
+    
   m_ui16Comp[Y_COMP] = NULL;
   m_ui16Comp[U_COMP] = NULL;
   m_ui16Comp[V_COMP] = NULL;
@@ -708,23 +705,19 @@ void InputDPX::allocateMemory(DPXFileData * t, FrameFormat *format)
   }
 
   
-  m_data              = NULL;
   m_comp[Y_COMP]      = NULL;
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
   
   if (m_memoryAllocated == FALSE || m_size != m_prevSize) {
-    if (m_memoryAllocated == TRUE)
-      delete [] m_ui16Data;
-    m_ui16Data          = new uint16[(int) m_size];
-    m_ui16Comp[Y_COMP]  = m_ui16Data;
+    m_ui16Data.resize(m_size);
+    m_ui16Comp[Y_COMP]  = &m_ui16Data[0];
     m_ui16Comp[U_COMP]  = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
     m_ui16Comp[V_COMP]  = m_ui16Comp[U_COMP] + m_compSize[U_COMP];
   }
   
   m_prevSize          = m_size;
-  m_ui16Comp[A_COMP]  = NULL;
-  m_floatData         = NULL;
+  m_ui16Comp [A_COMP] = NULL;
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -737,24 +730,14 @@ void InputDPX::allocateMemory(DPXFileData * t, FrameFormat *format)
 
 void InputDPX::freeMemory()
 {
-  if (m_ui16Data != NULL) {
     m_ui16Comp[Y_COMP] = NULL;
     m_ui16Comp[U_COMP] = NULL;
     m_ui16Comp[V_COMP] = NULL;
     m_ui16Comp[A_COMP] = NULL;
-    
-    delete [] m_ui16Data;
-    m_ui16Data = NULL;
-  }
-  if (m_floatData != NULL) {
     m_floatComp[Y_COMP] = NULL;
     m_floatComp[U_COMP] = NULL;
     m_floatComp[V_COMP] = NULL;
     m_floatComp[A_COMP] = NULL;
-    
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
 }
 
 

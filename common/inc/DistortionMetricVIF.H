@@ -210,33 +210,33 @@ private:
   MetricStatistics  m_vifFrameStats; 
   
   void convertOneRowVar            (const double** input, double * output); 
-  void refParamsVecGSM             (std::vector<std::vector<double> > &org,  int* subbands, int M, std::vector<std::vector<int> > &lenWh, int sizeSubBand, std::vector<std::vector<std::vector<double> > >   &ssArr, std::vector<std::vector<double> > &lArr, std::vector<std::vector<std::vector<double> > >   &cuArr);
-  void vifSubEstM                  (std::vector<std::vector<double> >  &org,  std::vector<std::vector<double> >  &dist, int* subbands, int M, std::vector<std::vector<int> > &lenWh,int sizeSubBand, std::vector<std::vector<std::vector<double> > >   &gAll, std::vector<std::vector<std::vector<double> > > &VvAll, std::vector<std::vector<int> > &lenWhGAll); 
+  void refParamsVecGSM             (vector<vector<double> > &org,  int* subbands, int M, vector<vector<int> > &lenWh, int sizeSubBand, vector<vector<vector<double> > >   &ssArr, vector<vector<double> > &lArr, vector<vector<vector<double> > >   &cuArr);
+  void vifSubEstM                  (vector<vector<double> >  &org,  vector<vector<double> >  &dist, int* subbands, int M, vector<vector<int> > &lenWh,int sizeSubBand, vector<vector<vector<double> > >   &gAll, vector<vector<vector<double> > > &VvAll, vector<vector<int> > &lenWhGAll); 
   void multiply                    (double* input1, double* input2, int size, double num,  double* output );
   void difference                  (double* input1, double* input2, int size,   double* output );
-  void mean                        (std::vector<std::vector<double> >  &input, int w, int h, double* mcu);
+  void mean                        (vector<vector<double> >  &input, int w, int h, double* mcu);
   void setCompare                  (double* input, int size, double compVal, double setVal, bool iseq , double* output);
   void addFix                      (double* input, int size, double num, double* output );
   void divFix                      (double* input, int size, double num, double* output );
   void div                         (double* input, double* input2, int size, double* output );
   void setCompareWithOther         (double* compInput, double* setInput, int size, double compVal, bool iseq, double * output );
-  void repmat                      (double* input, int w, int h, std::vector<std::vector<double> >  &output);
-  void differenceVector            (std::vector<std::vector<double> > &input1, std::vector<std::vector<double> >  &input2, int w, int h, std::vector<std::vector<double> >  &output);
-  void vectorMultiplication        (std::vector<std::vector<double> > &input1, int w1, int h1, std::vector<std::vector<double> > &input2, int w2,int h2, std::vector<std::vector<double> > &output);
+  void repmat                      (double* input, int w, int h, vector<vector<double> >  &output);
+  void differenceVector            (vector<vector<double> > &input1, vector<vector<double> >  &input2, int w, int h, vector<vector<double> >  &output);
+  void vectorMultiplication        (vector<vector<double> > &input1, int w1, int h1, vector<vector<double> > &input2, int w2,int h2, vector<vector<double> > &output);
   void vectorMax                   (int* input, int size , int imax);
-  void vectorMultiplicationSameSize(std::vector<std::vector<double> > &input1, int w1, int h1, std::vector<std::vector<double> > &input2, std::vector<std::vector<double> >  &output);
-  void vectorMultiplicationInverse (std::vector<std::vector<double> > &input1, int w1, int h1, std::vector<std::vector<double> > &input2, std::vector<std::vector<double> > &output);
-  void sumSSTempMM                 (std::vector<std::vector<double> > &input1, int w1, int h1, std::vector<std::vector<double> > &input2, double input3, std::vector<std::vector<double> >  &output);
-  double sumSumLog2GGSSLambdaDivVV (std::vector<std::vector<double> > &g, int w1, int h1, std::vector<std::vector<double> >  &ss, double lambda, double eps, std::vector<std::vector<double> >  &vv);
-  double sumSumLog2SSLambdaDivSigma(std::vector<std::vector<double> > &ssg, int w1, int h1,double lambda, double eps);
-  void vectorDivisionSameSize      (std::vector<std::vector<double> > &input1, int w1, int h1, std::vector<std::vector<double> > &input2, double input3, std::vector<std::vector<double> > &output);
-  void vectorMultiplyFixNum        (std::vector<std::vector<double> > &input1, int w1, int h1, double input2,  std::vector<std::vector<double> > &output);
-  void vectorAddFixNum             (std::vector<std::vector<double> > &input1, int w1, int h1, double input2,  std::vector<std::vector<double> > &output);
-  void invertVector                (std::vector<std::vector<double> > &input1, int w, int h, std::vector<std::vector<double> > &output);
-  void reshape                     (std::vector<std::vector<double> > &input, int newW, int newH , std::vector<std::vector<double> >  &s);
+  void vectorMultiplicationSameSize(vector<vector<double> > &input1, int w1, int h1, vector<vector<double> > &input2, vector<vector<double> >  &output);
+  void vectorMultiplicationInverse (vector<vector<double> > &input1, int w1, int h1, vector<vector<double> > &input2, vector<vector<double> > &output);
+  void sumSSTempMM                 (vector<vector<double> > &input1, int w1, int h1, vector<vector<double> > &input2, double input3, vector<vector<double> >  &output);
+  double sumSumLog2GGSSLambdaDivVV (vector<vector<double> > &g, int w1, int h1, vector<vector<double> >  &ss, double lambda, double eps, vector<vector<double> >  &vv);
+  double sumSumLog2SSLambdaDivSigma(vector<vector<double> > &ssg, int w1, int h1,double lambda, double eps);
+  void vectorDivisionSameSize      (vector<vector<double> > &input1, int w1, int h1, vector<vector<double> > &input2, double input3, vector<vector<double> > &output);
+  void vectorMultiplyFixNum        (vector<vector<double> > &input1, int w1, int h1, double input2,  vector<vector<double> > &output);
+  void vectorAddFixNum             (vector<vector<double> > &input1, int w1, int h1, double input2,  vector<vector<double> > &output);
+  void invertVector                (vector<vector<double> > &input1, int w, int h, vector<vector<double> > &output);
+  void reshape                     (vector<vector<double> > &input, int newW, int newH , vector<vector<double> >  &s);
   double SMPTE_ST_2084             (double x, bool Inverse, double MaxLum);
   int maxPyrHt                     (int imsize_w, int imsize_h,int filtsize); 
-  int buildSpyrLevs                (double* lo0, int ht, int w, int h, std::vector<std::vector<double> > &pyr, int max_ht,  int pyrElement, std::vector<std::vector<double> >  &pyr_arr, std::vector<bool> &subbandUsed); 
+  int buildSpyrLevs                (double* lo0, int ht, int w, int h, vector<vector<double> > &pyr, int max_ht,  int pyrElement, vector<vector<double> >  &pyr_arr, vector<bool> &subbandUsed); 
   
 public:
   // Construct/Deconstruct

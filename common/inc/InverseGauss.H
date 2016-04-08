@@ -44,7 +44,7 @@
 #define __InverseGauss_H__
 class InverseGauss{
 public:
-  static void inverseMatrix(std::vector<std::vector<double> > &input, int n, std::vector<std::vector<double> > &output);
+  static void inverseMatrix(vector<vector<double> > &input, int n, vector<vector<double> > &output);
 };
 
 #endif

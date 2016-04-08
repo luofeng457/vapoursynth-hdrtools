@@ -55,6 +55,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <iostream>
 
 #if defined(USEMMX) // MMX, SSE, SSE2 intrinsic support
 #if defined(_MSC_VER) || defined(__INTEL_COMPILER) // ICC
@@ -69,5 +70,6 @@
 #include "TypeDefs.H"
 #include "IFunctions.H"
 
+using namespace std;
 
 #endif

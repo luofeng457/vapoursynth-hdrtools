@@ -66,18 +66,18 @@
 
 class DistortionMetricTFMSSSIM : public DistortionMetric {
 private:
-  std::vector<float> m_dataY0;
-  std::vector<float> m_dataY1;
+  vector<float> m_dataY0;
+  vector<float> m_dataY1;
   int m_memWidth;
   int m_memHeight;
 
-  std::vector<double> m_dsRef;
-  std::vector<double> m_dsEnc;
+  vector<double> m_dsRef;
+  vector<double> m_dsEnc;
   int m_dsWidth;
   int m_dsHeight;
 
-  std::vector<double> m_temp;
-  std::vector<double> m_dest;
+  vector<double> m_temp;
+  vector<double> m_dest;
   int m_tempWidth;
   int m_tempHeight;
   int m_destWidth;

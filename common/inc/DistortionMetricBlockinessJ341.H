@@ -63,11 +63,11 @@ class DistortionMetricBlockinessJ341 : public DistortionMetric {
 private:
   DistortionTransferFunction *m_transferFunction;
 
-  std::vector<double> m_verGrad[2];
-  std::vector<double> m_horGrad[2];
+  vector<double> m_verGrad[2];
+  vector<double> m_horGrad[2];
 
-  std::vector<double> m_sumW[2];
-  std::vector<double> m_sumH[2];
+  vector<double> m_sumW[2];
+  vector<double> m_sumH[2];
   
   int m_memWidth;
   int m_memHeight;

@@ -41,9 +41,9 @@
 //http://www.sanfoundry.com/cpp-program-finds-inverse-graph-matrix/
 //The code is modified for the VIF metric
 
-void InverseGauss::inverseMatrix(std::vector<std::vector<double> > &input, int n, std::vector<std::vector<double> >  &output)
+void InverseGauss::inverseMatrix(vector<vector<double> > &input, int n, vector<vector<double> >  &output)
 {
-  std::vector<std::vector<double> >  a;
+  vector<vector<double> >  a;
   a.resize(2 * n);
   
   for (int i = 0; i < 2 * n;i++) {

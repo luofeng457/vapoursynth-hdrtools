@@ -100,19 +100,19 @@ private:
   MetricStatistics  m_maxPSNRStats[TOTAL_COMPONENTS];
   MetricStatistics  m_minPSNRStats[TOTAL_COMPONENTS];
   
-  std::vector<double> m_diffData;
+  vector<double> m_diffData;
   
-  std::vector<double> m_rgb0NormalData;
-  std::vector<double> m_rgb0TFData;
-  std::vector<double> m_xyz0TFData;
-  std::vector<double> m_ycbcr0TFData;
-  std::vector<double> m_yupvp0Data;
+  vector<double> m_rgb0NormalData;
+  vector<double> m_rgb0TFData;
+  vector<double> m_xyz0TFData;
+  vector<double> m_ycbcr0TFData;
+  vector<double> m_yupvp0Data;
 
-  std::vector<double> m_rgb1NormalData;
-  std::vector<double> m_rgb1TFData;
-  std::vector<double> m_xyz1TFData;
-  std::vector<double> m_ycbcr1TFData;
-  std::vector<double> m_yupvp1Data;
+  vector<double> m_rgb1NormalData;
+  vector<double> m_rgb1TFData;
+  vector<double> m_xyz1TFData;
+  vector<double> m_ycbcr1TFData;
+  vector<double> m_yupvp1Data;
 
   void   convert (Frame* inp, double *rgbNormalData,
                   double *rgbTFData,

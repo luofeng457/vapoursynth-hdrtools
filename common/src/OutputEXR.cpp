@@ -177,9 +177,7 @@ OutputEXR::OutputEXR(IOVideo *outputFile, FrameFormat *format) {
   m_channels = new channelInfo[6]();
   
   m_buf = NULL;
-  
-  m_floatData = NULL;
-  
+    
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -346,16 +344,15 @@ void OutputEXR::allocateMemory(FrameFormat *format)
   else
     m_buf  = new uint8 [(int) m_size * 4];
   
-  m_data              = NULL;
   m_comp[Y_COMP]      = NULL;
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
-  m_ui16Data          = NULL;
   m_ui16Comp[Y_COMP]  = NULL;
   m_ui16Comp[U_COMP]  = NULL;
   m_ui16Comp[V_COMP]  = NULL;
-  m_floatData         = new float[(int) m_size]();
-  m_floatComp[Y_COMP] = m_floatData;
+  
+  m_floatData.resize((int) m_size);
+  m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[U_COMP];
   
@@ -369,14 +366,9 @@ void OutputEXR::freeMemory()
     m_buf = NULL;
   }
   
-  if (m_floatData != NULL) {
-    m_floatComp[Y_COMP] = NULL;
-    m_floatComp[U_COMP] = NULL;
-    m_floatComp[V_COMP] = NULL;
-    
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
+  m_floatComp[Y_COMP] = NULL;
+  m_floatComp[U_COMP] = NULL;
+  m_floatComp[V_COMP] = NULL;
 }
 
 int OutputEXR::writeAttributeAndType( int vfile, char *attributeName, char *attributeType, int attributeSize, char *attributeValue) {

@@ -76,19 +76,19 @@ class DistortionMetricVQM : public DistortionMetric {
 private:
 
 	//Gabor variables
-  std::vector<Complex> m_fftIn0;
-  std::vector<Complex> m_fftIn1;
+  vector<Complex> m_fftIn0;
+  vector<Complex> m_fftIn1;
 
-  std::vector<Complex> m_fftOut0;
-  std::vector<Complex> m_fftOut1;
+  vector<Complex> m_fftOut0;
+  vector<Complex> m_fftOut1;
 
-	std::vector<float>   m_rszIn0;
-	std::vector<float>   m_rszIn1;
+	vector<float>   m_rszIn0;
+	vector<float>   m_rszIn1;
 
-	std::vector< std::vector<float> > m_filters;
-	std::vector< std::vector<float> > m_subBandError;
+	vector< vector<float> > m_filters;
+	vector< vector<float> > m_subBandError;
 	
-	std::vector<float> m_poolError;
+	vector<float> m_poolError;
 
 	float m_maxVideo[2];
 
