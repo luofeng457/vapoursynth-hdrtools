@@ -682,7 +682,7 @@ void InputTIFF::allocateMemory(FrameFormat *format)
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
   if (m_memoryAllocated == FALSE || m_size != m_prevSize) {
-    m_ui16Data.resize(m_size);
+    m_ui16Data.resize((unsigned int) m_size);
     m_ui16Comp[Y_COMP]  = &m_ui16Data[0];
     m_ui16Comp[U_COMP]  = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
     m_ui16Comp[V_COMP]  = m_ui16Comp[U_COMP] + m_compSize[U_COMP];

@@ -618,7 +618,7 @@ void OutputTIFF::allocateMemory(FrameFormat *format)
   m_comp[Y_COMP]      = NULL;
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
-  m_ui16Data.resize((int) m_size);
+  m_ui16Data.resize((unsigned int) m_size);
   m_ui16Comp[Y_COMP]  = &m_ui16Data[0];
   m_ui16Comp[U_COMP]  = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
   m_ui16Comp[V_COMP]  = m_ui16Comp[U_COMP] + m_compSize[U_COMP];

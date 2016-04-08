@@ -270,7 +270,7 @@ void InputEXR::allocateMemory(FrameFormat *format)
   m_ui16Comp[Y_COMP]  = NULL;
   m_ui16Comp[U_COMP]  = NULL;
   m_ui16Comp[V_COMP]  = NULL;
-  m_floatData.resize(m_size);
+  m_floatData.resize((unsigned int) m_size);
   m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[V_COMP];

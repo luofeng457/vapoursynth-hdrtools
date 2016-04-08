@@ -312,8 +312,8 @@ void ColorTransformClosedLoopY::allocateMemory(Frame* out, const Frame *inp) {
   }
   
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
-  m_floatData.resize((int) m_size);
-  if (m_floatData.size() != (int) m_size) {
+  m_floatData.resize((unsigned int) m_size);
+  if (m_floatData.size() != (unsigned int) m_size) {
     fprintf(stderr, "ColorTransformClosedLoopY: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }

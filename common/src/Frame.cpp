@@ -118,8 +118,8 @@ Frame::Frame(int width, int height,  bool isFloat, ColorSpace colorSpace, ColorP
     }
  
   if (m_isFloat) {
-    m_floatData.resize(m_size);
-    if (m_floatData.size() != (int) m_size) {
+    m_floatData.resize((unsigned int) m_size);
+    if (m_floatData.size() != (unsigned int) m_size) {
       fprintf(stderr, "Frame.cpp: Frame(...) Not enough memory to create array m_floatData, of size %d", (int) m_size);
       exit(-1);
     }
@@ -141,8 +141,8 @@ Frame::Frame(int width, int height,  bool isFloat, ColorSpace colorSpace, ColorP
   }
   else {
     if (m_bitDepth == 8) {
-      m_data.resize((int) m_size);
-      if (m_data.size() != (int) m_size) {
+      m_data.resize((unsigned int) m_size);
+      if (m_data.size() != (unsigned int) m_size) {
         fprintf(stderr, "Frame.cpp: Frame(...) Not enough memory to create array m_data, of size %d", (int) m_size);
         exit(-1);
       }
@@ -162,8 +162,8 @@ Frame::Frame(int width, int height,  bool isFloat, ColorSpace colorSpace, ColorP
       m_floatComp[V_COMP] = NULL;
     }
     else {
-      m_ui16Data.resize((int) m_size);
-      if (m_ui16Data.size() != (int) m_size) {
+      m_ui16Data.resize((unsigned int) m_size);
+      if (m_ui16Data.size() != (unsigned int) m_size) {
         fprintf(stderr, "Frame.cpp: Frame(...) Not enough memory to create array m_ui16Data, of size %d", (int) m_size);
         exit(-1);
       }

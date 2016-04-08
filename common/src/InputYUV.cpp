@@ -118,7 +118,7 @@ InputYUV::InputYUV(IOVideo *inputFile, FrameFormat *format) {
   m_buf  = new uint8 [(int) m_size * format->m_picUnitSizeShift3];
 
   if (format->m_picUnitSizeShift3 > 1) {
-    m_ui16Data.resize((int) m_size);
+    m_ui16Data.resize((unsigned int) m_size);
     m_ui16Comp[Y_COMP] = &m_ui16Data[0];
     m_ui16Comp[U_COMP] = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
     m_ui16Comp[V_COMP] = m_ui16Comp[U_COMP] + m_compSize[U_COMP];
@@ -133,7 +133,7 @@ InputYUV::InputYUV(IOVideo *inputFile, FrameFormat *format) {
     m_ui16Comp[Y_COMP] = NULL;
     m_ui16Comp[U_COMP] = NULL;
     m_ui16Comp[V_COMP] = NULL;
-    m_data.resize((int) m_size);
+    m_data.resize((unsigned int) m_size);
     m_comp[Y_COMP] = &m_data[0];
     m_comp[U_COMP] = m_comp[Y_COMP] + m_compSize[Y_COMP];
     m_comp[V_COMP] = m_comp[U_COMP] + m_compSize[U_COMP];
