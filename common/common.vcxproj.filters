@@ -369,16 +369,10 @@
     <ClCompile Include="src\InputDPX.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Convolve.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\DistortionMetricVIF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Eigenvalue.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\InverseGauss.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -776,16 +770,10 @@
     <ClInclude Include="inc\IODPX.H">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inc\Convolve.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="inc\DistortionMetricVIF.H">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\Eigenvalue.H">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\InverseGauss.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

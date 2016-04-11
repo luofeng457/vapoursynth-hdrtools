@@ -124,10 +124,12 @@ OutputYUV::OutputYUV(IOVideo *outputFile, FrameFormat *format) {
   m_size = m_compSize[Y_COMP] + m_compSize[U_COMP] + m_compSize[V_COMP];
 
   if (m_isInterleaved) {
-    m_iBuf  = new uint8 [(int) m_size * m_picUnitSizeShift3];
+    m_iBuffer.resize((unsigned int) m_size * m_picUnitSizeShift3);
+    m_iBuf  = &m_iBuffer[0];
   }
 
-  m_buf  = new uint8 [(int) m_size * m_picUnitSizeShift3];
+  m_buffer.resize((unsigned int) m_size * m_picUnitSizeShift3);
+  m_buf = &m_buffer[0];
 
   if (m_picUnitSizeShift3 > 1) {
     m_ui16Data.resize((unsigned int) m_size);
@@ -157,17 +159,8 @@ OutputYUV::OutputYUV(IOVideo *outputFile, FrameFormat *format) {
 }
 
 OutputYUV::~OutputYUV() {
-  if (m_isInterleaved) {
-    if (m_iBuf != NULL) {
-      delete[] m_iBuf;
-      m_iBuf = NULL;
-    }
-  }
-
-  if (m_buf != NULL) {
-    delete[] m_buf;
-    m_buf = NULL;
-  }
+  m_iBuf = NULL;
+  m_buf = NULL;
   m_comp[Y_COMP] = NULL;
   m_comp[U_COMP] = NULL;
   m_comp[V_COMP] = NULL;

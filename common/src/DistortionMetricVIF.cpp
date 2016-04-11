@@ -58,22 +58,20 @@
 
 #include "DistortionMetricVIF.h"
 #include "math.h"
-#include "Convolve.H"
 #include <vector>
 #include "Eigenvalue.H"
-#include "InverseGauss.H"
 #include <iostream>
 #include <string.h>
 
-//#include "DistortionMetricSigmaCompare.h";
 
 DistortionMetricVIF::DistortionMetricVIF(const FrameFormat *format, VIFParams *vifParams)
 :DistortionMetric()
 {
+  m_blockLength = 3; // M parameter for the block length
+  m_blockSize = m_blockLength * m_blockLength; // M * M;
   m_vifFrame = 0; 
   m_vifFrameStats.reset();
   m_vifYBitDepth = vifParams->m_vifBitDepth;
-  
 }
 
 DistortionMetricVIF::~DistortionMetricVIF()
@@ -81,6 +79,264 @@ DistortionMetricVIF::~DistortionMetricVIF()
 }
 
 // Private functions
+
+/* 
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ ;;;  
+ ;;;  Convolution Functions below were ported from code by Eero Simoncelli
+ ;;;  Description: General convolution code for 2D images
+ ;;;  Original Creation Date: Spring, 1987.
+ ;;;            in the upper-left corner of a filter with odd Y and X dimensions.
+ ;;;  ----------------------------------------------------------------
+ ;;;    Object-Based Vision and Image Understanding System (OBVIUS),
+ ;;;      Copyright 1988, Vision Science Group,  Media Laboratory,  
+ ;;;              Massachusetts Institute of Technology.
+ ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ */
+
+
+/*
+ --------------------------------------------------------------------
+ Correlate FILT with IMAGE, subsampling according to START, STEP, and
+ STOP parameters, with values placed into RESULT array.  RESULT
+ dimensions should be ceil((stop-start)/step).  TEMP should be a
+ pointer to a temporary double array the size of the filter.
+ EDGES is a string specifying how to handle boundaries -- see edges.c.
+ The convolution is done in 9 sections, where the border sections use
+ specially computed edge-handling filters (see edges.c). The origin 
+ of the filter is assumed to be (floor(xFDim/2), floor(yFDim/2)).
+ ------------------------------------------------------------------------ */
+
+/* abstract out the inner product computation */
+void DistortionMetricVIF::INPROD(int XCNR,int YCNR,int xDim, int xFDim, int filtSize, int resPos, double* result,  double* temp, double* image)
+{
+  double sum       = 0.0; 
+  int    imPos     = YCNR * xDim + XCNR;
+  int    filtPos   = 0;
+  int    xFiltStop = xFDim;
+  for (;  xFiltStop <= filtSize; imPos += (xDim - xFDim), xFiltStop += xFDim) {
+    for (; filtPos < xFiltStop; filtPos++, imPos++) {
+      sum+= image[imPos] * temp[filtPos]; 
+    }
+  }
+  result[resPos] = sum;
+}
+
+int DistortionMetricVIF::internalReduce(double* image, int xDim, int yDim, 
+                             const double *filt, double *temp, int xFDim, int yFDim,
+                             int xStart, int xStep, int xStop, 
+                             int yStart, int yStep, int yStop,
+                             double* result)
+{ 
+  int xPos     = xFDim * yFDim;
+  int filtSize = xFDim * yFDim;
+  int yPos, resPos;
+  int yCtrStop = yDim - ((yFDim == 1) ? 0 : yFDim);
+  int xCtrStop = xDim - ((xFDim == 1) ? 0 : xFDim);
+  int xResDim = (xStop - xStart + xStep - 1) / xStep;
+  int xCtrStart = ((xFDim == 1) ? 0 : 1);
+  int yCtrStart = ((yFDim == 1) ? 0 : 1);
+  int xFMid = xFDim / 2;
+  int yFMid = yFDim / 2;
+  int baseResPos;
+  // fptr reflect = edge_function(edges);  /* look up edge-handling function */
+  //  if (!reflect) return(-1);
+  
+  /* shift start/stop coords to filter upper left hand corner */
+  xStart -= xFMid;   
+  yStart -= yFMid;
+  xStop  -= xFMid;   
+  yStop  -= yFMid;
+  
+  if (xStop < xCtrStop) 
+    xCtrStop = xStop;
+  if (yStop < yCtrStop) 
+    yCtrStop = yStop;
+  
+  /* TOP ROWS */
+  for (resPos = 0, yPos = yStart; yPos < yCtrStart; yPos += yStep)  {
+    /* TOP-LEFT CORNER */
+    for (xPos = xStart; xPos < xCtrStart; xPos += xStep, resPos++)    {
+      reflect1(filt, xFDim, yFDim, xPos - 1, yPos - 1, temp, 0);
+      INPROD(0, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
+    }
+    
+    reflect1(filt, xFDim,yFDim,0,yPos-1,temp, 0);
+    
+    /* TOP EDGE */
+    for (; xPos < xCtrStop; xPos += xStep, resPos++) 
+      INPROD(xPos, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
+    
+    /* TOP-RIGHT CORNER */
+    for (;xPos < xStop; xPos += xStep, resPos++) {
+      reflect1(filt, xFDim, yFDim, xPos - xCtrStop + 1, yPos - 1, temp, 0);
+      INPROD(xCtrStop, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
+    }
+  } /* end TOP ROWS */   
+  
+  yCtrStart = yPos;			      /* hold location of top */
+  
+  /* LEFT EDGE */
+  for (baseResPos = resPos, xPos = xStart; xPos < xCtrStart; xPos += xStep, baseResPos++) {
+    reflect1(filt, xFDim, yFDim, xPos - 1, 0, temp, 0);
+    for (yPos = yCtrStart, resPos = baseResPos; yPos < yCtrStop; yPos += yStep, resPos += xResDim)
+      INPROD(0, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
+  }
+  
+  reflect1(filt,xFDim,yFDim,0,0,temp, 0);
+  /* CENTER */
+  for (; xPos < xCtrStop; xPos += xStep, baseResPos++) {
+    for (yPos = yCtrStart, resPos = baseResPos; yPos < yCtrStop; yPos += yStep, resPos += xResDim)
+      INPROD(xPos, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
+  }
+  /* RIGHT EDGE */
+  for (; xPos < xStop; xPos += xStep, baseResPos++)  {
+    reflect1(filt, xFDim, yFDim, xPos - xCtrStop + 1, 0, temp, 0);    
+    for (yPos = yCtrStart, resPos = baseResPos; yPos<yCtrStop; yPos += yStep, resPos += xResDim)
+      INPROD(xCtrStop, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
+  }
+  
+  /* BOTTOM ROWS */
+  for (resPos -= (xResDim - 1); yPos < yStop; yPos += yStep) {
+    /* BOTTOM-LEFT CORNER */
+    for (xPos = xStart; xPos < xCtrStart; xPos+=xStep, resPos++) {
+      reflect1(filt, xFDim, yFDim, xPos - 1, yPos - yCtrStop + 1, temp, 0);
+      INPROD(0, yCtrStop, xDim, xFDim, filtSize, resPos, result,  temp,  image);
+    }
+    
+    reflect1(filt, xFDim, yFDim, 0, yPos - yCtrStop + 1, temp, 0);
+    /* BOTTOM EDGE */
+    for (;xPos < xCtrStop; xPos += xStep, resPos++) 
+      INPROD(xPos, yCtrStop, xDim, xFDim, filtSize, resPos, result, temp, image);
+    
+    /* BOTTOM-RIGHT CORNER */
+    for (; xPos < xStop; xPos += xStep, resPos++) {
+      reflect1(filt, xFDim, yFDim, xPos - xCtrStop + 1, yPos - yCtrStop + 1,temp, 0);
+      INPROD(xCtrStop, yCtrStop, xDim, xFDim, filtSize, resPos, result, temp, image);
+    }
+  } /* end BOTTOM */
+  return(0);
+} /* end of internalReduce */
+
+
+/*
+ --------------------------------------------------------------------
+ Upsample IMAGE according to START,STEP, and STOP parameters and then
+ convolve with FILT, adding values into RESULT array.  IMAGE
+ dimensions should be ceil((stop-start)/step).  See
+ description of internalReduce (above).
+ 
+ WARNING: this subroutine destructively modifies the RESULT array!
+ ------------------------------------------------------------------------ */
+
+/* abstract out the inner product computation */
+
+int DistortionMetricVIF::reflect1( const double * filt,int xDim,int yDim,int xPos,int yPos,double* result,int rOrE)
+{
+  int filtSz = xDim * yDim;
+  int yFilt,xFilt, yRes, xRes;
+  int xBase  = (xPos > 0) ? (xDim - 1):0;
+  int yBase  = xDim * ((yPos > 0) ? (yDim - 1) : 0); 
+  int xOverhang = (xPos > 0) ? (xPos - 1) : ((xPos < 0) ? (xPos + 1) : 0);
+  int yOverhang = xDim * ((yPos > 0) ? (yPos - 1) : ((yPos < 0) ? (yPos + 1) : 0));
+  int i;
+  int mXPos = (xPos < 0) ? (xDim / 2) : ((xDim - 1) / 2);
+  int mYPos = xDim * ((yPos < 0) ? (yDim / 2) : ((yDim - 1) / 2));
+  
+  for (i=0; i<filtSz; i++) 
+    result[i] = 0.0;
+  
+  if (rOrE == 0) {
+    for (yFilt = 0, yRes = yOverhang - yBase; yFilt < filtSz; yFilt += xDim, yRes += xDim) {
+      for (xFilt = yFilt, xRes = xOverhang - xBase; xFilt < yFilt + xDim; xFilt++, xRes++) {
+        result[iAbs(yBase - iAbs(yRes)) + iAbs(xBase - iAbs(xRes))] += filt[xFilt];
+      }
+    }
+  }
+  else {
+    yOverhang = iAbs(yOverhang); 
+    xOverhang = iAbs(xOverhang);
+    for (yRes = yBase, yFilt = yBase - yOverhang; yFilt > yBase - filtSz; yFilt -= xDim, yRes -= xDim)    {
+      for (xRes = xBase, xFilt = xBase - xOverhang; xFilt > xBase - xDim; xRes--, xFilt--)
+        result[iAbs(yRes) + iAbs(xRes)] += filt[iAbs(yFilt) + iAbs(xFilt)];
+      
+      if ((xOverhang != mXPos) && (xPos != 0)) {
+        for (xRes = xBase, xFilt = xBase - 2 * mXPos + xOverhang; xFilt > xBase - xDim; xRes--, xFilt--)
+          result[iAbs(yRes) + iAbs(xRes)] += filt[iAbs(yFilt) + iAbs(xFilt)];
+      }
+    }
+    if ((yOverhang != mYPos) && (yPos != 0)) {
+      for (yRes = yBase, yFilt = yBase - 2 * mYPos + yOverhang; yFilt > yBase - filtSz; yFilt -= xDim, yRes -= xDim)  {
+        for (xRes = xBase, xFilt = xBase - xOverhang; xFilt > xBase - xDim; xRes--, xFilt--)
+          result[iAbs(yRes) + iAbs(xRes)] += filt[iAbs(yFilt) + iAbs(xFilt)];
+        
+        if  ((xOverhang != mXPos) && (xPos != 0)) {
+          for (xRes=xBase, xFilt = xBase - 2 * mXPos + xOverhang; xFilt > xBase - xDim; xRes--, xFilt--)
+            result[iAbs(yRes) + iAbs(xRes)] += filt[iAbs(yFilt) + iAbs(xFilt)];
+        }
+      }
+    }
+  }
+  return(0);
+  
+}
+
+
+// http://www.sanfoundry.com/cpp-program-finds-inverse-graph-matrix/
+// The code is modified for the VIF metric
+void DistortionMetricVIF::inverseMatrix(vector<vector<double> > &input, int n, vector<vector<double> >  &output)
+{
+  vector<vector<double> >  a;
+  a.resize(2 * n);
+  
+  for (int i = 0; i < 2 * n;i++) {
+    a[i].resize(2 * n);
+    for(int j = 0; j < 2 * n;j++) {
+      if(j > n - 1 || i > n - 1)
+        a[i][j] = 0;
+      else if(i < n && j < n)
+        a[i][j] = input[i][j];
+    }
+  }
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j <  2*n; j++) {
+      if (j == (i + n)) {
+        a[i][j] = 1;
+      }
+    }
+  }
+  
+  for (int i = n-1; i > 0; i--)
+  {
+    if (a[i-1][1] < a[i][1]) {
+      for(int j = 0; j < n * 2; j++) {
+        swap(&a[i][j], &a[i - 1][j]);
+      }
+    }
+  }
+  
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n * 2; j++) {
+      if (j != i) {
+        double d = a[j][i] / a[i][i];
+        for (int k =0 ; k < n * 2; k++) {
+          a[j][k] -= (a[i][k] * d);
+        }
+      }
+    }
+  }
+  
+  for (int i = 0; i < n; i++)  {
+    double d = a[i][i];
+    for (int j = 0; j < n * 2; j++) {
+      a[i][j] /= d;
+      if (j > n - 1) {
+        output[i][j - n] = a[i][j];
+      }
+    }
+  }
+}
+
 
 //compute mean of a matrix
 void DistortionMetricVIF::mean (vector<vector<double> >  &input, int w, int h, double* mcu)
@@ -284,10 +540,11 @@ void DistortionMetricVIF::vectorMultiplicationSameSize(vector<vector<double> >  
 
 double DistortionMetricVIF::sumSumLog2GGSSLambdaDivVV(vector<vector<double> >  &g, int w1, int h1, vector<vector<double> >  &ss, double lambda, double eps, vector<vector<double> >  &vv)
 {
+  static const double iLn2 = 1.0 / log(2.0);
   double sum=0.0;
   for (int i = 0;i < w1; i++) {
     for (int j = 0; j < h1; j++) {
-      sum+= log(1.0 + g[i][j] * g[i][j] * ss[i][j] * lambda / (vv[i][j] + eps))/log(2.0);
+      sum+= log(1.0 + g[i][j] * g[i][j] * ss[i][j] * lambda / (vv[i][j] + eps)) * iLn2;
     }
   }
   return sum;
@@ -300,7 +557,7 @@ double DistortionMetricVIF::sumSumLog2SSLambdaDivSigma(vector<vector<double> > &
   double sum = 0.0;
   for (int i = 0 ;i < w1; i++) {
     for (int j = 0; j < h1; j++) {
-      sum+= log(1.0 + ss[i][j] * lambda/(eps))/log(2.0);  //reference image information
+      sum += log(1.0 + ss[i][j] * lambda/(eps))/log(2.0);  //reference image information
     }
   }
   return sum;
@@ -313,7 +570,7 @@ void DistortionMetricVIF::sumSSTempMM(vector<vector<double> >  &input1, int w1, 
   for (int j = 0; j < h1; j++)	{
     double sum = 0.0;
     for (int i = 0;i < w1; i++)	{
-      sum+=(input1[i][j] * input2[i][j]) / input3;
+      sum += (input1[i][j] * input2[i][j]) / input3;
     }
     output[0][j]=sum;
   }
@@ -441,6 +698,7 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
                                            ) 
 {
   Eigenvalue eg1;
+  int MxM = M * M;
   
   for (int subi=0;subi<sizeSubBand;subi++)	{
     int   sub = subbands[subi];
@@ -461,7 +719,7 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     //Collect MxM blocks. Rearrange each block into an
     //M^2 dimensional vector and collect all such vectors.
     //Collece ALL possible MXM blocks (even those overlapping) from the subband
-    vector<vector<double> > temp(M * M);
+    vector<vector<double> > temp(MxM);
     int count=0;
     int sizeTempH=0;
     
@@ -483,19 +741,19 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     int totalSize= (newSizeYWidth - (M - 1)) * (newSizeYHeight - (M - 1));
     
     //estimate mean 
-    vector<double> mcu(M * M);
-    mean(temp, M * M, totalSize, &mcu[0]);
+    vector<double> mcu(MxM);
+    mean(temp, MxM, totalSize, &mcu[0]);
     
     //estimate covariance
-    vector<vector<double> > cu1 (M * M);
-    vector<vector<double> > cu2 (M * M);
-    vector<vector<double> > rep1(M * M);
+    vector<vector<double> > cu1 (MxM);
+    vector<vector<double> > cu2 (MxM);
+    vector<vector<double> > rep1(MxM);
     
-    repmat(&mcu[0], M * M, sizeTempH, rep1);
-    differenceVector(temp, rep1, M * M, sizeTempH, cu1);
-    vectorMultiplicationInverse (cu1, M * M, sizeTempH, cu1, cu2);
-    for (int ii = 0; ii < M * M; ii++)	{
-      for (int jj = 0;jj < M * M; jj++) {
+    repmat(&mcu[0], MxM, sizeTempH, rep1);
+    differenceVector(temp, rep1, MxM, sizeTempH, cu1);
+    vectorMultiplicationInverse (cu1, MxM, sizeTempH, cu1, cu2);
+    for (int ii = 0; ii < MxM; ii++)	{
+      for (int jj = 0;jj < MxM; jj++) {
         cuArr[sub] [ii][jj]=(cu2[ii][jj]/sizeTempH); //% covariance matrix for U
       }
     }
@@ -503,7 +761,7 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     //================================
     //Collect MxM blocks as above. Use ONLY non-overlapping blocks to
     //calculate the S field
-    vector<vector<double> > temp1(M * M);
+    vector<vector<double> > temp1(MxM);
     
     count = 0;
     int temp1Size = 0;
@@ -522,33 +780,33 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     }
     
     //Calculate the S field
-    vector<vector<double> > inCuCo(M * M);    
+    vector<vector<double> > inCuCo(MxM);    
     
-    for (int i = 0; i < M * M;i++)	{
-      inCuCo[i].resize(M * M); 
+    for (int i = 0; i < MxM;i++)	{
+      inCuCo[i].resize(MxM); 
     }
-    InverseGauss::inverseMatrix(cuArr[sub], M * M, inCuCo);
+    inverseMatrix(cuArr[sub], MxM, inCuCo);
     
-    vector<vector<double> > ss1(M * M);
-    vectorMultiplication(inCuCo, M * M, M * M, temp1, M * M, temp1Size, ss1);
+    vector<vector<double> > ss1(MxM);
+    vectorMultiplication(inCuCo, MxM, MxM, temp1, MxM, temp1Size, ss1);
     vector<vector<double> >  ss4(1);
     
-    sumSSTempMM (ss1, M * M, temp1Size, temp1, M * M, ss4);
+    sumSSTempMM (ss1, MxM, temp1Size, temp1, MxM, ss4);
     reshape(ss4,(int)(newSizeYWidth / (double) M), (int)(newSizeYHeight / (double) M), ssArr[sub]);
     
     //==========================
     //Eigen-decomposition
-    vector<double> a(M * M * M * M);
+    vector<double> a(MxM * MxM);
     
     int k=0;
-    for (int i = 0; i < M * M; i++)	{
-      for (int j = 0;j < M * M; j++)	{
+    for (int i = 0; i < MxM; i++)	{
+      for (int j = 0;j < MxM; j++)	{
         a[k++] = (cuArr[sub][i][j]);
       }
     }
-    int n = M * M;
+    int n = MxM;
     
-    vector<double> v(M * M * M * M);
+    vector<double> v(MxM * MxM);
     
     int itMax = 100;
     int rotNum;
@@ -619,17 +877,8 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     vector<double> meanY((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
     vector<double> temp  (newSizeYWidth * newSizeYHeight);
     
-    Convolve::internalReduce(&yMM[0], newSizeYWidth,  newSizeYHeight, 
-                             &winNormal[0], &temp[0],  winSize,  winSize,
-                             winStartX,  winStepX,  winStopX, 
-                             winStartY, winStepY,  winStopY,
-                             &meanX[0]); 
-    
-    Convolve::internalReduce(&ynMM[0], newSizeYWidth,  newSizeYHeight, 
-                             &winNormal[0], &temp[0],  winSize,  winSize,
-                             winStartX,  winStepX,  winStopX, 
-                             winStartY, winStepY,  winStopY,
-                             &meanY[0]); 
+    internalReduce(&yMM[0],  newSizeYWidth, newSizeYHeight, &winNormal[0], &temp[0], winSize, winSize, winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &meanX[0]);    
+    internalReduce(&ynMM[0], newSizeYWidth, newSizeYHeight, &winNormal[0], &temp[0], winSize, winSize, winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &meanY[0]); 
     
     //cov
     vector<double> yMMYnMM(newSizeYWidth * newSizeYHeight);
@@ -642,11 +891,8 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     
     multiply (&meanX[0], &meanY[0], (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M) , winSize * winSize, &covXY2[0]);    
     
-    Convolve::internalReduce(&yMMYnMM[0], newSizeYWidth,  newSizeYHeight, 
-                             &win[0], &temp[0],  winSize,  winSize,
-                             winStartX,  winStepX,  winStopX, 
-                             winStartY, winStepY,  winStopY,
-                             &covXY1[0]); 
+    internalReduce(&yMMYnMM[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0], winSize, winSize, winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &covXY1[0]); 
+    
     difference (&covXY1[0],&covXY2[0], (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M), &covXY[0]);    
     //varx
     vector<double> SsX1((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
@@ -655,7 +901,8 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     vector<double> yMM_2(newSizeYWidth * newSizeYHeight);
     
     multiply (&yMM[0], &yMM[0], newSizeYWidth * newSizeYHeight ,1.0, &yMM_2[0]);
-    Convolve::internalReduce(&yMM_2[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0], winSize, winSize,	winStartX,  winStepX,  winStopX, winStartY, winStepY,  winStopY, &SsX1[0]); 
+    internalReduce(&yMM_2[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0], winSize, winSize,	winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &SsX1[0]); 
+    
     multiply (&meanX[0], &meanX[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), winSize * winSize,  &SsX2[0]);
     difference (&SsX1[0], &SsX2[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), &SsX[0]);
     
@@ -667,7 +914,8 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     
     multiply (&ynMM[0], &ynMM[0], newSizeYWidth * newSizeYHeight, 1.0, &ynMM2[0]);
     
-    Convolve::internalReduce(&ynMM2[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0],  winSize,  winSize, winStartX,  winStepX,  winStopX, winStartY, winStepY,  winStopY, &SsY1[0]); 
+    internalReduce(&ynMM2[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0],  winSize,  winSize, winStartX,  winStepX,  winStopX, winStartY, winStepY, winStopY, &SsY1[0]); 
+    
     multiply (&meanY[0], &meanY[0],  (int) (newSizeYWidth/(double) M * newSizeYHeight / (double) M), winSize * winSize,  &SsY2[0] );
     difference (&SsY1[0], &SsY2[0],  (int) (newSizeYWidth/(double) M * newSizeYHeight / (double) M), &SsY[0]);
     
@@ -718,125 +966,94 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
 }
 
 
-//Construct a steerable pyramid on matrix IM.  Convolutions are
-//done with spatial filters.
-int DistortionMetricVIF::buildSpyrLevs(double* lo0, int ht, int w, int h, vector<vector<double> > &pyr, int max_ht, int pyrElement, vector<vector<double> >  &pyr_arr, vector<bool> &subbandUsed)
+//Construct a steerable pyramid on matrix IM.  Convolutions are performed using spatial filters.
+int DistortionMetricVIF::buildSteerablePyramidLevels(double* lo0, 
+                                                     int ht, 
+                                                     int width, 
+                                                     int height, 
+                                                     vector<vector<double> > &pyr, 
+                                                     int max_ht, 
+                                                     int pyrElement, 
+                                                     vector<vector<double> >  &pyrArr, 
+                                                     vector<bool> &subbandUsed)
 {
-  
-  //variables names were chosen similar to the Matlab code
-  int bfiltsz   = 0;
-  int bFiltsZ2  = sizeof(bfilts) / sizeof(*bfilts); 
-  int bfiltsz_1 = sizeof(*bfilts)/ sizeof(double);
-  bfiltsz       = (int) sqrt ((double) bfiltsz_1);
-  /*
-   double *bands =  new double[ w * h * bFiltsZ2 ];
-   double *band  =  new double[ w * h ];
-   double *bind  =  new double[ 2+bFiltsZ2 * 2];  
-   double *temp  =  new double[ w * h ];
-   int w_lo= ceil(w/2.0); int h_lo=ceil(h/2.0);
-   double *lo  =  new double[ w_lo * h_lo ];
-   double* bfilts_one_row=new double [bfiltsz*bfiltsz];
-   vector<vector<double> >  bfilts_reshaped;
-   bfilts_reshaped =new double * [bfiltsz];
-   */
-  int w_lo = (int) ceil(w / 2.0); 
-  int h_lo = (int) ceil(h / 2.0);
+  int bFiltsZ  = 0;
+  int bFiltsZ2 = sizeof(bfilts)  / sizeof(*bfilts); 
+  int bFiltsZ1 = sizeof(*bfilts) / sizeof(double);
+  bFiltsZ      = (int) sqrt ((double) bFiltsZ1);
+
+  int widthHalf  = (width  + 1) >> 1; 
+  int heightHalf = (height + 1) >> 1;
   
   vector<double>  bands;
   vector<double>  band;
   vector<double>  bind;
   vector<double>  temp;
   vector<double>  lo;
-  vector<double> bfilts_one_row;
-  vector<vector <double> > bfilts_reshaped;
+  vector<double>  bFiltsOneRow;
   
-  bands.resize( w * h * bFiltsZ2 );
-  band.resize( w * h );
-  bind.resize( 2+bFiltsZ2 * 2);  
-  temp.resize( w * h );
-  lo.resize( w_lo * h_lo );
-  bfilts_one_row.resize(bfiltsz * bfiltsz);
-  bfilts_reshaped.resize(bfiltsz);
-  
-  for (int i=0;i<bfiltsz; i++)	{
-    bfilts_reshaped [i].resize(bfiltsz);
-  }
-  
+  bands.resize( width * height * bFiltsZ2 );
+  band.resize ( width * height );
+  bind.resize ( 2 + bFiltsZ2 * 2);  
+  temp.resize ( width * height );
+  lo.resize   ( widthHalf * heightHalf );
+  bFiltsOneRow.resize  (bFiltsZ * bFiltsZ);
+    
   if (ht <=0)	{
-    if (subbandUsed[pyrElement]==TRUE)		{
-      int k1=0;
-      for (int j = 0; j < h; j++)
-        for (int i = 0; i < w ; i++)				{
-          pyr_arr[pyrElement][k1] = lo0[(i + j * w)]; 
-          k1++;
-        }
+    if (subbandUsed[pyrElement] == TRUE)		{
+      for (int i = 0; i < width * height; i++) {
+        pyrArr[pyrElement][i] = lo0 [i]; 
+      }
     }
   }
-  else
-  {			
-    for ( int b = 0; b < bFiltsZ2; b ++ )		{
-      int k = 0;
-      
-      for (int i = 0; i < bfiltsz  ; i ++)			{
-        for (int j =0; j < bfiltsz ; j ++)				{
-          //reshape the filter into matrice
-          bfilts_reshaped[j][i] = bfilts [b][k];
-          bfilts_one_row[i+j*bfiltsz]=	bfilts_reshaped[j][i] ;
+  else {			
+    for (int b = 0; b < bFiltsZ2; b ++ )		{     
+      for (int k = 0, i = 0; i < bFiltsZ  ; i ++) {
+        for (int j = i; j < i + bFiltsZ * bFiltsZ ; j += bFiltsZ) {
+          //reshape the filter
+          bFiltsOneRow  [j] = bfilts[b][k];
           k++;
         }
       }
       
-      Convolve::internalReduce(lo0, w,  h, &bfilts_one_row[0], &temp[0],  bfiltsz,  bfiltsz, 	0,  1,  w, 0,  1,  h,	&band[0]);
+      internalReduce(lo0, width, height, &bFiltsOneRow[0], &temp[0],  bFiltsZ,  bFiltsZ, 0, 1, width, 0,  1, height,	&band[0]);
       
-      if (subbandUsed [pyrElement]==TRUE)
-      {
-        int k1=0;
-        for (int j = 0; j < h; j++)
-          for (int i = 0; i < w ; i++)
-          {
-            pyr_arr[pyrElement][k1] = band [(i + j * w)]; 
-            k1++;
-          }
+      if (subbandUsed [pyrElement]==TRUE) {
+        for (int i = 0; i < width * height; i++) {
+          pyrArr[pyrElement][i] = band [i]; 
+        }
       }
       pyrElement--;
       
-      for (int i = 0; i < 2 ; i++)
-        if ( i == 0)
-          bind[ i + b * 2] = w;
-        else
-          bind[ i + b * 2] = h;
+      bind[ b * 2    ] = width;
+      bind[ b * 2 + 1] = height;
     }
     
-    int lioFiltSize= sizeof(lofilt) / sizeof(*lofilt);
-    vector<double>  loFiltOneRow;
-    loFiltOneRow.resize( lioFiltSize * lioFiltSize);
-    for (int i = 0; i <  lioFiltSize ; i ++)
-    {
-      for (int j =0; j < lioFiltSize ; j ++)
-      {
-        //reshape the filter into matrice
-        loFiltOneRow[j+i* lioFiltSize]=	lofilt[j][i] ;
+    int lioFiltSize = sizeof(lofilt) / sizeof(*lofilt);
+    vector<double>  loFiltOneRow( lioFiltSize * lioFiltSize);
+    
+    for (int i = 0; i < lioFiltSize ; i ++) {
+      for (int j = 0; j < lioFiltSize ; j ++) {
+        //reshape the filter
+        loFiltOneRow[j + i * lioFiltSize]=	lofilt[j][i] ;
       }
     }
     
-    Convolve::internalReduce(lo0, w,  h, &loFiltOneRow[0], &temp[0],  lioFiltSize,  lioFiltSize, 0,  2,  w, 0,  2,  h, &lo[0]);
-    
-    buildSpyrLevs(&lo[0], ht - 1, (w + 1) >> 1, (h + 1) >> 1, pyr, max_ht, pyrElement, pyr_arr, subbandUsed);
-    
+    internalReduce(lo0, width,  height, &loFiltOneRow[0], &temp[0],  lioFiltSize,  lioFiltSize, 0,  2, width, 0,  2,  height, &lo[0]);    
+    buildSteerablePyramidLevels(&lo[0], ht - 1, widthHalf, heightHalf, pyr, max_ht, pyrElement, pyrArr, subbandUsed);
   }
   
   return(0);
 }
 
-int DistortionMetricVIF::maxPyrHt(int imSizeW, int imSizeH,int filtsize)
+int DistortionMetricVIF::maxPyrHt(int imSizeW, int imSizeH, int filtsize)
 {
   int height = 0;
-  if (imSizeW < filtsize || imSizeH <filtsize) {
+  if (imSizeW < filtsize || imSizeH < filtsize) {
     height = 0;
   }
   else  {
     height = 1 + maxPyrHt(imSizeW >> 1, imSizeH >> 1, filtsize); 
-    //height = 1 + maxPyrHt(int(imSizeW/2), int(imSizeH/2), filtsize);
   }
   return (height);
 }
@@ -853,31 +1070,31 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
 {
   
   double sigma_nsq=0.4;
-  int M = 3;
   //int subbands []={4 ,7, 10, 13, 16, 19, 22, 25}; //Matlab Subbands
 #if spFilters5
-  int subbands []={3 ,6, 9, 12, 15, 18, 21, 24}; //C++ sub bands
+  int subbands [] = {3 ,6, 9, 12, 15, 18, 21, 24}; //C++ sub bands
 #else
-  int subbands []={3 ,6, 9, 12, 15}; //C++ sub bands for sp1filter
+  int subbands [] = {3 ,6, 9, 12, 15}; //C++ sub bands for sp1filter
 #endif
   
   int sizeSubBand = sizeof(subbands )/sizeof(*subbands );
-  int pYrSize = maxPyrHt(inp0->m_width[Y_COMP],inp0->m_height[Y_COMP],  sizeof(lo0filt) / sizeof(*lo0filt)   )-1;
-  vector<double>  image_org (inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP]); 
-  vector<double>  image_dist(inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP]);
+  int pYrSize = maxPyrHt(inp0->m_width[Y_COMP], inp0->m_height[Y_COMP],  sizeof(lo0filt) / sizeof(*lo0filt)   )-1;
+
+  m_image0.resize(inp0->m_compSize[Y_COMP]); 
+  m_image1.resize(inp1->m_compSize[Y_COMP]);
   
   //compute the non-constant luminace for each frames	
-  for (int i=0;i<inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP];i++) {
-    image_org[i]=   rgbPQYuv ( (double)inp0->m_floatComp[0][i], (double)inp0->m_floatComp[1][i],(double)inp0->m_floatComp[2][i], m_vifYBitDepth, inp0->m_colorPrimaries);
-    image_dist[i]=  rgbPQYuv ( (double)inp1->m_floatComp[0][i], (double)inp1->m_floatComp[1][i],(double)inp1->m_floatComp[2][i], m_vifYBitDepth, inp1->m_colorPrimaries);
+  for (int i = 0; i < inp0->m_compSize[Y_COMP]; i++) {
+    m_image0[i]= rgbPQYuv ( (double)inp0->m_floatComp[0][i], (double)inp0->m_floatComp[1][i],(double)inp0->m_floatComp[2][i], m_vifYBitDepth, inp0->m_colorPrimaries);
+    m_image1[i]= rgbPQYuv ( (double)inp1->m_floatComp[0][i], (double)inp1->m_floatComp[1][i],(double)inp1->m_floatComp[2][i], m_vifYBitDepth, inp1->m_colorPrimaries);
   }
   
   
   //variables names were chosen similar to the Matlab code
-  vector<double> hi0     (inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP]);
-  vector<double> lo0_org (inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP]);
-  vector<double> lo0_dist(inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP]);
-  vector<double> temp    (inp0->m_height[Y_COMP] * inp0->m_width[Y_COMP]);
+  m_hi0.resize    (inp0->m_compSize[Y_COMP]);
+  m_lo0Img0.resize(inp0->m_compSize[Y_COMP]);
+  m_lo0Img1.resize(inp1->m_compSize[Y_COMP]);
+  m_temp.resize   (inp0->m_compSize[Y_COMP]);
   
   int xFDimHi0 = sizeof(hi0filt) / sizeof(*hi0filt);
   int yFDimHi0 = xFDimHi0;
@@ -892,158 +1109,149 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   int xDim   = inp0->m_width [Y_COMP];
   int yDim   = inp0->m_height[Y_COMP];
   int li0FiltSize = sizeof(lo0filt) / sizeof(*lo0filt);
-  int bFiltsZ2    = sizeof(bfilts)  / sizeof(*bfilts); 
-  vector<vector<int> > lenWh(pYrSize * bFiltsZ2 + 2);
-  
-  for (int i=0;i<pYrSize*bFiltsZ2+2;i++)
+  int bFiltsZ2    = sizeof(bfilts)  / sizeof(*bfilts);
+  int subbandsNum = pYrSize * bFiltsZ2 + 2;
+  vector<vector<double> > pyrImg0(pYrSize + 1);
+  vector<vector<double> > pyrImg1(pYrSize + 1);
+  vector<vector<double> > pyrImg0Arr (subbandsNum);
+  vector<vector<double> > pyrImg1Arr (subbandsNum);  
+  vector<double>          lo0FiltOneRow(li0FiltSize * li0FiltSize);
+  vector<double>          hi0FiltOneRow(xFDimHi0 * xFDimHi0);
+  vector<vector<int> >    lenWh(subbandsNum);
+  vector<bool>            subbandUsed(subbandsNum);
+
+  for (int i = 0;i < subbandsNum;i++)
     lenWh[i].resize(2);
   
-  vector<vector<double> > pyrOrgArr (pYrSize * bFiltsZ2 + 2);
-  vector<vector<double> > pyrDistArr(pYrSize * bFiltsZ2 + 2);
-  vector<bool> subbandUsed(pYrSize * bFiltsZ2 + 2);
-  
-  for (int i=0;i<pYrSize*bFiltsZ2+2;i++)	{
-    subbandUsed [i]=FALSE;
+  for (int i = 0; i < subbandsNum;i++)	{
+    subbandUsed[i] = FALSE;
   }
   
-  for (int i=0;i<sizeSubBand;i++)	{
-    subbandUsed[subbands[i]]=TRUE;
+  for (int i = 0; i < sizeSubBand;i++)	{
+    subbandUsed[subbands[i]] = TRUE;
   }
   
-  int elementPyrOrg  = pYrSize * bFiltsZ2 + 2 - 1;
-  int elementPyrDist = pYrSize * bFiltsZ2 + 2 - 1;
+  int elementPyrImg0  = subbandsNum - 1;
+  int elementPyrImg1 = subbandsNum - 1;
   
+  int k1 = elementPyrImg0;
   
-  lenWh[elementPyrOrg][0] = xStop;  
-  lenWh[elementPyrOrg][1] = yStop;
-  int k1=elementPyrOrg;
+  lenWh[k1  ][0] = xStop;  
+  lenWh[k1--][1] = yStop;
   
   for (int i = 0; i < pYrSize; i++)	{
-    for (int j = 0; j < bFiltsZ2; j++)		{
-      k1--;
-      lenWh [k1][0] = iShiftRightRound(xStop, i); //ceil(xStop / pow(2.0, (double) i));
-      lenWh [k1][1] = iShiftRightRound(yStop, i); //ceil(yStop / pow(2.0, (double) i));
+    int xLen = iRightShiftRound(xStop, i);
+    int yLen = iRightShiftRound(yStop, i);
+    for (int j = 0; j < bFiltsZ2; j++) {
+      lenWh [k1][0] = xLen;
+      lenWh [k1--][1] = yLen;
     }
   }
-  lenWh [k1 - 1][0] = iShiftRightRound(xStop, pYrSize); // ceil(xStop / pow(2.0, pYrSize));
-  lenWh [k1 - 1][1] = iShiftRightRound(yStop, pYrSize); // ceil(yStop / pow(2.0, pYrSize));
+  lenWh [k1][0] = iRightShiftRound(xStop, pYrSize); 
+  lenWh [k1][1] = iRightShiftRound(yStop, pYrSize);
   
   
-  k1=elementPyrOrg;
-  for (int i = 0; i < pYrSize * bFiltsZ2 + 2;i++)  {
-    if (subbandUsed[k1]==TRUE)   {
-      pyrOrgArr[k1].resize (lenWh[k1][0] * lenWh[k1][1]);
-      pyrDistArr[k1].resize(lenWh[k1][0] * lenWh[k1][1]);
+  k1 = elementPyrImg0;
+  for (int i = 0; i < subbandsNum;i++)  {
+    if (subbandUsed[k1] == TRUE)   {
+      pyrImg0Arr[k1].resize(lenWh[k1][0] * lenWh[k1][1]);
+      pyrImg1Arr[k1].resize(lenWh[k1][0] * lenWh[k1][1]);
     }
-    else {
-      pyrOrgArr[k1].resize (1);
-      pyrDistArr[k1].resize(1);
-      
-    }
+    //else {
+    //pyrImg0Arr[k1].resize (1);
+    //pyrImg1Arr[k1].resize(1);
+    //}
     k1--;
   }
   
-  vector<vector<double> > pyrOrg (pYrSize + 1);
-  vector<vector<double> > pyrDist(pYrSize + 1);
   
-  vector<double> lo0FiltOneRow(li0FiltSize * li0FiltSize);
-  vector<double> hi0FiltOneRow(xFDimHi0 * xFDimHi0);
-  
-  for (int i = 0; i <  li0FiltSize ; i ++) {
+  for (int i = 0; i < li0FiltSize ; i ++) {
     for (int j = 0; j < li0FiltSize ; j ++) {
       //reshape the filter into matrice
       lo0FiltOneRow[j + i * li0FiltSize]=	lo0filt[j][i] ;
     }
   }
   
-  for (int i = 0; i <  xFDimHi0 ; i ++)	{
-    for (int j = 0; j <  yFDimHi0 ; j ++) {
-      hi0FiltOneRow[j + i *  xFDimHi0]=	hi0filt[j][i] ;
+  for (int i = 0; i < xFDimHi0 ; i ++)	{
+    for (int j = 0; j < yFDimHi0 ; j ++) {
+      hi0FiltOneRow[j + i * xFDimHi0]=	hi0filt[j][i] ;
     }
   }
   
   // Do wavelet decomposition. This requires the Steerable Pyramid. You can
   // use your own wavelet as long as the cell arrays org and dist contain
-  //corresponding subbands from the reference and the distorted images respectively.
-  //for orginal
-  if (subbandUsed[elementPyrOrg]) {
-    Convolve::internalReduce(&image_org[0], xDim,  yDim, &hi0FiltOneRow[0], &temp[0],  xFDimHi0,  yFDimHi0,	xStart,  xStep,  xStop, yStart,  yStep,  yStop,	&pyrOrgArr[elementPyrOrg][0]); //hio0
+  // corresponding subbands from the reference and the distorted images respectively.
+  // for the original !/ AMT: Note that there should be no notion of original vs distorted. 
+  if (subbandUsed[elementPyrImg0]) {
+    internalReduce(&m_image0[0], xDim, yDim, &hi0FiltOneRow[0], &m_temp[0],  xFDimHi0,  yFDimHi0,	xStart,  xStep,  xStop, yStart,  yStep,  yStop,	&pyrImg0Arr[elementPyrImg0][0]); //hio0
   }
   
-  Convolve::internalReduce(&image_org[0], xDim,  yDim, &lo0FiltOneRow[0], &temp[0],  xFDimLo0,  y_fdim_lo0,	xStart,  xStep,  xStop, yStart,  yStep,  yStop,	&lo0_org[0]);
+  internalReduce(&m_image0[0], xDim,  yDim, &lo0FiltOneRow[0], &m_temp[0],  xFDimLo0,  y_fdim_lo0,xStart,  xStep,  xStop, yStart,  yStep,  yStop,	&m_lo0Img0[0]);
   
-  elementPyrOrg--;
-  buildSpyrLevs(&lo0_org[0], pYrSize, inp0->m_width[Y_COMP],inp0->m_height[Y_COMP], pyrOrg, pYrSize,  elementPyrOrg, pyrOrgArr, subbandUsed);
+  elementPyrImg0--;
+  buildSteerablePyramidLevels(&m_lo0Img0[0], pYrSize, inp0->m_width[Y_COMP],inp0->m_height[Y_COMP], pyrImg0, pYrSize,  elementPyrImg0, pyrImg0Arr, subbandUsed);
   
-  //for distorted
-  if (subbandUsed[elementPyrDist]) {
-    Convolve::internalReduce(&image_dist[0], xDim,  yDim, 
-                             &hi0FiltOneRow[0], &temp[0],  xFDimHi0,  yFDimHi0,
-                             xStart,  xStep,  xStop, 
-                             yStart,  yStep,  yStop,
-                             &pyrDistArr[elementPyrDist][0]); //hio0
+  // for the distorted
+  if (subbandUsed[elementPyrImg1]) {
+    internalReduce(&m_image1[0], xDim,  yDim, &hi0FiltOneRow[0], &m_temp[0], xFDimHi0, yFDimHi0, xStart, xStep, xStop, yStart, yStep, yStop, &pyrImg1Arr[elementPyrImg1][0]); //hio0
   }
   
-  Convolve::internalReduce(&image_dist[0], xDim,  yDim, 
-                           &lo0FiltOneRow[0], &temp[0],  xFDimLo0,  y_fdim_lo0,
-                           xStart,  xStep,  xStop, 
-                           yStart,  yStep,  yStop,
-                           &lo0_dist[0]);
+  internalReduce(&m_image1[0], xDim, yDim, &lo0FiltOneRow[0], &m_temp[0], xFDimLo0, y_fdim_lo0, xStart, xStep, xStop, yStart, yStep, yStop, &m_lo0Img1[0]);
   
-  elementPyrDist--;
-  buildSpyrLevs(&lo0_dist[0], pYrSize, inp1->m_width[Y_COMP],inp1->m_height[Y_COMP], pyrDist,  pYrSize,  elementPyrDist, pyrDistArr, subbandUsed);
+  elementPyrImg1--;
+  buildSteerablePyramidLevels(&m_lo0Img1[0], pYrSize, inp1->m_width[Y_COMP],inp1->m_height[Y_COMP], pyrImg1,  pYrSize,  elementPyrImg1, pyrImg1Arr, subbandUsed);
   
   //================================
   // calculate the parameters of the distortion channel
-  vector<vector<vector<double> > >   gAll     (pYrSize * bFiltsZ2 + 2);
-  vector<vector<vector<double> > >   VvAll    (pYrSize * bFiltsZ2 + 2);
-  vector<vector<int> >                    lenWhGAll(pYrSize * bFiltsZ2 + 2);
+  vector<vector<vector<double> > >   gAll     (subbandsNum);
+  vector<vector<vector<double> > >   VvAll    (subbandsNum);
+  vector<vector<int> >               lenWhGAll(subbandsNum);
   
-  for (int i=0;i<pYrSize*bFiltsZ2+2;i++)
+  for (int i = 0; i < subbandsNum;i++)
     lenWhGAll[i].resize(2);
   
   for (int ii=0; ii<sizeSubBand;ii++)	{
     int sub = subbands [ii];
-    int  newSizeYWidth = (int) (floor(lenWh[sub][0]/((double)M))*(double)M);
-    int newSizeYHeight = (int) (floor(lenWh[sub][1]/((double)M))*(double)M);
+    int  newSizeYWidth = (int) (floor(lenWh[sub][0] / ((double) m_blockLength)) * (double) m_blockLength);
+    int newSizeYHeight = (int) (floor(lenWh[sub][1] / ((double) m_blockLength)) * (double) m_blockLength);
     
-    lenWhGAll [sub][0] = (int) (newSizeYWidth  / (double) M);  
-    lenWhGAll [sub][1] = (int) (newSizeYHeight / (double) M); 
+    lenWhGAll [sub][0] = (int) (newSizeYWidth  / (double) m_blockLength);  
+    lenWhGAll [sub][1] = (int) (newSizeYHeight / (double) m_blockLength); 
     gAll[sub].resize(lenWhGAll [sub][0]);
     VvAll[sub].resize( lenWhGAll [sub][0]);
-    for (int jj=0;jj< lenWhGAll [sub][0];jj++)		{
+    for (int jj = 0;jj < lenWhGAll [sub][0]; jj++)		{
       gAll[sub][jj].resize( lenWhGAll [sub][1]);
       VvAll[sub][jj].resize( lenWhGAll [sub][1]);
     }
   }
   
   //calculate the parameters of the distortion channel
-  vifSubEstM (pyrOrgArr, pyrDistArr,  subbands,  M,  lenWh,sizeSubBand, gAll,  VvAll, lenWhGAll);
+  vifSubEstM (pyrImg0Arr, pyrImg1Arr,  subbands,  m_blockLength,  lenWh, sizeSubBand, gAll,  VvAll, lenWhGAll);
   
-  vector<vector<vector<double> > >  ssArr(pYrSize * bFiltsZ2 + 2);
-  vector<vector<vector<double> > >  cuArr(pYrSize * bFiltsZ2 + 2);
-  vector<vector<double> >                lArr (pYrSize * bFiltsZ2 + 2);
+  vector<vector<vector<double> > >  ssArr(subbandsNum);
+  vector<vector<vector<double> > >  cuArr(subbandsNum);
+  vector<vector<double> >           lArr (subbandsNum);
   
-  for (int ii=0;ii<sizeSubBand;ii++)  {
+  for (int ii = 0;ii < sizeSubBand; ii++)  {
     int i = subbands[ii];
-    int newSizeYWidth  = (int) ((floor(lenWh[i][0] / ((double) M))) * (double) M);
-    int newSizeYHeight = (int) ((floor(lenWh[i][1] / ((double) M))) * (double) M);
+    int newSizeYWidth  = (int) ((floor(lenWh[i][0] / ((double) m_blockLength))) * (double) m_blockLength);
+    int newSizeYHeight = (int) ((floor(lenWh[i][1] / ((double) m_blockLength))) * (double) m_blockLength);
     
-    cuArr[i].resize(M * M);
-    ssArr[i].resize((int(newSizeYWidth / (double) M)));
-    lArr[i].resize(M * M);
+    cuArr[i].resize(m_blockSize);
+    ssArr[i].resize((int(newSizeYWidth / (double) m_blockLength)));
+    lArr[i].resize (m_blockSize);
     
-    for (int j=0;j<M * M;j++) {
-      cuArr[i][j].resize( M * M );
+    for (int j = 0; j < m_blockSize; j++) {
+      cuArr[i][j].resize( m_blockSize );
     }
     
-    for (int j=0;j<int(newSizeYWidth / (double) M);j++)  {
-      ssArr[i][j].resize( int(newSizeYHeight / (double) M));
+    for (int j=0;j<int(newSizeYWidth / (double) m_blockLength);j++)  {
+      ssArr[i][j].resize( int(newSizeYHeight / (double) m_blockLength));
     }
   }
   
   //calculate the parameters of the reference image
-  refParamsVecGSM (pyrOrgArr ,   subbands,  M,  lenWh,  sizeSubBand,  ssArr,  lArr,  cuArr);
+  refParamsVecGSM (pyrImg0Arr, subbands, m_blockLength, lenWh,  sizeSubBand,  ssArr,  lArr,  cuArr);
   
   // compute reference and distorted image information from each subband
   vector<double> num(sizeSubBand);
@@ -1057,8 +1265,8 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
     //effects
     int lev     = (int) ceil((sub)/6.0);
     int winSize = (1 << lev) + 1; 
-    int offset  = (winSize - 1)>> 1;
-    offset = (int) (ceil(offset / (double) M));
+    int offset  = (winSize - 1) >> 1;
+    offset = (int) (ceil(offset / (double) m_blockLength));
     int sizeGWidth  = lenWhGAll[sub][0] - 2 * offset;
     int sizeGHeight = lenWhGAll[sub][1] - 2 * offset;
     
@@ -1086,20 +1294,20 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
     }
     
     // VIF
-    double  temp1=0; double temp2=0;
-    for (int j=0;j<M * M; j++)  {
-      temp1 += sumSumLog2GGSSLambdaDivVV( g, sizeGWidth, sizeGHeight,  ss, lArr[sub][j],  sigma_nsq,  vv);
-      temp2 += sumSumLog2SSLambdaDivSigma (ss,sizeGWidth, sizeGHeight,lArr[sub][j],sigma_nsq); 
+    double temp1 = 0.0; 
+    double temp2 = 0.0;
+    for (int j = 0; j < m_blockSize; j++)  {
+      temp1 += sumSumLog2GGSSLambdaDivVV  ( g, sizeGWidth, sizeGHeight,  ss, lArr[sub][j],  sigma_nsq,  vv);
+      temp2 += sumSumLog2SSLambdaDivSigma (ss, sizeGWidth, sizeGHeight, lArr[sub][j], sigma_nsq); 
     }
-    num[i]=temp1;
-    den[i]=temp2;
+    num[i] = temp1;
+    den[i] = temp2;
     
-    //compuate IFC and normalize to size of the image
+    //compute IFC and normalize to size of the image
     double ifc1=0;
     double sumNum=0;
     double sumDen=0;
-    for (int j=0;j<sizeSubBand; j++)
-    {
+    for (int j=0;j<sizeSubBand; j++) {
       sumNum += num[j];
       sumDen += den[j];
       ifc1   += num[j] / (inp0->m_width[Y_COMP] * inp0->m_height[Y_COMP]);

@@ -205,9 +205,25 @@ static const double mtx[2][2] =
 
 class DistortionMetricVIF : public DistortionMetric {
 private:
+  int               m_blockLength;
+  int               m_blockSize;
   int               m_vifYBitDepth; 
   double            m_vifFrame; 
-  MetricStatistics  m_vifFrameStats; 
+  MetricStatistics  m_vifFrameStats;
+  
+  vector<double>    m_hi0;
+  vector<double>    m_lo0Img0;
+  vector<double>    m_lo0Img1;
+  vector<double>    m_temp;
+  vector<double>    m_image0; 
+  vector<double>    m_image1;
+
+  
+  int internalReduce(double* image, int x_idim, int y_idim, const double *filt, double *temp, int xFDim, int yFDim, int xStart, int xStep, int xStop, int yStart, int yStep, int yStop, double *result);
+  int reflect1( const double * filt,int xDim,int yDim,int xPos,int yPos,double* result,int rOrE);
+  void INPROD(int XCNR,int YCNR,int xDim, int xFDim, int filtSize, int resPos, double* result, double* temp, double* image);
+  void inverseMatrix(vector<vector<double> > &input, int n, vector<vector<double> > &output);
+
   
   void convertOneRowVar            (const double** input, double * output); 
   void refParamsVecGSM             (vector<vector<double> > &org,  int* subbands, int M, vector<vector<int> > &lenWh, int sizeSubBand, vector<vector<vector<double> > >   &ssArr, vector<vector<double> > &lArr, vector<vector<vector<double> > >   &cuArr);
@@ -236,7 +252,7 @@ private:
   void reshape                     (vector<vector<double> > &input, int newW, int newH , vector<vector<double> >  &s);
   double SMPTE_ST_2084             (double x, bool Inverse, double MaxLum);
   int maxPyrHt                     (int imsize_w, int imsize_h,int filtsize); 
-  int buildSpyrLevs                (double* lo0, int ht, int w, int h, vector<vector<double> > &pyr, int max_ht,  int pyrElement, vector<vector<double> >  &pyr_arr, vector<bool> &subbandUsed); 
+  int buildSteerablePyramidLevels                (double* lo0, int ht, int w, int h, vector<vector<double> > &pyr, int max_ht,  int pyrElement, vector<vector<double> >  &pyrArr, vector<bool> &subbandUsed); 
   
 public:
   // Construct/Deconstruct

@@ -15,7 +15,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "235"
             endingLineNumber = "235"
-            landmarkName = "power2(int x)"
+            landmarkName = "uiShiftRightRound(uint16 val, uint16 b)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -169,7 +169,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "370"
             endingLineNumber = "370"
-            landmarkName = "DistortionMetricVIF::setCompareWithOther (double *compInput, double *setInput, int size, double compVal, bool iseq, double *output )"
+            landmarkName = "DistortionMetricVIF::vectorMax (int* input, int size , int imax)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

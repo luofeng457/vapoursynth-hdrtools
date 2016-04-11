@@ -64,8 +64,9 @@ private:
   vector<int32> m_i32Data;
   vector<float> m_floatData;
 
-  int32  *m_i32DataTemp[5];
-  float  *m_floatDataTemp[5];
+  vector<int32> m_i32DataTemp[5];
+  vector<float> m_floatDataTemp[5];
+
   ScaleFilter *m_horFilterDown[5];
   ScaleFilter *m_verFilterDown[5];
   ScaleFilter *m_horFilterUp[2];

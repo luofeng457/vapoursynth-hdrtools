@@ -130,10 +130,13 @@ InputY4M::InputY4M(IOVideo *inputFile, FrameFormat *format) {
   format->m_picUnitSizeShift3 = format->m_picUnitSizeOnDisk >> 3;
 
   if (m_isInterleaved) {
-    m_iBuf  = new uint8 [(int) m_size * format->m_picUnitSizeShift3];
+    m_iBuffer.resize((unsigned int) m_size * format->m_picUnitSizeShift3);
   }
 
-  m_buf  = new uint8 [(int) m_size * format->m_picUnitSizeShift3];
+  m_buffer.resize((unsigned int) m_size * format->m_picUnitSizeShift3);
+
+  m_iBuf = &m_iBuffer[0];
+  m_buf  = &m_buffer[0];
 
   if (format->m_picUnitSizeShift3 > 1) {
     m_ui16Data.resize((unsigned int) m_size);
@@ -162,17 +165,9 @@ InputY4M::InputY4M(IOVideo *inputFile, FrameFormat *format) {
 }
 
 InputY4M::~InputY4M() {
-  if (m_isInterleaved) {
-    if (m_iBuf != NULL) {
-      delete[] m_iBuf;
-      m_iBuf = NULL;
-    }
-  }
+  m_iBuf = NULL;
+  m_buf = NULL;
 
-  if (m_buf != NULL) {
-    delete[] m_buf;
-    m_buf = NULL;
-  }
   m_comp[Y_COMP] = NULL;
   m_comp[U_COMP] = NULL;
   m_comp[V_COMP] = NULL;

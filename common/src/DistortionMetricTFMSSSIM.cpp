@@ -482,23 +482,14 @@ float DistortionMetricTFMSSSIM::computePlane(float *inp0Data, float *inp1Data, i
   float luminance;
   int   dsWidth  = width >> 1;
   int   dsHeight = height >> 1;
-  float* dsRef = new float [dsHeight * dsWidth];
-  float* dsEnc = new float [dsHeight * dsWidth];
-  /*
-  if (dsWidth > m_dsWidth || dsHeight > m_dsHeight ) {
-    m_dsWidth  = dsWidth;
-    m_dsHeight = dsHeight;
-    
-    m_dsRef.resize ( m_dsWidth * m_dsHeight );
-    m_dsEnc.resize ( m_dsWidth * m_dsHeight );
-  }
-  */
+  vector<float>  dsRef(dsHeight * dsWidth);
+  vector<float>  dsEnc(dsHeight * dsWidth);
   
   structural[0] = computeStructuralComponents(inp0Data, inp1Data, height, width, m_blockSizeY, m_blockSizeX, maxPixelValue);
   float distortion = (float)pow(structural[0], m_exponent[0]);
   
-  downsample(inp0Data, dsRef, width, height, dsWidth, dsHeight);
-  downsample(inp1Data, dsEnc, width, height, dsWidth, dsHeight);
+  downsample(inp0Data, &dsRef[0], width, height, dsWidth, dsHeight);
+  downsample(inp1Data, &dsEnc[0], width, height, dsWidth, dsHeight);
   
   for (int m = 1; m < MAX_SSIM_LEVELS; m++)  {
     width  = dsWidth;
@@ -506,21 +497,18 @@ float DistortionMetricTFMSSSIM::computePlane(float *inp0Data, float *inp1Data, i
     dsWidth  = width >> 1;
     dsHeight = height >> 1;
     
-    structural[m] = computeStructuralComponents(dsRef, dsEnc, height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
+    structural[m] = computeStructuralComponents(&dsRef[0], &dsEnc[0], height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
     distortion *= (float) pow(structural[m], m_exponent[m]);
     
     if (m < m_maxSSIMLevelsMinusOne)  {
-      downsample(dsRef, dsRef, width, height, dsWidth, dsHeight);
-      downsample(dsEnc, dsEnc, width, height, dsWidth, dsHeight);
+      downsample(&dsRef[0], &dsRef[0], width, height, dsWidth, dsHeight);
+      downsample(&dsEnc[0], &dsEnc[0], width, height, dsWidth, dsHeight);
     }
     else  {
-      luminance = computeLuminanceComponent(dsRef, dsEnc, height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
+      luminance = computeLuminanceComponent(&dsRef[0], &dsEnc[0], height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
       distortion *= (float)pow(luminance, m_exponent[m]);
     }
   }
-  
-  delete [] dsRef;
-  delete [] dsEnc;
   
   if (m_useLogSSIM)
     return (float) ssimSNR(distortion);

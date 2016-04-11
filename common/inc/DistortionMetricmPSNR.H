@@ -67,8 +67,8 @@ private:
   MetricStatistics  m_mseStats[T_COMP];
   double            m_mPSNR;
   MetricStatistics  m_mPSNRStats;
-  imgpel           *m_ldrSrc;
-  imgpel           *m_ldrRef;
+  vector<imgpel>    m_ldrSrc;
+  vector<imgpel>    m_ldrRef;
   int               m_compSize;
   
   double calculateError(Frame* inp0, Frame* inp1);

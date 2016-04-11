@@ -200,18 +200,20 @@ void ResizeBiCubic::horizontal(const float** src, float** dst, int count, const 
         double v = 0.0;
         for( j = 0; j < 4; j++ ) {
           int sxj = sx + j*cn;
-          if( (unsigned)sxj >= (unsigned)swidth ) {
+          if( (unsigned) sxj >= (unsigned)swidth ) {
             while( sxj < 0 )
               sxj += cn;
             while( sxj >= swidth )
               sxj -= cn;
 					}
-					v += (double) S[sxj]* (double) alpha[j];
+					v += (double) S[sxj] * (double) alpha[j];
 				}
 				D[dx] = (float) v;
 			}
-			if( limit == dwidth )
+			
+      if( limit == dwidth )
 				break;
+        
 			for( ; dx < xMax; dx++, alpha += 4 ) {
 				int sx = xofs[dx];
 				D[dx] = (float) ((double) S[sx - cn] * (double) alpha[0] + (double) S[sx         ] * (double) alpha[1] +

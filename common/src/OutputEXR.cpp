@@ -340,10 +340,11 @@ void OutputEXR::allocateMemory(FrameFormat *format)
   }
   
   if (m_channels[Y_COMP].pixelType == HALF)
-    m_buf  = new uint8 [(int) m_size * 2];
+    m_buffer.resize((unsigned int) m_size * 2);
   else
-    m_buf  = new uint8 [(int) m_size * 4];
+    m_buffer.resize((unsigned int) m_size * 4);
   
+  m_buf               = &m_buffer[0];
   m_comp[Y_COMP]      = NULL;
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
@@ -359,10 +360,7 @@ void OutputEXR::allocateMemory(FrameFormat *format)
 
 void OutputEXR::freeMemory()
 {
-  if (m_buf != NULL) {
-    delete[] m_buf;
-    m_buf = NULL;
-  }
+  m_buf = NULL;
   
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;

@@ -88,8 +88,8 @@ private:
   
   int                 m_mapSize;
   double              m_scaleFactor;
-  double             *m_invTransformMap;
-  double             *m_fwdTransformMap;
+  vector<double>      m_invTransformMap;
+  vector<double>      m_fwdTransformMap;
   
   int                 m_mode;
   int                 m_invMode;

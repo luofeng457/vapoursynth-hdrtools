@@ -95,7 +95,7 @@
 //    Output, int &ROT_NUM, the total number of rotations.
 //
 //****************************************************************************80
-void Eigenvalue::jacobiEigenvalue ( int n, double*  a, int itMax,double*  v, double*  d, int &itNum, int &rotNum )
+void Eigenvalue::jacobiEigenvalue ( int n, double*  a, int itMax, double*  v, double*  d, int &itNum, int &rotNum )
 {
   vector<double> bw(n);
   vector<double> zw(n);

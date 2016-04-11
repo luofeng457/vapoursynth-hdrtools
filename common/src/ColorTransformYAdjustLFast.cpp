@@ -259,8 +259,8 @@ ColorTransformYAdjustLFast::ColorTransformYAdjustLFast(
   //m_mapSize =    1048576; // reduced size just to test performance with lower precision
   m_scaleFactor = (double) m_mapSize;
   // Using double precision LUTs. A bit big, but it should be okay
-  m_invTransformMap = new double[m_mapSize + 1];
-  m_fwdTransformMap = new double[m_mapSize + 1];
+  m_invTransformMap.resize(m_mapSize + 1);
+  m_fwdTransformMap.resize(m_mapSize + 1);
 
   for (int i = 0; i < m_mapSize + 1; i++) {
     double value = (double) i / (double) m_mapSize;
@@ -269,16 +269,7 @@ ColorTransformYAdjustLFast::ColorTransformYAdjustLFast(
   }
 }
 
-ColorTransformYAdjustLFast::~ColorTransformYAdjustLFast() {
-  if (m_fwdTransformMap != NULL) {
-    delete[] m_fwdTransformMap;
-    m_fwdTransformMap = NULL;
-  }
-  if (m_invTransformMap != NULL) {
-    delete[] m_invTransformMap;
-    m_invTransformMap = NULL;
-  }
-  
+ColorTransformYAdjustLFast::~ColorTransformYAdjustLFast() {  
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;

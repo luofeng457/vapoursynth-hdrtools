@@ -135,8 +135,8 @@ Conv444to420Adaptive::Conv444to420Adaptive(int width, int height, int method, Ch
     m_horFilterDown[index] = new ScaleFilter(DF_GS - index, 0,  0,      0,     0, &offset, &scale, hPhase);
     m_verFilterDown[index] = new ScaleFilter(DF_GS - index, 0,  2, offset, scale, &downOffset, &downScale, vPhase);
 
-    m_floatDataTemp[index] = new float[ iMax((width >> 1), (height >> 1)) ];
-    m_i32DataTemp[index]   = new int32[ iMax((width >> 1), (height >> 1)) ];
+    m_floatDataTemp[index].resize(iMax((width >> 1), (height >> 1)) );
+    m_i32DataTemp  [index].resize(iMax((width >> 1), (height >> 1)) );
   }
   
   // Upsampling
@@ -157,15 +157,6 @@ Conv444to420Adaptive::~Conv444to420Adaptive() {
     if (m_verFilterDown[index] != NULL) {
       delete m_verFilterDown[index];
       m_verFilterDown[index] = NULL;
-    }
-
-    if ( m_i32DataTemp[index] != NULL ) {
-      delete [] m_i32DataTemp[index];
-      m_i32DataTemp[index] = NULL;
-    }
-    if ( m_floatDataTemp[index] != NULL ) {
-      delete [] m_floatDataTemp[index];
-      m_floatDataTemp[index] = NULL;
     }
   }
   for (int index = 0; index < 2; index++) {

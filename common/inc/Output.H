@@ -59,6 +59,8 @@
 class Output {
 protected:  
   unsigned char *m_buf, *m_iBuf;
+  vector<unsigned char>  m_buffer;
+  vector<unsigned char>  m_iBuffer;
   void imageReformat       ( unsigned char* inp,  unsigned char* out,   FrameFormat *source, int symbolSizeInBytes);
   void imageReformatUInt16 ( unsigned char* buf, FrameFormat *source, int symbolSizeInBytes);
  

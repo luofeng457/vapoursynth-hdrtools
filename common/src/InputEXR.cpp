@@ -255,10 +255,12 @@ void InputEXR::allocateMemory(FrameFormat *format)
 
   
   if (m_channels[Y_COMP].pixelType == HALF)
-    m_buf  = new uint8 [(int) m_size * 2];
+    m_buffer.resize((unsigned int) m_size * 2);
   else
-    m_buf  = new uint8 [(int) m_size * 4];
+    m_buffer.resize((unsigned int) m_size * 4);
 
+  m_buf = &m_buffer[0];
+  
   format->m_pixelType[Y_COMP] = m_pixelType[Y_COMP] = m_channels[Y_COMP].pixelType;
   format->m_pixelType[U_COMP] = m_pixelType[U_COMP] = m_channels[U_COMP].pixelType;
   format->m_pixelType[V_COMP] = m_pixelType[V_COMP] = m_channels[V_COMP].pixelType;
@@ -279,10 +281,7 @@ void InputEXR::allocateMemory(FrameFormat *format)
 
 void InputEXR::freeMemory()
 { 
-  if (m_buf != NULL) {
-    delete[] m_buf;
-    m_buf = NULL;
-  }
+  m_buf = NULL;
   
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;

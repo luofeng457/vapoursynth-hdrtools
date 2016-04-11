@@ -732,10 +732,7 @@ void Input::imageReformatUInt16 (
         m_bufToImg->process(m_ui16Comp[V_COMP], buf + bytesY + bytesUV, source->m_width[V_COMP], source->m_height[V_COMP], source->m_width[V_COMP], source->m_height[V_COMP], symbolSizeInBytes, bit_scale);
       }           
     } 
-    else {
-      //uint16 *dataTemp = new uint16[source->m_width[U_COMP] * source->m_height[U_COMP]];     
-
-      //delete [] dataTemp;
+    else { // different chroma format buffers? This should not happen.
     }
   }
 }

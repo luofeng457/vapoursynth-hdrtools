@@ -178,7 +178,6 @@
     <ClCompile Include="src\ConvertNull.cpp" />
     <ClCompile Include="src\ConvFixedToFloat.cpp" />
     <ClCompile Include="src\ConvFloatToFixed.cpp" />
-    <ClCompile Include="src\Convolve.cpp" />
     <ClCompile Include="src\DisplayGammaAdjust.cpp" />
     <ClCompile Include="src\DisplayGammaAdjustHLG.cpp" />
     <ClCompile Include="src\DisplayGammaAdjustNull.cpp" />
@@ -221,7 +220,6 @@
     <ClCompile Include="src\InputTIFF.cpp" />
     <ClCompile Include="src\InputY4M.cpp" />
     <ClCompile Include="src\InputYUV.cpp" />
-    <ClCompile Include="src\InverseGauss.cpp" />
     <ClCompile Include="src\IOFunctions.cpp" />
     <ClCompile Include="src\Output.cpp" />
     <ClCompile Include="src\OutputAVI.cpp" />
@@ -304,7 +302,6 @@
     <ClInclude Include="inc\ConvertNull.H" />
     <ClInclude Include="inc\ConvFixedToFloat.H" />
     <ClInclude Include="inc\ConvFloatToFixed.H" />
-    <ClInclude Include="inc\Convolve.H" />
     <ClInclude Include="inc\Defines.H" />
     <ClInclude Include="inc\DisplayGammaAdjust.H" />
     <ClInclude Include="inc\DisplayGammaAdjustHLG.H" />
@@ -351,7 +348,6 @@
     <ClInclude Include="inc\InputTIFF.H" />
     <ClInclude Include="inc\InputY4M.H" />
     <ClInclude Include="inc\InputYUV.H" />
-    <ClInclude Include="inc\InverseGauss.H" />
     <ClInclude Include="inc\IODPX.H" />
     <ClInclude Include="inc\IOFunctions.H" />
     <ClInclude Include="inc\IOTIFF.H" />
