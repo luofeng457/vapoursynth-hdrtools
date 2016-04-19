@@ -53,11 +53,20 @@
 #define __DistortionTransferFunction_H__
 
 #include "Global.H"
+#include <vector>
 //#include "Frame.H"
 //#include "DistortionMetric.H"
 
 class DistortionTransferFunction {
 protected:
+  // LUT related
+  bool                    m_enableLUT;
+  uint32                  m_binsLUT;
+  vector<uint32>          m_elementsLUT;
+  vector<double>          m_boundLUT;
+  vector<double>          m_multiplierLUT;
+  vector<vector<double> > m_computeLUT;
+
   double computeDE      (double value);
   double computePQ      (double value);
   double computeHPQ     (double value);
@@ -65,11 +74,16 @@ protected:
   double computePQNoise (double value);
   double computePH10K   (double value);
   double computeNull    (double value);
+  
+  void   initLUT();
+  double computeLUT(double value);
+
 public:
-  static DistortionTransferFunction *create(DistortionFunction method);
+  static DistortionTransferFunction *create(DistortionFunction method, bool enableLUT);
   
   virtual double compute(double value) = 0;
   virtual ~DistortionTransferFunction() {};
+  double performCompute(double value);
 
 };
 

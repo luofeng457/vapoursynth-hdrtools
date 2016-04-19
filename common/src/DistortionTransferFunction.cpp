@@ -63,7 +63,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionTransferFunction *DistortionTransferFunction::create(DistortionFunction method) {
+DistortionTransferFunction *DistortionTransferFunction::create(DistortionFunction method, bool enableLUT) {
   DistortionTransferFunction *result = NULL;
   
   switch (method){
@@ -90,9 +90,43 @@ DistortionTransferFunction *DistortionTransferFunction::create(DistortionFunctio
       result = new DistortionTransferFunctionHPQ2();
       break;
   }
+  result->m_enableLUT = enableLUT;
+    
+  result->initLUT();
+
   return result;
 }
 
+
+void DistortionTransferFunction::initLUT() {  
+  if (m_enableLUT == FALSE) {
+    m_binsLUT = 0;
+  }
+  else {
+    printf("Initializing LUTs for TF metric computations\n");
+    uint32 i, j;
+    m_binsLUT = 10;
+    m_elementsLUT.resize   (m_binsLUT);
+    m_multiplierLUT.resize (m_binsLUT);
+    m_boundLUT.resize      (m_binsLUT + 1);
+    m_computeLUT.resize    (m_binsLUT);
+    m_boundLUT[0] = 0.0;
+    for (i = 0; i < m_binsLUT; i++) {
+      m_elementsLUT[i] = 10000; // Size of each bin. 
+                                // Could be different for each bin, but for now lets set this to be the same.
+      m_boundLUT[i + 1] = 1 / pow( 10.0 , (double) (m_binsLUT - i - 1)); // upper bin boundary
+      double stepSize = (m_boundLUT[i + 1] -  m_boundLUT[i]) / (m_elementsLUT[i] - 1);
+      m_multiplierLUT[i] = (double) (m_elementsLUT[i] - 1) / (m_boundLUT[i + 1] -  m_boundLUT[i]);
+      
+      // Now allocate memory given the specified size
+      m_computeLUT[i].resize(m_elementsLUT[i]);
+      for (j = 0; j < m_elementsLUT[i] ; j++) {
+        double curValue = m_boundLUT[i] + (double) j * stepSize;
+        m_computeLUT[i][j] = compute(curValue);
+      }
+    }
+  }
+}
 
 double DistortionTransferFunction::computeNull(double value) {
   return (value);
@@ -187,6 +221,26 @@ double DistortionTransferFunction::computePH10K(double value) {
   return (log(1.0 + (rho - 1.0) * pow(ratio * value, invGamma)) / (log(rho) * maxValue));
 }
 
+double DistortionTransferFunction::computeLUT(double value) {
+  if (value <= 0.0)
+    return m_computeLUT[0][0];
+  else if (value >= 1.0) {
+    // top value, most likely 1.0
+    return m_computeLUT[m_binsLUT - 1][m_elementsLUT[m_binsLUT - 1] - 1];
+  }
+  else { // now search for value in the table
+    for (int i = 0; i < m_binsLUT; i++) {
+      if (value < m_boundLUT[i + 1]) { // value located
+        double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
+        int    valuePlus     = (int) dCeil(satValue) ;
+        double distancePlus  = (double) valuePlus - satValue;
+        return (m_computeLUT[i][valuePlus - 1] * distancePlus + m_computeLUT[i][valuePlus] * (1.0 - distancePlus));
+      }
+    }
+  }
+  return 0.0;
+}
+
 double DistortionTransferFunctionNull::compute(double value) {
   
   double clippedValue = dMax(0.0, dMin(value, 1.0));
@@ -236,6 +290,17 @@ double DistortionTransferFunctionCombo::compute(double value) {
   double clippedValue = dMax(0.0, dMin(value, 1.0));
   
   return (computePQ(clippedValue) + computePH10K(clippedValue)) * 0.5;
+}
+
+//-----------------------------------------------------------------------------
+// Public
+//-----------------------------------------------------------------------------
+
+double DistortionTransferFunction::performCompute(double value) {
+  if (m_enableLUT == TRUE)
+    return computeLUT(value);
+  else
+    return compute(value);
 }
 
 //-----------------------------------------------------------------------------

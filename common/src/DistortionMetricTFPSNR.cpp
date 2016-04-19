@@ -66,7 +66,7 @@
 DistortionMetricTFPSNR::DistortionMetricTFPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion, params->m_tfLUTEnable);
   m_totalComponents    = TOTAL_COMPONENTS; // 3 for YCbCr, 3 for RGB, 3 for XYZ and three aggregators = 12
   m_colorSpace         = format->m_colorSpace;
   m_enableShowMSE      = params->m_enableShowMSE;
@@ -213,13 +213,13 @@ void DistortionMetricTFPSNR::compute(Frame* inp0, Frame* inp1)
     rgb1Normal[B_COMP] = inp1->m_floatComp[B_COMP][i] / m_maxValue[B_COMP];
     
     if (m_computePsnrInRgb == TRUE || m_computePsnrInYCbCr == TRUE) {
-      rgb0Double[R_COMP] = m_transferFunction->compute( rgb0Normal[R_COMP] );
-      rgb0Double[G_COMP] = m_transferFunction->compute( rgb0Normal[G_COMP] );
-      rgb0Double[B_COMP] = m_transferFunction->compute( rgb0Normal[B_COMP] );
+      rgb0Double[R_COMP] = m_transferFunction->performCompute( rgb0Normal[R_COMP] );
+      rgb0Double[G_COMP] = m_transferFunction->performCompute( rgb0Normal[G_COMP] );
+      rgb0Double[B_COMP] = m_transferFunction->performCompute( rgb0Normal[B_COMP] );
       // TF inp1
-      rgb1Double[R_COMP] = m_transferFunction->compute( rgb1Normal[R_COMP] );
-      rgb1Double[G_COMP] = m_transferFunction->compute( rgb1Normal[G_COMP] );
-      rgb1Double[B_COMP] = m_transferFunction->compute( rgb1Normal[B_COMP] );
+      rgb1Double[R_COMP] = m_transferFunction->performCompute( rgb1Normal[R_COMP] );
+      rgb1Double[G_COMP] = m_transferFunction->performCompute( rgb1Normal[G_COMP] );
+      rgb1Double[B_COMP] = m_transferFunction->performCompute( rgb1Normal[B_COMP] );
     }
     
     if (m_computePsnrInRgb == TRUE) {
@@ -254,9 +254,9 @@ void DistortionMetricTFPSNR::compute(Frame* inp0, Frame* inp1)
       convertToXYZ(rgb1Normal, xyz1Normal, transform10, transform11, transform12);
       // Y Component
       // TF inp0
-      xyz0Double[1] = m_transferFunction->compute( xyz0Normal[1] );
+      xyz0Double[1] = m_transferFunction->performCompute( xyz0Normal[1] );
       // TF inp1
-      xyz1Double[1] = m_transferFunction->compute( xyz1Normal[1] );
+      xyz1Double[1] = m_transferFunction->performCompute( xyz1Normal[1] );
       
       // Y component
       diff = (xyz0Double[1] - xyz1Double[1]);
@@ -266,11 +266,11 @@ void DistortionMetricTFPSNR::compute(Frame* inp0, Frame* inp1)
       
       if ( m_computePsnrInXYZ == TRUE ) {
         // TF inp0
-        xyz0Double[0] = m_transferFunction->compute( xyz0Normal[0] );
-        xyz0Double[2] = m_transferFunction->compute( xyz0Normal[2] );
+        xyz0Double[0] = m_transferFunction->performCompute( xyz0Normal[0] );
+        xyz0Double[2] = m_transferFunction->performCompute( xyz0Normal[2] );
         // TF inp1
-        xyz1Double[0] = m_transferFunction->compute( xyz1Normal[0] );
-        xyz1Double[2] = m_transferFunction->compute( xyz1Normal[2] );
+        xyz1Double[0] = m_transferFunction->performCompute( xyz1Normal[0] );
+        xyz1Double[2] = m_transferFunction->performCompute( xyz1Normal[2] );
         // X component
         diff = (xyz0Double[0] - xyz1Double[0]);
         diff2 = diff * diff;

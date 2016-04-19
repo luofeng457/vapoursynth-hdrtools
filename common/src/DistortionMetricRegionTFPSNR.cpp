@@ -66,7 +66,7 @@
 DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue)
  : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion, params->m_tfLUTEnable);
   m_totalComponents    = TOTAL_COMPONENTS; // 3 for YCbCr, 3 for RGB, 3 for XYZ and three aggregators = 12
   
   m_blockWidth    = params->m_rPSNRBlockSizeX;
@@ -365,9 +365,9 @@ void DistortionMetricRegionTFPSNR::convert (Frame* inp, double *rgbNormalData,
     rgbNormalData[planeSize * 2 + i] = rgbNormal[B_COMP] = inp->m_floatComp[B_COMP][i] / m_maxValue[B_COMP];
     
     if (m_computePsnrInRgb == TRUE || m_computePsnrInYCbCr == TRUE) {
-      rgbTFData[planeSize * 0 + i] = rgbDouble[R_COMP] = m_transferFunction->compute( rgbNormal[R_COMP] );
-      rgbTFData[planeSize * 1 + i] = rgbDouble[G_COMP] = m_transferFunction->compute( rgbNormal[G_COMP] );
-      rgbTFData[planeSize * 2 + i] = rgbDouble[B_COMP] = m_transferFunction->compute( rgbNormal[B_COMP] );
+      rgbTFData[planeSize * 0 + i] = rgbDouble[R_COMP] = m_transferFunction->performCompute( rgbNormal[R_COMP] );
+      rgbTFData[planeSize * 1 + i] = rgbDouble[G_COMP] = m_transferFunction->performCompute( rgbNormal[G_COMP] );
+      rgbTFData[planeSize * 2 + i] = rgbDouble[B_COMP] = m_transferFunction->performCompute( rgbNormal[B_COMP] );
     }
     
     if (m_computePsnrInYCbCr == TRUE) {
@@ -383,11 +383,11 @@ void DistortionMetricRegionTFPSNR::convert (Frame* inp, double *rgbNormalData,
     {
       convertToXYZ(rgbNormal, xyzNormal, transform0, transform1, transform2);
       // Y Component
-      xyzDouble[1] = m_transferFunction->compute( xyzNormal[1] );
+      xyzDouble[1] = m_transferFunction->performCompute( xyzNormal[1] );
       
       if ( m_computePsnrInXYZ == TRUE ) {
-        xyzDouble[0] = m_transferFunction->compute( xyzNormal[0] );
-        xyzDouble[2] = m_transferFunction->compute( xyzNormal[2] );
+        xyzDouble[0] = m_transferFunction->performCompute( xyzNormal[0] );
+        xyzDouble[2] = m_transferFunction->performCompute( xyzNormal[2] );
         xyzTFData[planeSize * 0 + i] = xyzDouble[0];
         xyzTFData[planeSize * 1 + i] = xyzDouble[1];
         xyzTFData[planeSize * 2 + i] = xyzDouble[2];

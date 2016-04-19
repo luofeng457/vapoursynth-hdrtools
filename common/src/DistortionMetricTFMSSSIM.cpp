@@ -83,7 +83,7 @@ static const double kMsSSIMBeta4 = 0.1333;
 DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, SSIMParams *params, double maxSampleValue)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion, params->m_tfLUTEnable);
 
   // Metric parameters
   m_K1 = params->m_K1;
@@ -556,9 +556,9 @@ void DistortionMetricTFMSSSIM::compute(Frame* inp0, Frame* inp1)
     convertToXYZ(rgb1Normal, xyz1Normal, transform10, transform11, transform12);
     // Y Component
     // TF inp0
-    m_dataY0[i] = (float) m_transferFunction->compute( xyz0Normal[1] );
+    m_dataY0[i] = (float) m_transferFunction->performCompute( xyz0Normal[1] );
     // TF inp1
-    m_dataY1[i] = (float) m_transferFunction->compute( xyz1Normal[1] );
+    m_dataY1[i] = (float) m_transferFunction->performCompute( xyz1Normal[1] );
   }  
   
   m_metric[0] = (double) computePlane(&m_dataY0[0], &m_dataY1[0], inp0->m_height[0], inp0->m_width[0], 1.0);

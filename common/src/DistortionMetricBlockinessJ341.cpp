@@ -66,7 +66,7 @@
 DistortionMetricBlockinessJ341::DistortionMetricBlockinessJ341(double maxSampleValue, DistortionFunction distortionMethod)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(distortionMethod, FALSE);
 
   m_memWidth = 0;
   m_memHeight = 0;
