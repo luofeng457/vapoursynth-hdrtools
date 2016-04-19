@@ -98,19 +98,24 @@ public:
 
 class SSIMParams {
 public:
-  int     m_ssimBlockDistance;
-  int     m_ssimBlockSizeX;
-  int     m_ssimBlockSizeY;
-  bool    m_useLogSSIM;
-  double  m_ssimK1;
-  double  m_ssimK2;
+  int     m_blockDistance;
+  int     m_blockSizeX;
+  int     m_blockSizeY;
+  bool    m_useLog;
+  double  m_K1;
+  double  m_K2;
+  DistortionFunction m_tfDistortion;
+  bool    m_tfLUTEnable;
+
   SSIMParams () {
-    m_ssimBlockDistance = 1;
-    m_ssimBlockSizeX = 4;
-    m_ssimBlockSizeY = 4;
-    m_useLogSSIM = FALSE;
-    m_ssimK1 = 0.01f;
-    m_ssimK2 = 0.03f;    
+    m_blockDistance = 1;
+    m_blockSizeX    = 4;
+    m_blockSizeY    = 4;
+    m_useLog        = FALSE;
+    m_K1            = 0.01f;
+    m_K2            = 0.03f;    
+    m_tfDistortion  = DIF_PQPH10K;
+    m_tfLUTEnable   = FALSE;
   }
 };
 
@@ -161,14 +166,38 @@ public:
   }
 };
 
-
-class DistortionParameters {
+class PSNRParams {
 public:
   bool    m_enableShowMSE;
   bool    m_computePsnrInYCbCr;
   bool    m_computePsnrInRgb;
   bool    m_computePsnrInXYZ;
   bool    m_computePsnrInYUpVp;
+  DistortionFunction m_tfDistortion;
+  bool    m_tfLUTEnable;
+  int                m_rPSNRBlockSizeX;
+  int                m_rPSNRBlockSizeY;
+  int                m_rPSNROverlapX;
+  int                m_rPSNROverlapY;
+  PSNRParams() {
+    m_enableShowMSE             = FALSE;
+    m_computePsnrInYCbCr        = TRUE;
+    m_computePsnrInRgb          = FALSE;
+    m_computePsnrInXYZ          = FALSE;
+    m_computePsnrInYUpVp        = FALSE;
+    m_tfDistortion  = DIF_PQPH10K;
+    m_tfLUTEnable   = FALSE;
+    m_rPSNRBlockSizeX           = 64;
+    m_rPSNRBlockSizeY           = 64;
+    m_rPSNROverlapX             = 4;
+    m_rPSNROverlapY             = 4;
+
+  }
+};
+
+
+class DistortionParameters {
+public:
   bool    m_enableCompmPSNR;
   bool    m_enableCompmPSNRfast;
   bool    m_clipInputValues;
@@ -177,48 +206,22 @@ public:
   double  m_amplitudeFactor;
   bool    m_enableSymmetry;
   
-  int                m_ssimBlockDistance;
-  int                m_ssimBlockSizeX;
-  int                m_ssimBlockSizeY;
-  bool               m_useLogSSIM;
-  double             m_ssimK1;
-  double             m_ssimK2;
-  DistortionFunction m_tfPSNRDistortion;
   int                m_deltaEPointsEnable;
-  int                m_rPSNRBlockSizeX;
-  int                m_rPSNRBlockSizeY;
-  int                m_rPSNROverlapX;
-  int                m_rPSNROverlapY;
   VQMParams          m_VQM; 
   VIFParams          m_VIF;
   SSIMParams         m_SSIM;
-  
+  PSNRParams         m_PSNR;
+    
   DistortionParameters() {
     for (int index = 0; index < NB_REF_WHITE; index ++)
       m_whitePointDeltaE[index] = 1000.0;
-    m_enableShowMSE             = FALSE;
-    m_computePsnrInYCbCr        = TRUE;
-    m_computePsnrInRgb          = FALSE;
-    m_computePsnrInXYZ          = FALSE;
-    m_computePsnrInYUpVp        = FALSE;
     m_enableCompmPSNR           = FALSE;
     m_enableCompmPSNRfast       = FALSE;
     m_clipInputValues           = FALSE;
     m_maxSampleValue            = 10000.0;
     m_amplitudeFactor           = 1.0;
     m_enableSymmetry            = FALSE;
-    m_ssimBlockDistance         = 1;
-    m_ssimBlockSizeX            = 4;
-    m_ssimBlockSizeY            = 4;
-    m_useLogSSIM                = FALSE;
-    m_ssimK1                    = 0.01f;
-    m_ssimK2                    = 0.03f;
-    m_tfPSNRDistortion          = DIF_PQPH10K;
     m_deltaEPointsEnable        = 1;
-    m_rPSNRBlockSizeX           = 64;
-    m_rPSNRBlockSizeY           = 64;
-    m_rPSNROverlapX             = 4;
-    m_rPSNROverlapY             = 4;
   }
 };
 

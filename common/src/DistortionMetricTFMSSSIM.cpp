@@ -80,19 +80,19 @@ static const double kMsSSIMBeta4 = 0.1333;
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, int blockSizeX, int blockSizeY, int blockDistance, bool useLogSSIM, double K1, double K2, double maxSampleValue, DistortionFunction distortionMethod)
+DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, SSIMParams *params, double maxSampleValue)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion);
 
   // Metric parameters
-  m_K1 = K1;
-  m_K2 = K2;
+  m_K1 = params->m_K1;
+  m_K2 = params->m_K2;
   
-  m_blockDistance = blockDistance;
-  m_blockSizeX    = blockSizeX;
-  m_blockSizeY    = blockSizeY;
-  m_useLogSSIM    = useLogSSIM;
+  m_blockDistance = params->m_blockDistance;
+  m_blockSizeX    = params->m_blockSizeX;
+  m_blockSizeY    = params->m_blockSizeY;
+  m_useLogSSIM    = params->m_useLog;
   
 #ifdef UNBIASED_VARIANCE
   m_bias = 1;

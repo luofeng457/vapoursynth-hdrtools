@@ -76,6 +76,7 @@ FrameFormat          *src1    = &pParams->m_source[1];
 DistortionParameters *dParams = &pParams->m_distortionParameters;
 VIFParams            *vif     = &dParams->m_VIF;
 SSIMParams           *ssim    = &dParams->m_SSIM;
+PSNRParams           *snr     = &dParams->m_PSNR;
 
 
 static char def_logfile[]  = "distortion.txt";
@@ -130,16 +131,17 @@ IntegerParameter intParameterList[] = {
   { "WindowMaxPosY",          &pParams->m_windowMaxPosY,                       0,      -65536,      65536,    "Maximum Window Y position"            },
   { "NumberOfFrames",         &pParams->m_numberOfFrames,                      1,           1,    INT_INF,    "Number of Frames to process"          },
   // SSIM parameters
-  { "SSIMBlockDistance",      &dParams->m_ssimBlockDistance,                   1,           1,        128,    "Block Distance for SSIM computation"  },
-  { "SSIMBlockSizeX",         &dParams->m_ssimBlockSizeX,                      4,           4,        128,    "Block Width for SSIM computation"     },
-  { "SSIMBlockSizeY",         &dParams->m_ssimBlockSizeY,                      4,           4,        128,    "Block Height for SSIM computation"    },
+  { "SSIMBlockDistance",      &ssim->m_blockDistance,                          1,           1,        128,    "Block Distance for SSIM computation"  },
+  { "SSIMBlockSizeX",         &ssim->m_blockSizeX,                             4,           4,        128,    "Block Width for SSIM computation"     },
+  { "SSIMBlockSizeY",         &ssim->m_blockSizeY,                             4,           4,        128,    "Block Height for SSIM computation"    },
   
-  { "TFPSNRDistortion",       (int *) &dParams->m_tfPSNRDistortion,  DIF_PQPH10K,  DIF_PQPH10K, DIF_TOTAL-1,  "TF for tPSNR and other metrics"       },
+  { "TFPSNRDistortion",       (int *) &snr->m_tfDistortion,          DIF_PQPH10K,  DIF_PQPH10K, DIF_TOTAL-1,  "TF for tPSNR and other metrics"       },
+  { "TFPSNRDistortion",       (int *) &ssim->m_tfDistortion,         DIF_PQPH10K,  DIF_PQPH10K, DIF_TOTAL-1,  "TF for tSSIM and other metrics"       },
   { "DeltaEPointsEnable",      &dParams->m_deltaEPointsEnable,                 1,           1,          7,    "Delta E points to Enable"             },
-  { "RPSNRBlockDistanceX",     &dParams->m_rPSNROverlapX,                      4,           1,      65536,    "Block Horz. Distance for rPSNR"       },
-  { "RPSNRBlockDistanceY",     &dParams->m_rPSNROverlapY,                      4,           1,     65536,     "Block Vert. Distance for rPSNR"       },
-  { "RPSNRBlockSizeX",         &dParams->m_rPSNRBlockSizeX,                    4,           4,     65536,     "Block Width for rPSNR"                },
-  { "RPSNRBlockSizeY",         &dParams->m_rPSNRBlockSizeY,                    4,           4,     65536,     "Block Height for rPSNR"               },
+  { "RPSNRBlockDistanceX",     &snr->m_rPSNROverlapX,                          4,           1,      65536,    "Block Horz. Distance for rPSNR"       },
+  { "RPSNRBlockDistanceY",     &snr->m_rPSNROverlapY,                          4,           1,      65536,     "Block Vert. Distance for rPSNR"       },
+  { "RPSNRBlockSizeX",         &snr->m_rPSNRBlockSizeX,                        4,           4,      65536,     "Block Width for rPSNR"                },
+  { "RPSNRBlockSizeY",         &snr->m_rPSNRBlockSizeY,                        4,           4,      65536,     "Block Height for rPSNR"               },
   // FIV parameters
   { "VIFBitDepthY",            &vif->m_vifBitDepth,                            8,           8,         16,    "VIF YUV Bitdepth control param"       },
   
@@ -178,16 +180,18 @@ BoolParameter boolParameterList[] = {
   { "EnableWindowTFMSSSIM",      &pParams->m_enableWindowMetric[DIST_TFMSSSIM],     FALSE,  FALSE,  TRUE,    "Enable Window MTF S-SSIM Computation"          },
   { "EnableWindowJ341Block",     &pParams->m_enableWindowMetric[DIST_BLKJ341],      FALSE,  FALSE,  TRUE,    "Enable Window J341 Blockiness Computation"     },
   { "EnableWindowBlockiness",    &pParams->m_enableWindowMetric[DIST_BLK],          FALSE,  FALSE,  TRUE,    "Enable Window Blockiness Computation"          },
-  { "EnableShowMSE",             &dParams->m_enableShowMSE,                         FALSE,  FALSE,  TRUE,    "Enable MSE presentation for PSNR"              },
-  { "ComputeYCbCrPSNR",          &dParams->m_computePsnrInYCbCr,                    FALSE,  FALSE,  TRUE,    "Enable YCbCr tPSNR"                            },
-  { "ComputeRGBPSNR",            &dParams->m_computePsnrInRgb,                      FALSE,  FALSE,  TRUE,    "Enable RGB tPSNR"                              },
-  { "ComputeXYZPSNR",            &dParams->m_computePsnrInXYZ,                       TRUE,  FALSE,  TRUE,    "Enable XYZ tPSNR"                              },
-  { "ComputeYUpVpPSNR",          &dParams->m_computePsnrInYUpVp,                    FALSE,  FALSE,  TRUE,    "Enable YUpVp tPSNR"                            },
+  { "EnableShowMSE",             &snr->m_enableShowMSE,                             FALSE,  FALSE,  TRUE,    "Enable MSE presentation for PSNR"              },
+  { "ComputeYCbCrPSNR",          &snr->m_computePsnrInYCbCr,                        FALSE,  FALSE,  TRUE,    "Enable YCbCr tPSNR"                            },
+  { "ComputeRGBPSNR",            &snr->m_computePsnrInRgb,                          FALSE,  FALSE,  TRUE,    "Enable RGB tPSNR"                              },
+  { "ComputeXYZPSNR",            &snr->m_computePsnrInXYZ,                           TRUE,  FALSE,  TRUE,    "Enable XYZ tPSNR"                              },
+  { "ComputeYUpVpPSNR",          &snr->m_computePsnrInYUpVp,                        FALSE,  FALSE,  TRUE,    "Enable YUpVp tPSNR"                            },
   { "ClipInputValues",           &dParams->m_clipInputValues,                       FALSE,  FALSE,  TRUE,    "Clip input during distortion comp."            },
   { "EnableComponentmPSNR",      &dParams->m_enableCompmPSNR,                       FALSE,  FALSE,  TRUE,    "Enable per component mPSNR"                    },
   { "EnableComponentmPSNRfast",  &dParams->m_enableCompmPSNRfast,                   FALSE,  FALSE,  TRUE,    "Enable per component mPSNR (fast)"             },
-  { "EnableSymmetricmPSNRfast",  &dParams->m_enableSymmetry,                        FALSE,  FALSE,  TRUE,    "Enable symmetric mPSNR computation(fast)"      },
-  { "EnableLogSSIM",             &dParams->m_useLogSSIM,                            FALSE,  FALSE,  TRUE,    "Enable log reporting of SSIM results"          },
+  { "EnableSymmetricmPSNRfast",  &dParams->m_enableSymmetry,                        FALSE,  FALSE,  TRUE,    "Enable symmetric mPSNR computation(fast)"        },
+  { "EnableLogSSIM",             &ssim->m_useLog,                                   FALSE,  FALSE,  TRUE,    "Enable log reporting of SSIM results"             },
+  { "EnableTFunctionLUT",        &ssim->m_tfLUTEnable,                              FALSE,  FALSE,  TRUE,    "Enable TF LUT for some operations"               }, 
+  { "EnableTFunctionLUT",        &snr->m_tfLUTEnable,                               FALSE,  FALSE,  TRUE,    "Enable TF LUT for some operations"               }, 
   
   { "",                          NULL,                                              FALSE,  FALSE, FALSE,    "Boolean Termination entry"                     }
 };
@@ -199,8 +203,8 @@ DoubleParameter doubleParameterList[] = {
   { "WhitePointDeltaE3",     &dParams->m_whitePointDeltaE[2],                         5000.0,        1.0,    10000.0,    "3rd reference white point value"                             },
   // 429496.729500000  is the largest value of luminance in Mastering Display Color Volume SEI
   { "AmplitudeFactor",       &dParams->m_amplitudeFactor,                                1.0,  1.0/429496.7295, 429496.7295, "Scale factor to convert real-valued samples <--> cd/m^2" },
-  { "SSIMK1",                &dParams->m_ssimK1,                                        0.01,  0.0000001,        1.0,    "SSIM/MSSSIM K1 parameter"                              },
-  { "SSIMK2",                &dParams->m_ssimK2,                                        0.03,  0.0000001,        1.0,    "SSIM/MSSSIM K2 parameter"                              },
+  { "SSIMK1",                &ssim->m_K1,                                               0.01,  0.0000001,        1.0,    "SSIM/MSSSIM K1 parameter"                              },
+  { "SSIMK2",                &ssim->m_K2,                                               0.03,  0.0000001,        1.0,    "SSIM/MSSSIM K2 parameter"                              },
   { "",                      NULL,                                                       0.0,        0.0,        0.0,    "Double Termination entry"                                    }
 };
 

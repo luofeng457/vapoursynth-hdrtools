@@ -158,9 +158,6 @@ IntegerParameter intParameterList[] = {
   { "",                       NULL,                                                  0,           0,          0,    "Integer Termination entry"               }
 };
 
-int     m_ssimBlockDistance;
-int     m_ssimBlockSizeX;
-int     m_ssimBlockSizeY;
 
 BoolParameter boolParameterList[] = {
   { "Input0Interleaved",         &pParams->m_inputFile[0].m_isInterleaved,                FALSE,      FALSE,      TRUE,    "1st Input Interleaved Source"                  },

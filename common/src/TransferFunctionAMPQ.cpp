@@ -124,9 +124,14 @@ double TransferFunctionAMPQ::forwardPQ(double value) {
 }
 
 double TransferFunctionAMPQ::inversePQ(double value) {
-  double tempValue = pow((double) value, m1);
+  value = dClip(value, 0, 1.0);
+  double tempValue = pow(value, m1);
   return (float) (pow(((c2 *(tempValue) + c1)/(1.0 + c3 *(tempValue))), m2));
 }
+
+//-----------------------------------------------------------------------------
+// Public methods
+//-----------------------------------------------------------------------------
 
 
 double TransferFunctionAMPQ::forward(double value) {
@@ -149,109 +154,6 @@ double TransferFunctionAMPQ::inverse(double value) {
   }
 }
 
-//-----------------------------------------------------------------------------
-// Public methods
-//-----------------------------------------------------------------------------
-
-
-void TransferFunctionAMPQ::forward( Frame* out, const Frame *inp, int component ) {
-  // In this scenario, we should likely copy the frame number externally
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) forward((double) inp->m_floatComp[component][i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) (m_normalFactor * forward((double) inp->m_floatComp[component][i]));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-}
-
-void TransferFunctionAMPQ::forward( Frame* out, const Frame *inp ) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-  
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) forward((double) inp->m_floatData[i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) (m_normalFactor * forward((double) inp->m_floatData[i]));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp);
-    }
-  }
-}
-
-void TransferFunctionAMPQ::inverse( Frame* out, const Frame *inp, int component ) {
-  // In this scenario, we should likely copy the frame number externally
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) inverse((double) inp->m_floatComp[component][i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) inverse(dMax(0.0, dMin((double) inp->m_floatComp[component][i]/m_normalFactor, 1.0)));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-}
-
-void TransferFunctionAMPQ::inverse( Frame* out, const Frame *inp ) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) inverse((double) inp->m_floatData[i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) inverse(dMax(0.0, dMin((double) inp->m_floatData[i]/m_normalFactor, 1.0)));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp);
-    }
-  }
-}
 
 //-----------------------------------------------------------------------------
 // End of file

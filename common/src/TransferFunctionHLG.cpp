@@ -82,54 +82,6 @@ double TransferFunctionHLG::inverse(double value) {
   return (value < 1.0 ? 0.5 * sqrt(value) : m_a * log(value - m_b) + m_c);
 }
 
-void TransferFunctionHLG::forward(Frame *out, const Frame *inp)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size)  {
-    for (int index = 0; index < inp->m_size; index++) {
-      out->m_floatData[index] = (float) forward((double) inp->m_floatData[index]);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp);
-  }
-}
-
-void TransferFunctionHLG::forward(Frame *out, const Frame *inp, int component)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    for (int index = 0; index < inp->m_compSize[component]; index++) {
-      out->m_floatComp[component][index] = (float) forward((double) inp->m_floatComp[component][index]);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp, component);
-  }
-}
-
-void TransferFunctionHLG::inverse(Frame *out, const Frame *inp)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size)  {
-    for (int index = 0; index < inp->m_size; index++) {
-      out->m_floatData[index] = (float) inverse((double) inp->m_floatData[index]);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp);
-  }
-}
-
-void TransferFunctionHLG::inverse(Frame *out, const Frame *inp, int component)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    for (int index = 0; index < inp->m_compSize[component]; index++) {
-      out->m_floatComp[component][index] = (float) inverse((double) inp->m_floatComp[component][index]);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp, component);
-  }
-}
-
 //-----------------------------------------------------------------------------
 // End of file
 //-----------------------------------------------------------------------------

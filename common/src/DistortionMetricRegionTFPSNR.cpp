@@ -63,24 +63,23 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod)
+DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue)
  : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion);
   m_totalComponents    = TOTAL_COMPONENTS; // 3 for YCbCr, 3 for RGB, 3 for XYZ and three aggregators = 12
   
-  m_blockWidth    = blockWidth;
-  m_blockHeight   = blockWidth;
-  m_overlapWidth  = overlapWidth;
-  m_overlapHeight = overlapHeight;
+  m_blockWidth    = params->m_rPSNRBlockSizeX;
+  m_blockHeight   = params->m_rPSNRBlockSizeY;
+  m_overlapWidth  = params->m_rPSNROverlapX;
+  m_overlapHeight = params->m_rPSNROverlapY;
   m_width         = format->m_width[Y_COMP];
   m_height        = format->m_height[Y_COMP];
   
-  m_computePsnrInRgb   = computePsnrInRgb;
-  m_computePsnrInXYZ   = computePsnrInXYZ;
-  m_computePsnrInYCbCr = computePsnrInYCbCr;
-  m_computePsnrInYUpVp = computePsnrInYUpVp;
-
+  m_computePsnrInRgb   = params->m_computePsnrInRgb;
+  m_computePsnrInXYZ   = params->m_computePsnrInXYZ;
+  m_computePsnrInYCbCr = params->m_computePsnrInYCbCr;
+  m_computePsnrInYUpVp = params->m_computePsnrInYUpVp;
   
   m_diffData.resize  ( m_width * m_height );
    
@@ -103,7 +102,7 @@ DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *fo
   }
 
   m_colorSpace    = format->m_colorSpace;
-  m_enableShowMSE = enableShowMSE;
+  m_enableShowMSE = params->m_enableShowMSE;
   
   for (int c = 0; c < m_totalComponents; c++) {
     m_mse[c]  = 0.0;

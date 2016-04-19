@@ -63,17 +63,17 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricTFPSNR::DistortionMetricTFPSNR(const FrameFormat *format, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod)
+DistortionMetricTFPSNR::DistortionMetricTFPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion);
   m_totalComponents    = TOTAL_COMPONENTS; // 3 for YCbCr, 3 for RGB, 3 for XYZ and three aggregators = 12
   m_colorSpace         = format->m_colorSpace;
-  m_enableShowMSE      = enableShowMSE;
-  m_computePsnrInRgb   = computePsnrInRgb;
-  m_computePsnrInXYZ   = computePsnrInXYZ;
-  m_computePsnrInYCbCr = computePsnrInYCbCr;
-  m_computePsnrInYUpVp = computePsnrInYUpVp;
+  m_enableShowMSE      = params->m_enableShowMSE;
+  m_computePsnrInRgb   = params->m_computePsnrInRgb;
+  m_computePsnrInXYZ   = params->m_computePsnrInXYZ;
+  m_computePsnrInYCbCr = params->m_computePsnrInYCbCr;
+  m_computePsnrInYUpVp = params->m_computePsnrInYUpVp;
   
   for (int c = 0; c < m_totalComponents; c++) {
     m_mse[c]   = 0.0;

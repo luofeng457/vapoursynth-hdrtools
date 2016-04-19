@@ -121,7 +121,7 @@ private:
   void padImage                      (const float*  src, float *buffer, int width, int height);
 public:
   // Construct/Deconstruct
-  DistortionMetricTFMSSSIM(const FrameFormat *format, int blockSizeX, int blockSizeY, int blockDistance, bool useLogSSIM, double K1, double K2, double maxSampleValue, DistortionFunction distortionMethod);
+  DistortionMetricTFMSSSIM(const FrameFormat *format, SSIMParams *params, double maxSampleValue);
   virtual ~DistortionMetricTFMSSSIM();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

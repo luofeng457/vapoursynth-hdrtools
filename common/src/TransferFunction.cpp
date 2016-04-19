@@ -5,9 +5,9 @@
  *
  * <OWNER> = Apple Inc.
  * <ORGANIZATION> = Apple Inc.
- * <YEAR> = 2014
+ * <YEAR> = 2014-2016
  *
- * Copyright (c) 2014, Apple Inc.
+ * Copyright (c) 2014-2016, Apple Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -72,6 +72,8 @@
 #ifdef __SIM2_SUPPORT_ENABLED__
 #include "TransferFunctionSim2.H"
 #endif
+#include <time.h>
+
 
 //-----------------------------------------------------------------------------
 // Private methods
@@ -80,9 +82,9 @@
 //-----------------------------------------------------------------------------
 // Public methods
 //-----------------------------------------------------------------------------
-TransferFunction *TransferFunction::create(int method, int singleStep, float scale, float systemGamma, float minValue, float maxValue) {
+TransferFunction *TransferFunction::create(int method, int singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT) {
   TransferFunction *result = NULL;
-    
+  
   switch (method){
     case TF_NULL:
       result = new TransferFunctionNull();
@@ -169,41 +171,296 @@ TransferFunction *TransferFunction::create(int method, int singleStep, float sca
       exit(EXIT_FAILURE);
   }
   
+  result->m_enableLUT = enableLUT;
+
+  result->initLUT();
+  
   return result;
 }
 
-// The following functions perform in place conversion. They currently also do not support normalization (TBF)
-// We intend to also move all the original functions here that perform conversion to a different frame buffer.
-// That would considerably improve the code.
+void TransferFunction::initLUT() {  
+  if (m_enableLUT == FALSE) {
+    m_binsLUT = 0;
+  }
+  else {
+    printf("Initializing LUTs for TF computations\n");
+    uint32 i, j;
+    m_binsLUT = 10;
+    m_elementsLUT.resize    (m_binsLUT);
+    m_multiplierLUT.resize  (m_binsLUT);
+    m_boundLUT.resize       (m_binsLUT + 1);
+    m_invTransformLUT.resize(m_binsLUT);
+    m_fwdTransformLUT.resize(m_binsLUT);
+    m_boundLUT[0] = 0.0;
+    for (i = 0; i < m_binsLUT; i++) {
+      m_elementsLUT[i] = 10000; // Size of each bin. 
+                                // Could be different for each bin, but for now lets set this to be the same.
+      m_boundLUT[i + 1] = 1 / pow( 10.0 , (double) (m_binsLUT - i - 1)); // upper bin boundary
+      double stepSize = (m_boundLUT[i + 1] -  m_boundLUT[i]) / (m_elementsLUT[i] - 1);
+      m_multiplierLUT[i] = (double) (m_elementsLUT[i] - 1) / (m_boundLUT[i + 1] -  m_boundLUT[i]);
+      
+      // Now allocate memory given the specified size
+      m_invTransformLUT[i].resize(m_elementsLUT[i]);
+      m_fwdTransformLUT[i].resize(m_elementsLUT[i]);
+      for (j = 0; j < m_elementsLUT[i] ; j++) {
+        double curValue = m_boundLUT[i] + (double) j * stepSize;
+        m_invTransformLUT[i][j] = inverse(curValue);
+        m_fwdTransformLUT[i][j] = forward(curValue);
+      }
+    }
+  }
+}
+
+
+
+double TransferFunction::inverseLUT(double value) {
+  if (value <= 0.0)
+    return m_invTransformLUT[0][0];
+  else if (value >= 1.0) {
+  // top value, most likely 1.0
+    return m_invTransformLUT[m_binsLUT - 1][m_elementsLUT[m_binsLUT - 1] - 1];
+  }
+  else { // now search for value in the table
+    for (int i = 0; i < m_binsLUT; i++) {
+      if (value < m_boundLUT[i + 1]) { // value located
+        double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
+        //return (m_invTransformMap[(int) dRound(satValue)]);
+        int    valuePlus     = (int) dCeil(satValue) ;
+        double distancePlus  = (double) valuePlus - satValue;
+        return (m_invTransformLUT[i][valuePlus - 1] * distancePlus + m_invTransformLUT[i][valuePlus] * (1.0 - distancePlus));
+      }
+    }
+  }
+  return 0.0;
+}
+
+double TransferFunction::forwardLUT(double value) {
+  if (value <= 0.0)
+    return m_fwdTransformLUT[0][0];
+  else if (value >= 1.0  ) {
+    // top value, most likely 1.0
+    return m_fwdTransformLUT[m_binsLUT - 1][m_elementsLUT[m_binsLUT - 1] - 1];
+  }
+  else {
+    // now search for value in the table
+    for (int i = 0; i < m_binsLUT; i++) {
+      if (value < m_boundLUT[i + 1]) { // value located
+        double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
+        //return (m_invTransformMap[(int) dRound(satValue)]);
+        int    valuePlus     = (int) dCeil(satValue) ;
+        double distancePlus  = (double) valuePlus - satValue;
+        return (m_fwdTransformLUT[i][valuePlus - 1] * distancePlus + m_fwdTransformLUT[i][valuePlus] * (1.0 - distancePlus));
+      }
+    }
+  }
+  return 0.0;
+}
+
+
+double TransferFunction::getForward(double value) {
+  if (m_enableLUT == FALSE)
+    return forward(value);
+  else 
+    return forwardLUT(value);
+}
+
+double TransferFunction::getInverse(double value) {
+  if (m_enableLUT == FALSE)
+    return inverse(value);
+  else 
+    return inverseLUT(value);
+}
+
 
 void TransferFunction::forward( Frame* frame, int component ) {
   if (frame->m_isFloat == TRUE) {
-    for (int i = 0; i < frame->m_compSize[component]; i++) {
-      frame->m_floatComp[component][i] = (float) forward((double) frame->m_floatComp[component][i]);
+    if (m_enableLUT == FALSE) {
+      for (int i = 0; i < frame->m_compSize[component]; i++) {
+        frame->m_floatComp[component][i] = (float) forward((double) frame->m_floatComp[component][i]);
+      }
+    }
+    else {
+      for (int i = 0; i < frame->m_compSize[component]; i++) {
+        frame->m_floatComp[component][i] = (float) forwardLUT((double) frame->m_floatComp[component][i]);
+      }      
     }
   }
 }
 
 void TransferFunction::forward( Frame* frame ) {  
   if (frame->m_isFloat) {
-    for (int i = 0; i < frame->m_size; i++) {
-      frame->m_floatData[i] = (float) forward((double) frame->m_floatData[i]);
+    if (m_enableLUT == FALSE) {
+      for (int i = 0; i < frame->m_size; i++) {
+        frame->m_floatData[i] = (float) forward((double) frame->m_floatData[i]);
+      }
+    }
+    else {
+      printf("in here\n");
+      for (int i = 0; i < frame->m_size; i++) {
+        frame->m_floatData[i] = (float) forwardLUT((double) frame->m_floatData[i]);
+      }      
     }
   }
 }
 
 void TransferFunction::inverse( Frame* frame, int component ) {
   if (frame->m_isFloat == TRUE) {
-    for (int i = 0; i < frame->m_compSize[component]; i++) {
-      frame->m_floatComp[component][i] = (float) inverse((double) frame->m_floatComp[component][i]);
+    if (m_enableLUT == FALSE) {
+      for (int i = 0; i < frame->m_compSize[component]; i++) {
+        frame->m_floatComp[component][i] = (float) inverse((double) frame->m_floatComp[component][i]);
+      }
+    }
+    else {
+      for (int i = 0; i < frame->m_compSize[component]; i++) {
+        frame->m_floatComp[component][i] = (float) inverseLUT((double) frame->m_floatComp[component][i]);
+      }      
     }
   }
 }
 
 void TransferFunction::inverse( Frame* frame ) {
   if (frame->m_isFloat) {
-    for (int i = 0; i < frame->m_size; i++) {
-      frame->m_floatData[i] = (float) inverse((double) frame->m_floatData[i]);
+    if (m_enableLUT == FALSE) {
+      for (int i = 0; i < frame->m_size; i++) {
+        frame->m_floatData[i] = (float) inverse((double) frame->m_floatData[i]);
+      }
+    }
+    else {
+      for (int i = 0; i < frame->m_size; i++) {
+        frame->m_floatData[i] = (float) inverseLUT((double) frame->m_floatData[i]);
+      }      
+    }
+  }
+}
+
+
+void TransferFunction::forward( Frame* out, const Frame *inp, int component ) {
+  // In this scenario, we should likely copy the frame number externally
+  if (m_normalFactor == 1.0) {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
+      for (int i = 0; i < inp->m_compSize[component]; i++) {
+        out->m_floatComp[component][i] = (float) forward((double) inp->m_floatComp[component][i]);
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp, component);
+    }
+  }
+  else {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
+      for (int i = 0; i < inp->m_compSize[component]; i++) {
+        out->m_floatComp[component][i] = (float) (m_normalFactor * forward((double) inp->m_floatComp[component][i]));
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+
+      out->copy((Frame *) inp, component);
+    }
+  }
+}
+
+void TransferFunction::forward( Frame* out, const Frame *inp ) {
+  out->m_frameNo = inp->m_frameNo;
+  out->m_isAvailable = TRUE;
+  
+  if (m_normalFactor == 1.0) {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
+      if (m_enableLUT == FALSE) {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) forward((double) inp->m_floatData[i]);
+        }
+      }
+      else {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) forwardLUT((double) inp->m_floatData[i]);
+        }        
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp);
+    }
+  }
+  else {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
+      if (m_enableLUT == FALSE) {
+        for (int i = 0; i < inp->m_size; i++) {
+          // ideally, we should remove the double cast. However, we are currently keeping compatibility with the old code
+          //out->m_floatData[i] = (float) (m_normalFactor * forward((double) inp->m_floatData[i]));
+          out->m_floatData[i] = (float) (m_normalFactor * (double) ((float) forward((double) inp->m_floatData[i])));
+        }
+      }
+      else {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) (m_normalFactor * (double) forwardLUT((double) inp->m_floatData[i]));
+        }        
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp);
+    }
+  }
+}
+
+void TransferFunction::inverse( Frame* out, const Frame *inp, int component ) {
+  // In this scenario, we should likely copy the frame number externally
+  if (m_normalFactor == 1.0) {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
+      for (int i = 0; i < inp->m_compSize[component]; i++) {
+        out->m_floatComp[component][i] = (float) inverse((double) inp->m_floatComp[component][i]);
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp, component);
+    }
+  }
+  else {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
+      for (int i = 0; i < inp->m_compSize[component]; i++) {
+        out->m_floatComp[component][i] = (float) inverse((double) inp->m_floatComp[component][i] / m_normalFactor);
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp, component);
+    }
+  }
+}
+
+void TransferFunction::inverse( Frame* out, const Frame *inp ) {
+  out->m_frameNo = inp->m_frameNo;
+  out->m_isAvailable = TRUE;
+  
+  if (m_normalFactor == 1.0) {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
+      if (m_enableLUT == FALSE) {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) inverse((double) inp->m_floatData[i]);
+        }
+      }
+      else {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) inverseLUT((double) inp->m_floatData[i]);
+        }        
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp);
+    }
+  }
+  else {
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
+      if (m_enableLUT == FALSE) {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) inverse((double) inp->m_floatData[i] / m_normalFactor);
+        }
+      }
+      else {
+        for (int i = 0; i < inp->m_size; i++) {
+          out->m_floatData[i] = (float) inverseLUT((double) inp->m_floatData[i] / m_normalFactor);
+        }        
+      }
+    }
+    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
+      out->copy((Frame *) inp);
     }
   }
 }

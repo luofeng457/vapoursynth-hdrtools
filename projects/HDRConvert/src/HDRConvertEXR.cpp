@@ -428,19 +428,19 @@ void HDRConvertEXR::init (ProjectParameters *inputParams) {
   }
     
   m_addNoise = AddNoise::create(inputParams->m_addNoise, inputParams->m_noiseVariance, inputParams->m_noiseMean);
-  m_inputTransferFunction  = TransferFunction::create(input->m_transferFunction, TRUE, inputParams->m_srcNormalScale, input->m_systemGamma, inputParams->m_srcMinValue, inputParams->m_srcMaxValue);
+  m_inputTransferFunction  = TransferFunction::create(input->m_transferFunction, TRUE, inputParams->m_srcNormalScale, input->m_systemGamma, inputParams->m_srcMinValue, inputParams->m_srcMaxValue, inputParams->m_enableTFunctionLUT);
 
   if ( output->m_iConstantLuminance !=0 || (output->m_transferFunction != TF_NULL && output->m_transferFunction != TF_POWER && ( inputParams->m_useSingleTransferStep == FALSE || (output->m_transferFunction != TF_PQ && output->m_transferFunction != TF_HPQ && output->m_transferFunction != TF_HPQ2 && output->m_transferFunction != TF_APQ && output->m_transferFunction != TF_APQS && output->m_transferFunction != TF_MPQ && output->m_transferFunction != TF_AMPQ  && output->m_transferFunction != TF_PH  && output->m_transferFunction != TF_APH && output->m_transferFunction != TF_HLG && output->m_transferFunction != TF_NORMAL)) )) {
     m_useSingleTransferStep = FALSE;
     m_normalizeFunction = TransferFunction::create(TF_NORMAL, FALSE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);
-    m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, FALSE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);
+    m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, FALSE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue, inputParams->m_enableTFunctionLUT);
   }
   else {
     m_useSingleTransferStep = TRUE;
     //m_normalizeFunction = NULL;
     m_normalizeFunction = TransferFunction::create(TF_NORMAL, FALSE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);
 
-    m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, TRUE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue);
+    m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, TRUE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue, inputParams->m_enableTFunctionLUT);
   }
  
   m_srcDisplayGammaAdjust = DisplayGammaAdjust::create(input->m_displayAdjustment,  m_useSingleTransferStep ? inputParams->m_srcNormalScale : 1.0f, input->m_systemGamma);

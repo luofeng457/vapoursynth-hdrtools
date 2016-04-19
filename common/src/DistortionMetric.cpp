@@ -117,26 +117,28 @@ DistortionMetric *DistortionMetric::create(const FrameFormat *format, int distor
   switch (distortionMetric) {
     default:
     case DIST_PSNR:
-      result = new DistortionMetricPSNR(format, distortionParameters->m_enableShowMSE, distortionParameters->m_maxSampleValue);
+      result = new DistortionMetricPSNR(format, 
+                                        distortionParameters->m_PSNR.m_enableShowMSE, 
+                                        distortionParameters->m_maxSampleValue);
       break;
     case DIST_MPSNR:
-      result = new DistortionMetricmPSNR(format, distortionParameters->m_enableCompmPSNR, distortionParameters->m_maxSampleValue);
+      result = new DistortionMetricmPSNR(format, 
+                                         distortionParameters->m_enableCompmPSNR, 
+                                         distortionParameters->m_maxSampleValue);
       break;
     case DIST_MPSNRFAST:
-      result = new DistortionMetricmPSNRfast(format, distortionParameters->m_enableCompmPSNRfast, distortionParameters->m_enableSymmetry);
+      result = new DistortionMetricmPSNRfast(format, 
+                                             distortionParameters->m_enableCompmPSNRfast, 
+                                             distortionParameters->m_enableSymmetry);
       break;
     case DIST_TFPSNR:
-      result = new DistortionMetricTFPSNR(format, distortionParameters->m_enableShowMSE,
-                                          distortionParameters->m_computePsnrInYCbCr,
-                                          distortionParameters->m_computePsnrInRgb,
-                                          distortionParameters->m_computePsnrInXYZ,
-                                          distortionParameters->m_computePsnrInYUpVp,
-                                          distortionParameters->m_maxSampleValue,
-                                          distortionParameters->m_tfPSNRDistortion);
+      result = new DistortionMetricTFPSNR(format, 
+                                          &distortionParameters->m_PSNR,
+                                          distortionParameters->m_maxSampleValue);
       break;
     case DIST_DELTAE:
       result = new DistortionMetricDeltaE(format, 
-                                          distortionParameters->m_enableShowMSE, 
+                                          distortionParameters->m_PSNR.m_enableShowMSE, 
                                           distortionParameters->m_maxSampleValue, 
                                           distortionParameters->m_whitePointDeltaE, 
                                           distortionParameters->m_deltaEPointsEnable);
@@ -146,55 +148,31 @@ DistortionMetric *DistortionMetric::create(const FrameFormat *format, int distor
       break;
     case DIST_MSSSIM:
       result = new DistortionMetricMSSSIM(format, 
-                                         distortionParameters->m_ssimBlockSizeX, 
-                                         distortionParameters->m_ssimBlockSizeY, 
-                                         distortionParameters->m_ssimBlockDistance, 
-                                         distortionParameters->m_useLogSSIM, 
-                                         distortionParameters->m_ssimK1, 
-                                         distortionParameters->m_ssimK2, 
-                                         distortionParameters->m_maxSampleValue);
+                                          &distortionParameters->m_SSIM,
+                                          distortionParameters->m_maxSampleValue);
       break;
     case DIST_TFMSSSIM:
       result = new DistortionMetricTFMSSSIM(format, 
-                                            distortionParameters->m_ssimBlockSizeX, 
-                                            distortionParameters->m_ssimBlockSizeY, 
-                                            distortionParameters->m_ssimBlockDistance, 
-                                            distortionParameters->m_useLogSSIM, 
-                                            distortionParameters->m_ssimK1, 
-                                            distortionParameters->m_ssimK2, 
-                                            distortionParameters->m_maxSampleValue, 
-                                            distortionParameters->m_tfPSNRDistortion);
+                                            &distortionParameters->m_SSIM,
+                                            distortionParameters->m_maxSampleValue);
       break;
     case DIST_RPSNR:
       result = new DistortionMetricRegionPSNR(format, 
-                                              distortionParameters->m_rPSNRBlockSizeX, 
-                                              distortionParameters->m_rPSNRBlockSizeY, 
-                                              distortionParameters->m_rPSNROverlapX, 
-                                              distortionParameters->m_rPSNROverlapY, 
-                                              distortionParameters->m_enableShowMSE, 
+                                              &distortionParameters->m_PSNR,
                                               distortionParameters->m_maxSampleValue);
       break;
     case DIST_RTFPSNR:
     result = new DistortionMetricRegionTFPSNR(format,
-                                              distortionParameters->m_rPSNRBlockSizeX, 
-                                              distortionParameters->m_rPSNRBlockSizeY, 
-                                              distortionParameters->m_rPSNROverlapX, 
-                                              distortionParameters->m_rPSNROverlapY,
-                                              distortionParameters->m_enableShowMSE,
-                                              distortionParameters->m_computePsnrInYCbCr,
-                                              distortionParameters->m_computePsnrInRgb,
-                                              distortionParameters->m_computePsnrInXYZ,
-                                              distortionParameters->m_computePsnrInYUpVp,
-                                              distortionParameters->m_maxSampleValue,
-                                              distortionParameters->m_tfPSNRDistortion);
+                                              &distortionParameters->m_PSNR,
+                                              distortionParameters->m_maxSampleValue);
       break;
     case DIST_BLKJ341:
       result = new DistortionMetricBlockinessJ341(distortionParameters->m_maxSampleValue,
-                                                  distortionParameters->m_tfPSNRDistortion);
+                                                  distortionParameters->m_PSNR.m_tfDistortion);
       break;
     case DIST_BLK:
       result = new DistortionMetricBlockAct(distortionParameters->m_maxSampleValue,
-                                                  distortionParameters->m_tfPSNRDistortion);
+                                            distortionParameters->m_PSNR.m_tfDistortion);
       break;
     case DIST_VQM:
       result = new DistortionMetricVQM(format, &distortionParameters->m_VQM);

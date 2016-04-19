@@ -74,11 +74,6 @@ public:
   virtual double forward(double value);
   virtual double inverse(double value);
 
-  
-  virtual void forward(Frame *out,  const Frame *inp);
-  virtual void forward(Frame *out,  const Frame *inp, int component);
-  virtual void inverse(Frame *out,  const Frame *inp);
-  virtual void inverse(Frame *out,  const Frame *inp, int component);
 };
 
 #endif
