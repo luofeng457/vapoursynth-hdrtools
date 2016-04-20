@@ -602,8 +602,6 @@ int InputEXR::reformatData (uint8 *buf,  float  *floatComp[4]) {
         for (i = 0; i < m_width[component[j]]; i++) {
           // Convert data from half precision to float.
           *comp++ = halfToFloat(*curBuf++);
-          //if (k > 982 && i == 0)
-          //printf("Value %d %d %7.3f\n", *(comp - 1), *(curBuf - 1), *((float *) (comp - 1)));
         }
       }
     }

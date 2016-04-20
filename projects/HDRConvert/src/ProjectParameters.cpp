@@ -139,7 +139,7 @@ IntegerParameter intParameterList[] = {
   { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,               3,    "Use Min/Max Filtering"                    },
   { "ToneMappingMode",         &pParams->m_toneMapping,                  TM_NULL,     TM_NULL,    TM_TOTAL - 1,    "Tone Mapping Mode "                       },
   { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,               2,    "High Precision Color Mode "               },
-  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,              0,           0,               1,    "Use Adaptive Upsampler"                   },
+  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,       ADF_NULL,    ADF_NULL,   ADF_TOTAL - 1,    "Use Adaptive Upsampler"                   },
   { "UseAdaptiveDownsampling", &pParams->m_useAdaptiveDownsampling,     ADF_NULL,    ADF_NULL,   ADF_TOTAL - 1,    "Use Adaptive Downsampler"                   },
   
   { "",                        NULL,                                           0,           0,               0,    "Integer Termination entry"                }

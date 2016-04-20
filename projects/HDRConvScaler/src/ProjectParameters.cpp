@@ -40,7 +40,7 @@
  * \file ProjectParameters.cpp
  *
  * \brief
- *    ProjectParameters class functions for HDRConvert project
+ *    ProjectParameters class functions for HDRConvScaler project
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -135,7 +135,7 @@ IntegerParameter intParameterList[] = {
   { "OutputConstantLuminance", &out->m_iConstantLuminance,                     0,           0,              2,    "Constant Luminance Output"                },
   { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,              3,    "Use Min/Max Filtering"                    },
   { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,              2,    "High Precision Color Mode "               },
-  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,              0,           0,              1,    "Use Adaptive Upsampler"                   },
+  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,       ADF_NULL,    ADF_NULL,  ADF_TOTAL - 1,    "Use Adaptive Upsampler"                   },
   { "UseAdaptiveDownsampling", &pParams->m_useAdaptiveDownsampling,     ADF_NULL,    ADF_NULL,  ADF_TOTAL - 1,    "Use Adaptive Downsampler"                   },
 
   

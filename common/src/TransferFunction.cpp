@@ -221,7 +221,7 @@ double TransferFunction::inverseLUT(double value) {
     return m_invTransformLUT[m_binsLUT - 1][m_elementsLUT[m_binsLUT - 1] - 1];
   }
   else { // now search for value in the table
-    for (int i = 0; i < m_binsLUT; i++) {
+    for (uint32 i = 0; i < m_binsLUT; i++) {
       if (value < m_boundLUT[i + 1]) { // value located
         double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
         //return (m_invTransformMap[(int) dRound(satValue)]);
@@ -243,7 +243,7 @@ double TransferFunction::forwardLUT(double value) {
   }
   else {
     // now search for value in the table
-    for (int i = 0; i < m_binsLUT; i++) {
+    for (uint32 i = 0; i < m_binsLUT; i++) {
       if (value < m_boundLUT[i + 1]) { // value located
         double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
         //return (m_invTransformMap[(int) dRound(satValue)]);

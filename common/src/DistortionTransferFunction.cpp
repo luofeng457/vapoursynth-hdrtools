@@ -144,7 +144,8 @@ double DistortionTransferFunction::computePQ(double value) {
   static const double c2 = 2413.0 /   128.0;
   static const double c3 = 2392.0 /   128.0;
   
-  double tempValue = pow(dMax(0.0, dMin(value, 1.0)), m1);
+  // value = dClip(value, 0.0, 1.0);
+  double tempValue = pow(value, m1);
   return (pow(((c2 * (tempValue) + c1)/(1.0 + c3 * (tempValue))), m2));
 }
 
@@ -165,7 +166,7 @@ double DistortionTransferFunction::computeHPQ(double value) {
   static const double scale = computePQ(value1);
   
   //printf(" Value %10.8f %10.8f\n", scale, value);
-  value = dMax(0.0, dMin(value, 1.0));
+  //value = dClip(value, 0.0, 1.0);
   if (value < value0) {
     return ((linear * value * 100.0) * scale);
   }
@@ -190,7 +191,7 @@ double DistortionTransferFunction::computeHPQ2(double value) {
   static const double scale = computePQ(0.01);
   
   //printf(" Value %10.8f %10.8f\n", scale, value);
-  value = dMax(0.0, dMin(value, 1.0));
+  //value = dClip(value, 0.0, 1.0);
   if (value < 0.01) {
     return ((pow(value * 100.0, iGamma)) * scale);
   }
@@ -229,7 +230,7 @@ double DistortionTransferFunction::computeLUT(double value) {
     return m_computeLUT[m_binsLUT - 1][m_elementsLUT[m_binsLUT - 1] - 1];
   }
   else { // now search for value in the table
-    for (int i = 0; i < m_binsLUT; i++) {
+    for (uint32 i = 0; i < m_binsLUT; i++) {
       if (value < m_boundLUT[i + 1]) { // value located
         double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
         int    valuePlus     = (int) dCeil(satValue) ;

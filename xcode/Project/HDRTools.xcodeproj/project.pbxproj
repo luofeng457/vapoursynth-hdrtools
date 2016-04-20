@@ -250,6 +250,8 @@
 		C5CC7E371BB3677200EBE780 /* DistortionMetricBlockAct.H in Headers */ = {isa = PBXBuildFile; fileRef = C5CC7E361BB3677200EBE780 /* DistortionMetricBlockAct.H */; };
 		C5CC7E391BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5CC7E381BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp */; };
 		C5CC7E3B1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H in Headers */ = {isa = PBXBuildFile; fileRef = C5CC7E3A1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H */; };
+		C5D169301CC6EEF900A4A487 /* Conv420to444CrBounds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */; };
+		C5D169321CC6EF2300A4A487 /* Conv420to444CrBounds.H in Headers */ = {isa = PBXBuildFile; fileRef = C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */; };
 		C5DA4E3A1A5B17ED00DA2F2E /* Conv420to422Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */; };
 		C5DA4E3E1A5B674600DA2F2E /* Conv420to422Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */; };
 		C5DA4E401A5CB5B500DA2F2E /* OutputAVI.H in Headers */ = {isa = PBXBuildFile; fileRef = C5DA4E3F1A5CB5B500DA2F2E /* OutputAVI.H */; };
@@ -663,6 +665,8 @@
 		C5CC7E361BB3677200EBE780 /* DistortionMetricBlockAct.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricBlockAct.H; path = ../common/inc/DistortionMetricBlockAct.H; sourceTree = "<group>"; };
 		C5CC7E381BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameFilterWiener2DDark.cpp; path = ../common/src/FrameFilterWiener2DDark.cpp; sourceTree = "<group>"; };
 		C5CC7E3A1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameFilterWiener2DDark.H; path = ../common/inc/FrameFilterWiener2DDark.H; sourceTree = "<group>"; };
+		C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv420to444CrBounds.cpp; path = ../common/src/Conv420to444CrBounds.cpp; sourceTree = "<group>"; };
+		C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv420to444CrBounds.H; path = ../common/inc/Conv420to444CrBounds.H; sourceTree = "<group>"; };
 		C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv420to422Generic.cpp; path = ../common/src/Conv420to422Generic.cpp; sourceTree = "<group>"; };
 		C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv420to422Generic.H; path = ../common/inc/Conv420to422Generic.H; sourceTree = "<group>"; };
 		C5DA4E3F1A5CB5B500DA2F2E /* OutputAVI.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OutputAVI.H; path = ../common/inc/OutputAVI.H; sourceTree = "<group>"; };
@@ -1031,6 +1035,7 @@
 				C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */,
 				C51896311ACF62920021356F /* Conv420to444Adaptive.H */,
 				C5BD26B419CCAC10003F1B51 /* Conv420to444Generic.H */,
+				C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */,
 				C5BD26B319CCAC10003F1B51 /* Conv420to444NN.H */,
 				C5F1E38619D2035F00327932 /* Conv422to420Generic.H */,
 				C50BC6B51AE0C5F600F1A398 /* Conv444to420Adaptive.H */,
@@ -1170,6 +1175,7 @@
 				C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */,
 				C518962D1ACF62530021356F /* Conv420to444Adaptive.cpp */,
 				C5BD26E819CCAC17003F1B51 /* Conv420to444Generic.cpp */,
+				C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */,
 				C5BD26E719CCAC17003F1B51 /* Conv420to444NN.cpp */,
 				C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */,
 				C50BC6B31AE0C5D600F1A398 /* Conv444to420Adaptive.cpp */,
@@ -1504,6 +1510,7 @@
 				C5133DFC19CCF59C00D64D48 /* Input.H in Headers */,
 				C5F1E38719D2035F00327932 /* Conv422to420Generic.H in Headers */,
 				C5F63D291C6D6A9D004D8B25 /* ColorTransformClosedLoopFRGB.H in Headers */,
+				C5D169321CC6EF2300A4A487 /* Conv420to444CrBounds.H in Headers */,
 				C5133DFD19CCF59C00D64D48 /* InputEXR.H in Headers */,
 				C5DE88DF1A0D774600248B84 /* ColorTransformXYZ2YUpVp.H in Headers */,
 				C5133DFE19CCF59C00D64D48 /* InputTIFF.H in Headers */,
@@ -1742,6 +1749,7 @@
 				C5BE378D1B5730F800350F6D /* TransferFunctionPQLB.cpp in Sources */,
 				C5C22C721CA5D81A00A539F3 /* ColorTransformYAdjustFull.cpp in Sources */,
 				C53E9BC71C10F83600448F69 /* Conv444to420CrBounds.cpp in Sources */,
+				C5D169301CC6EEF900A4A487 /* Conv420to444CrBounds.cpp in Sources */,
 				C5133E1719CCF5B700D64D48 /* ConvertColorFormat.cpp in Sources */,
 				C51896341ACF63D80021356F /* ScaleFilter.cpp in Sources */,
 				C5133E1819CCF5B700D64D48 /* ConvertColorFormatNull.cpp in Sources */,

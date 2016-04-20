@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file Conv444to420CrBounds.cpp
+ * \file Conv420to444CrBounds.cpp
  *
  * \brief
- *    Convert 444 to 420 using an adaptive, Bounded Chroma edge detection method
+ *    Convert 420 to 444 using an adaptive filter selection approach
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -53,102 +53,101 @@
 //-----------------------------------------------------------------------------
 
 #include "Global.H"
-#include "Conv444to420CrBounds.H"
+#include "Conv420to444CrBounds.H"
 #include <string.h>
 
 //-----------------------------------------------------------------------------
 // Macros
 //-----------------------------------------------------------------------------
-#define DFSET 1
+
 //-----------------------------------------------------------------------------
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-Conv444to420CrBounds::Conv444to420CrBounds(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax) {
-  int hPhase, vPhase;
 
+Conv420to444CrBounds::Conv420to444CrBounds(int width, int height, int method, ChromaLocation chromaLocationType[2]) {
+  int hPhase[2];
+  int vPhase[2];
   // here we allocate the entire image buffers. To save on memory we could just allocate
   // these based on filter length, but this is test code so we don't care for now.
-  m_i32Data.resize  ( (width >> 1) * height );
-  m_floatData.resize( (width >> 1) * height );
-
-  
+  m_i32Data.resize  (width * height * 2);
+  m_floatData.resize(width * height * 2);
   // Currently we only support progressive formats, and thus ignore the bottom chroma location type
-  
   switch (chromaLocationType[FP_FRAME]) {
     case CL_FIVE:
-      hPhase = 1;
-      vPhase = 0;
+      hPhase[0] = 1;
+      hPhase[1] = 3;
+      vPhase[0] = 2;
+      vPhase[1] = 0;
       break;
     case CL_FOUR:
-      hPhase = 0;  
-      vPhase = 0;
+      hPhase[0] = 0;
+      hPhase[1] = 2;
+      vPhase[0] = 2;
+      vPhase[1] = 0;
       break;
     case CL_THREE:
-      hPhase = 1;
-      vPhase = 0;
+      hPhase[0] = 1;
+      hPhase[1] = 3;
+      vPhase[0] = 0;
+      vPhase[1] = 2;
       break;
     case CL_TWO:
-      hPhase = 0;
-      vPhase = 0;
+      hPhase[0] = 0;
+      hPhase[1] = 2;
+      vPhase[0] = 0;
+      vPhase[1] = 2;
       break;
     case CL_ONE:
-      hPhase = 1;
-      vPhase = 1;
+      hPhase[0] = 1;
+      hPhase[1] = 3;
+      vPhase[0] = 1;
+      vPhase[1] = 3;
       break;
     case CL_ZERO:
     default:
-      hPhase = 0;
-      vPhase = 1;
+      hPhase[0] = 0;
+      hPhase[1] = 2;
+      vPhase[0] = 1;
+      vPhase[1] = 3;
       break;
   }
-
-// Downsampling filters
-#if (DFSET == 1)
-// go through several sine based windows plus the F0 filter used currently
-  setupFilter(0, DF_SNW15,  hPhase, vPhase); // 15/16 tap
-  setupFilter(1, DF_SNW11,  hPhase, vPhase); // 11/12 tap
-  setupFilter(2, DF_SNW7,   hPhase, vPhase); // 7/10
-  setupFilter(3, DF_SNW3,   hPhase, vPhase); // 3/6
-  setupFilter(4, DF_F0,     hPhase, vPhase); // 3/2
-#elif (DFSET == 2)
-  setupFilter(0, DF_SSW15,  hPhase, vPhase); // 15/16 tap
-  setupFilter(1, DF_SSW11,  hPhase, vPhase); // 11/12 tap
-  setupFilter(2, DF_SSW7,   hPhase, vPhase); // 7/10
-  setupFilter(3, DF_SSW5,   hPhase, vPhase); // 5/6
-  setupFilter(4, DF_SSW3,   hPhase, vPhase); // 3/4
-#else
-  setupFilter(0, DF_GS,  hPhase, vPhase); // 15/16 tap
-  setupFilter(1, DF_SNW, hPhase, vPhase); // 13/14 tap
-  setupFilter(2, DF_TM,  hPhase, vPhase); // 11/12
-  setupFilter(3, DF_FV,  hPhase, vPhase); // 10/9
-  setupFilter(4, DF_F0,  hPhase, vPhase); // 3/2
-#endif
-
+   
+  setupFilter(0, UF_LS6,  hPhase, vPhase); // L6
+  setupFilter(1, UF_LS5,  hPhase, vPhase); // L5
+  setupFilter(2, UF_LS4,  hPhase, vPhase); // L4
+  setupFilter(3, UF_LS3,  hPhase, vPhase); // L3
+  setupFilter(4, UF_F0,   hPhase, vPhase); // L2
+  
   m_edgeClassifier = 0.15;
 }
 
-Conv444to420CrBounds::~Conv444to420CrBounds() {
+Conv420to444CrBounds::~Conv420to444CrBounds() {
+
+for (int phase = 0; phase < 2; phase++) {
   for (int index = 0; index < 5; index++) {
-    if (m_horFilterDown[index] != NULL) {
-      delete m_horFilterDown[index];
-      m_horFilterDown[index] = NULL;
+    if (m_horFilter[phase][index] != NULL) {
+      delete m_horFilter[phase][index];
+      m_horFilter[phase][index] = NULL;
     }
-    if (m_verFilterDown[index] != NULL) {
-      delete m_verFilterDown[index];
-      m_verFilterDown[index] = NULL;
+    if (m_verFilter[phase][index] != NULL) {
+      delete m_verFilter[phase][index];
+      m_verFilter[phase][index] = NULL;
     }
+  }
   }
 }
 
-void Conv444to420CrBounds::setupFilter(int index, DownSamplingFilters filter, int hPhase, int vPhase) {
-  int offset,     scale;
-  int downOffset, downScale;
-  m_horFilterDown[index] = new ScaleFilter(filter, 0,  0,      0,     0, &offset, &scale, hPhase);
-  m_verFilterDown[index] = new ScaleFilter(filter, 0,  2, offset, scale, &downOffset, &downScale, vPhase);
+void Conv420to444CrBounds::setupFilter(int index, UpSamplingFilters filter, int *hPhase, int *vPhase) {
+  int offset,     scale;  
+  
+  m_verFilter[0][index] = new ScaleFilter(filter, 1, 0,      0,     0, &offset, &scale, vPhase[0]); //even
+  m_horFilter[0][index] = new ScaleFilter(filter, 1, 2, offset, scale, &offset, &scale, hPhase[0]); //even
+  m_verFilter[1][index] = new ScaleFilter(filter, 1, 0,      0,     0, &offset, &scale, vPhase[1]); //odd
+  m_horFilter[1][index] = new ScaleFilter(filter, 1, 2, offset, scale, &offset, &scale, hPhase[1]); //odd
 }
 
-float Conv444to420CrBounds::filterHorizontal(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
+float Conv420to444CrBounds::filterHorizontal(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
   double value = 0.0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += (double) filter->m_floatFilter[i] * (double) inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
@@ -160,7 +159,8 @@ float Conv444to420CrBounds::filterHorizontal(const float *inp, const ScaleFilter
     return (float) ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale);
 }
 
-int Conv444to420CrBounds::filterHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+
+int Conv420to444CrBounds::filterHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
   int value = 0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += filter->m_i32Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
@@ -172,7 +172,7 @@ int Conv444to420CrBounds::filterHorizontal(const uint16 *inp, const ScaleFilter 
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
 
-int Conv444to420CrBounds::filterHorizontal(const int32 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+int Conv420to444CrBounds::filterHorizontal(const int32 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
   int value = 0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += filter->m_i32Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
@@ -184,7 +184,8 @@ int Conv444to420CrBounds::filterHorizontal(const int32 *inp, const ScaleFilter *
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
 
-int Conv444to420CrBounds::filterHorizontal(const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+
+int Conv420to444CrBounds::filterHorizontal(const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
   int value = 0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += filter->m_i32Filter[i] * inp[iClip(pos_x + i - filter->m_positionOffset, 0, width)];
@@ -196,7 +197,7 @@ int Conv444to420CrBounds::filterHorizontal(const imgpel *inp, const ScaleFilter 
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
 
-bool Conv444to420CrBounds::analyzeHorizontal(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
+bool Conv420to444CrBounds::analyzeHorizontal(const float *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue) {
   double minRange =  1e37;
   double maxRange = -1e37;
   
@@ -215,7 +216,7 @@ bool Conv444to420CrBounds::analyzeHorizontal(const float *inp, const ScaleFilter
     return 1;
 }
 
-bool Conv444to420CrBounds::analyzeHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+bool Conv420to444CrBounds::analyzeHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
   int minRange = INT_MAX;
   int maxRange = INT_MIN;
   
@@ -233,7 +234,7 @@ bool Conv444to420CrBounds::analyzeHorizontal(const uint16 *inp, const ScaleFilte
   return 1;
 }
 
-bool Conv444to420CrBounds::analyzeHorizontal(const int32 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+bool Conv420to444CrBounds::analyzeHorizontal(const int32 *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
   int minRange = INT_MAX;
   int maxRange = INT_MIN;
   
@@ -250,7 +251,7 @@ bool Conv444to420CrBounds::analyzeHorizontal(const int32 *inp, const ScaleFilter
   return 1;
 }
 
-bool Conv444to420CrBounds::analyzeHorizontal(const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
+bool Conv420to444CrBounds::analyzeHorizontal(const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int minValue, int maxValue) {
   int minRange = INT_MAX;
   int maxRange = INT_MIN;
   
@@ -266,20 +267,20 @@ bool Conv444to420CrBounds::analyzeHorizontal(const imgpel *inp, const ScaleFilte
   }
   return 1;
 }
-
-float Conv444to420CrBounds::filterVertical(const float *inp, const ScaleFilter *filter, int pos_y, int width, int height, float minValue, float maxValue) {
+float Conv420to444CrBounds::filterVertical(const float *inp, const ScaleFilter *filter, int pos_y, int width, int height, float minValue, float maxValue) {
   double value = 0.0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += (double) filter->m_floatFilter[i] * (double) inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
   }
   
   if (filter->m_clip == TRUE)
-    return fClip((float) ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale), -0.5, 0.5);
+    return fClip((float) ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale), minValue, maxValue);
   else
     return (float) ((value + (double) filter->m_floatOffset) * (double) filter->m_floatScale);
 }
 
-int Conv444to420CrBounds::filterVertical(const int32 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
+
+int Conv420to444CrBounds::filterVertical(const int32 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
   int value = 0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += filter->m_i32Filter[i] * inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
@@ -291,19 +292,7 @@ int Conv444to420CrBounds::filterVertical(const int32 *inp, const ScaleFilter *fi
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
 
-int Conv444to420CrBounds::filterVertical(const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
-  int value = 0;
-  for (int i = 0; i < filter->m_numberOfTaps; i++) {
-    value += filter->m_i32Filter[i] * inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
-  }
-  
-  if (filter->m_clip == TRUE)
-    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
-  else
-    return (value + filter->m_i32Offset) >> filter->m_i32Shift;
-}
-
-int Conv444to420CrBounds::filterVertical(const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
+int Conv420to444CrBounds::filterVertical(const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
   int value = 0;
   for (int i = 0; i < filter->m_numberOfTaps; i++) {
     value += filter->m_i32Filter[i] * inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
@@ -315,7 +304,20 @@ int Conv444to420CrBounds::filterVertical(const imgpel *inp, const ScaleFilter *f
     return (value + filter->m_i32Offset) >> filter->m_i32Shift;
 }
 
-bool Conv444to420CrBounds::analyzeVertical(const float *inp, const ScaleFilter *filter, int pos_y, int width, int height, float minValue, float maxValue) {
+int Conv420to444CrBounds::filterVertical(const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
+  int value = 0;
+  for (int i = 0; i < filter->m_numberOfTaps; i++) {
+    value += filter->m_i32Filter[i] * inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
+  }
+  
+  if (filter->m_clip == TRUE)
+    return iClip((value + filter->m_i32Offset) >> filter->m_i32Shift, minValue, maxValue);
+  else
+    return (value + filter->m_i32Offset) >> filter->m_i32Shift;
+}
+
+
+bool Conv420to444CrBounds::analyzeVertical(const float *inp, const ScaleFilter *filter, int pos_y, int width, int height, float minValue, float maxValue) {
   double minRange =  1e37;
   double maxRange = -1e37;
 
@@ -334,7 +336,7 @@ bool Conv444to420CrBounds::analyzeVertical(const float *inp, const ScaleFilter *
   return 1;
 }
 
-bool Conv444to420CrBounds::analyzeVertical(const int32 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
+bool Conv420to444CrBounds::analyzeVertical(const int32 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
   int minRange = INT_MAX;
   int maxRange = INT_MIN;
   int value = 0;
@@ -351,24 +353,7 @@ bool Conv444to420CrBounds::analyzeVertical(const int32 *inp, const ScaleFilter *
   return 1;
 }
 
-bool Conv444to420CrBounds::analyzeVertical(const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
-  int minRange = INT_MAX;
-  int maxRange = INT_MIN;
-  int value = 0;
-  for (int i = 0; i < filter->m_numberOfTaps; i++) {
-    value = inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
-    if (value < minRange)
-      minRange = value;
-    if (value > maxRange)
-      maxRange = value;
-    if ((maxRange - minRange) > m_edgeClassifier)
-      return 0;
-  }
-  
-  return 1;
-}
-
-bool Conv444to420CrBounds::analyzeVertical(const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
+bool Conv420to444CrBounds::analyzeVertical(const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
   int minRange = INT_MAX;
   int maxRange = INT_MIN;
   int value = 0;
@@ -384,34 +369,65 @@ bool Conv444to420CrBounds::analyzeVertical(const imgpel *inp, const ScaleFilter 
   
   return 1;
 }
-
+                    
+bool Conv420to444CrBounds::analyzeVertical(const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int height, int minValue, int maxValue) {
+  int minRange = INT_MAX;
+  int maxRange = INT_MIN;
+  int value = 0;
+  for (int i = 0; i < filter->m_numberOfTaps; i++) {
+    value = inp[iClip(pos_y + i - filter->m_positionOffset, 0, height) * width];
+    if (value < minRange)
+      minRange = value;
+    if (value > maxRange)
+      maxRange = value;
+    if ((maxRange - minRange) > m_edgeClassifier)
+      return 0;
+  }
+  
+  return 1;
+}
+                    
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-void Conv444to420CrBounds::filter(float *out, const float *inp, int width, int height, float minValue, float maxValue)
+void Conv420to444CrBounds::filter(float *out, const float *inp, int width, int height, float minValue, float maxValue)
 {
   int i, j, index;
-  int inp_width  = 2 * width;
-  int inputHeight = 2 * height;
+  int inp_width  = width >> 1;
+  int inputHeight = height >> 1;
   bool  testSamples;
-    
+
   for (j = 0; j < inputHeight; j++) {
-    for (i = 0; i < width; i++) {
+    for (i = 0; i < inp_width; i++) {
       for (index = 0; index < 5; index ++) {
-        testSamples = analyzeHorizontal(&inp[ j * inp_width], m_horFilterDown[index], 2 * i, inp_width - 1, 0.0, 0.0);
+        testSamples = analyzeVertical(&inp[i], m_verFilter[0][index], j    , inp_width, inputHeight - 1, 0.0, 0.0);
         if (testSamples == TRUE || index == 4) {
-          m_floatData[ j * width + i ] = filterHorizontal(&inp[ j * inp_width], m_horFilterDown[index], 2 * i, inp_width - 1, 0.0, 0.0);
+          m_floatData[ (2 * j    ) * inp_width + i ] = filterVertical(&inp[i], m_verFilter[0][index], j    , inp_width, inputHeight - 1, 0.0, 0.0);
+          break;
+        }
+      }
+      for (index = 0; index < 5; index ++) {
+        testSamples = analyzeVertical(&inp[i], m_verFilter[1][index], j    , inp_width, inputHeight - 1, 0.0, 0.0);
+        if (testSamples == TRUE || index == 4) {
+          m_floatData[ (2 * j + 1) * inp_width + i ] = filterVertical(&inp[i], m_verFilter[1][index], j + 1, inp_width, inputHeight - 1, 0.0, 0.0);
           break;
         }
       }
     }
-  }    
+  }
   for (j = 0; j < height; j++) {
-    for (i = 0; i < width; i++) {
+    for (i = 0; i < inp_width; i++) {
       for (index = 0; index < 5; index ++) {
-        testSamples = analyzeVertical(&m_floatData[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+        testSamples = analyzeHorizontal(&m_floatData[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
         if (testSamples == TRUE || index == 4) {
-        out[ j * width + i ] = filterVertical(&m_floatData[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+          out[ j * width + 2 * i     ] = filterHorizontal(&m_floatData[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
+          break;
+        }
+      }
+      for (index = 0; index < 5; index ++) {
+        testSamples = analyzeHorizontal(&m_floatData[ j * inp_width], m_horFilter[1][index], i    , inp_width - 1, minValue, maxValue);
+        if (testSamples == TRUE || index == 4) {
+          out[ j * width + 2 * i + 1 ] = filterHorizontal(&m_floatData[ j * inp_width], m_horFilter[1][index], i + 1, inp_width - 1, minValue, maxValue);
           break;
         }
       }
@@ -419,30 +435,47 @@ void Conv444to420CrBounds::filter(float *out, const float *inp, int width, int h
   }
 }
 
-void Conv444to420CrBounds::filter(uint16 *out, const uint16 *inp, int width, int height, int minValue, int maxValue)
+void Conv420to444CrBounds::filter(uint16 *out, const uint16 *inp, int width, int height, int minValue, int maxValue)
 {
   int i, j, index;
-  int inp_width  = 2 * width;
-  int inputHeight = 2 * height;
-  bool  testSamples;
+  int inp_width  = width >> 1;
+  int inputHeight = height >> 1;
+  
+  bool testSamples;
   
   for (j = 0; j < inputHeight; j++) {
-    for (i = 0; i < width; i++) {
+    for (i = 0; i < inp_width; i++) {
       for (index = 0; index < 5; index ++) {
-        testSamples = analyzeHorizontal(&inp[ j * inp_width], m_horFilterDown[index], 2 * i, inp_width - 1, minValue, maxValue);
+        testSamples = analyzeVertical(&inp[i], m_verFilter[0][index], j    , inp_width, inputHeight - 1, minValue, maxValue);
         if (testSamples == TRUE || index == 4) {
-          m_i32Data[ j * width + i ] = filterHorizontal(&inp[ j * inp_width], m_horFilterDown[index], 2 * i, inp_width - 1, minValue, maxValue);
+          m_i32Data[ (2 * j    ) * inp_width + i ] = filterVertical(&inp[i], m_verFilter[0][index], j    , inp_width, inputHeight - 1, minValue, maxValue);
+          break;
+        }
+      }
+      for (index = 0; index < 5; index ++) {
+        testSamples = analyzeVertical(&inp[i], m_verFilter[1][index], j    , inp_width, inputHeight - 1, minValue, maxValue);
+        if (testSamples == TRUE || index == 4) {
+          m_i32Data[ (2 * j + 1) * inp_width + i ] = filterVertical(&inp[i], m_verFilter[1][index], j + 1, inp_width, inputHeight - 1, minValue, maxValue);
           break;
         }
       }
     }
-  }    
+  }
+  
   for (j = 0; j < height; j++) {
-    for (i = 0; i < width; i++) {
+    for (i = 0; i < inp_width; i++) {
       for (index = 0; index < 5; index ++) {
-        testSamples = analyzeVertical(&m_i32Data[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+        testSamples = analyzeHorizontal(&m_i32Data[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
         if (testSamples == TRUE || index == 4) {
-          out[ j * width + i ] = filterVertical(&m_i32Data[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+          out[ j * width + 2 * i     ] = filterHorizontal(&m_i32Data[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
+          break;
+        }
+      }
+      for (index = 0; index < 5; index ++) {
+        testSamples = analyzeHorizontal(&m_i32Data[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
+        if (testSamples == TRUE || index == 4) {
+          
+          out[ j * width + 2 * i + 1 ] = filterHorizontal(&m_i32Data[ j * inp_width], m_horFilter[1][index], i + 1, inp_width - 1, minValue, maxValue);
           break;
         }
       }
@@ -450,30 +483,47 @@ void Conv444to420CrBounds::filter(uint16 *out, const uint16 *inp, int width, int
   }
 }
 
-void Conv444to420CrBounds::filter(imgpel *out, const imgpel *inp, int width, int height, int minValue, int maxValue)
+void Conv420to444CrBounds::filter(imgpel *out, const imgpel *inp, int width, int height, int minValue, int maxValue)
 {
   int i, j, index;
-  int inp_width  = 2 * width;
-  int inputHeight = 2 * height;
-  bool  testSamples;
+  int inp_width  = width >> 1;
+  int inputHeight = height >> 1;
   
+  bool testSamples;
+
   for (j = 0; j < inputHeight; j++) {
-    for (i = 0; i < width; i++) {
+    for (i = 0; i < inp_width; i++) {
       for (index = 0; index < 5; index ++) {
-        testSamples = analyzeHorizontal(&inp[ j * inp_width], m_horFilterDown[index], 2 * i, inp_width - 1, minValue, maxValue);
+        testSamples = analyzeVertical(&inp[i], m_verFilter[0][index], j    , inp_width, inputHeight - 1, minValue, maxValue);
         if (testSamples == TRUE || index == 4) {
-          m_i32Data[ j * width + i ] = filterHorizontal(&inp[ j * inp_width], m_horFilterDown[index], 2 * i, inp_width - 1, minValue, maxValue);
+          m_i32Data[ (2 * j    ) * inp_width + i ] = filterVertical(&inp[i], m_verFilter[0][index], j    , inp_width, inputHeight - 1, minValue, maxValue);
+          break;
+        }
+      }
+      for (index = 0; index < 5; index ++) {
+        testSamples = analyzeVertical(&inp[i], m_verFilter[1][index], j    , inp_width, inputHeight - 1, minValue, maxValue);
+        if (testSamples == TRUE || index == 4) {
+          m_i32Data[ (2 * j + 1) * inp_width + i ] = filterVertical(&inp[i], m_verFilter[1][index], j + 1, inp_width, inputHeight - 1, minValue, maxValue);
           break;
         }
       }
     }
-  }    
+  }
+  
   for (j = 0; j < height; j++) {
-    for (i = 0; i < width; i++) {
+    for (i = 0; i < inp_width; i++) {
       for (index = 0; index < 5; index ++) {
-        testSamples = analyzeVertical(&m_i32Data[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+        testSamples = analyzeHorizontal(&m_i32Data[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
         if (testSamples == TRUE || index == 4) {
-          out[ j * width + i ] = filterVertical(&m_i32Data[i], m_verFilterDown[index], (2 * j), width, inputHeight - 1, minValue, maxValue);
+          out[ j * width + 2 * i     ] = filterHorizontal(&m_i32Data[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
+          break;
+        }
+      }
+      for (index = 0; index < 5; index ++) {
+        testSamples = analyzeHorizontal(&m_i32Data[ j * inp_width], m_horFilter[0][index], i    , inp_width - 1, minValue, maxValue);
+        if (testSamples == TRUE || index == 4) {
+          
+          out[ j * width + 2 * i + 1 ] = filterHorizontal(&m_i32Data[ j * inp_width], m_horFilter[1][index], i + 1, inp_width - 1, minValue, maxValue);
           break;
         }
       }
@@ -485,7 +535,7 @@ void Conv444to420CrBounds::filter(imgpel *out, const imgpel *inp, int width, int
 // Public methods
 //-----------------------------------------------------------------------------
 
-void Conv444to420CrBounds::process ( Frame* out, const Frame *inp)
+void Conv420to444CrBounds::process ( Frame* out, const Frame *inp)
 {
   if (( out->m_isFloat != inp->m_isFloat ) || (( inp->m_isFloat == 0 ) && ( out->m_bitDepth != inp->m_bitDepth ))) {
     fprintf(stderr, "Error: trying to copy frames of different data types. \n");

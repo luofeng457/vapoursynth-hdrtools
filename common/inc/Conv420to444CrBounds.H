@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file Conv444to420CrBounds.H
+ * \file Conv420to444CrBounds.H
  *
  * \brief
- *    Conv444to420CrBounds class Header
+ *    Conv420to444CrBounds class Header
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -49,38 +49,39 @@
  */
 
 
-#ifndef __Conv444to420CrBounds_H__
-#define __Conv444to420CrBounds_H__
+#ifndef __Conv420to444CrBounds_H__
+#define __Conv420to444CrBounds_H__
 
 #include "Global.H"
 #include "Frame.H"
 #include "ConvertColorFormat.H"
 #include "ScaleFilter.H"
 
-
-class Conv444to420CrBounds : public ConvertColorFormat {
-
+class Conv420to444CrBounds : public ConvertColorFormat {
+  
 private:
   vector<int32> m_i32Data;
   vector<float> m_floatData;
-  ScaleFilter  *m_horFilterDown[5];
-  ScaleFilter  *m_verFilterDown[5];
   
+  ScaleFilter *m_horFilter[2][5];
+  ScaleFilter *m_verFilter[2][5];
   double        m_edgeClassifier;
-
-  void    setupFilter(int index, DownSamplingFilters filter, int hPhase, int vPhase);
+  
+  void    setupFilter(int index, UpSamplingFilters filter, int *hPhase, int *vPhase);
   
   void  filter(float  *out, const float  *inp, int width, int height, float minValue, float maxValue);
   void  filter(uint16 *out, const uint16 *inp, int width, int height, int   minValue, int   maxValue);
   void  filter(imgpel *out, const imgpel *inp, int width, int height, int   minValue, int   maxValue);
-  float filterHorizontal(const float  *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue);
-  int   filterHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
-  int   filterHorizontal(const int32  *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
-  int   filterHorizontal(const imgpel *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
-  float filterVertical  (const float  *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   float minValue, float maxValue);
-  int   filterVertical  (const int32  *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
-  int   filterVertical  (const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
-  int   filterVertical  (const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
+  
+  float filterHorizontal (const float  *inp, const ScaleFilter *filter, int pos_x, int width,             float minValue, float maxValue);
+  int   filterHorizontal (const uint16 *inp, const ScaleFilter *filter, int pos_x, int width,             int   minValue, int   maxValue);
+  int   filterHorizontal (const int32  *inp, const ScaleFilter *filter, int pos_x, int width,             int   minValue, int   maxValue);
+  int   filterHorizontal (const imgpel *inp, const ScaleFilter *filter, int pos_x, int width,             int   minValue, int   maxValue);
+  float filterVertical   (const float  *inp, const ScaleFilter *filter, int pos_y, int width, int height, float minValue, float maxValue);
+  int   filterVertical   (const int32  *inp, const ScaleFilter *filter, int pos_y, int width, int height, int   minValue, int   maxValue);
+  int   filterVertical   (const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int height, int   minValue, int   maxValue);
+  int   filterVertical   (const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int height, int   minValue, int   maxValue);    
+  
   bool  analyzeHorizontal(const float  *inp, const ScaleFilter *filter, int pos_x, int width, float minValue, float maxValue);
   bool  analyzeHorizontal(const uint16 *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
   bool  analyzeHorizontal(const int32  *inp, const ScaleFilter *filter, int pos_x, int width, int   minValue, int   maxValue);
@@ -89,10 +90,11 @@ private:
   bool  analyzeVertical  (const int32  *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
   bool  analyzeVertical  (const uint16 *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
   bool  analyzeVertical  (const imgpel *inp, const ScaleFilter *filter, int pos_y, int width, int   height,   int   minValue, int   maxValue);
+  
 public:
   // Construct/Deconstruct
-  Conv444to420CrBounds(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax = 0);
-  virtual ~Conv444to420CrBounds();
+  Conv420to444CrBounds(int width, int height, int method, ChromaLocation chromaLocationType[2]);
+  virtual ~Conv420to444CrBounds();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

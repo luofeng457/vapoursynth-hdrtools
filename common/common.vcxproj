@@ -158,6 +158,7 @@
     <ClCompile Include="src\ColorTransformYAdjustXYZ.cpp" />
     <ClCompile Include="src\Conv420to422Generic.cpp" />
     <ClCompile Include="src\Conv420to444Adaptive.cpp" />
+    <ClCompile Include="src\Conv420to444CrBounds.cpp" />
     <ClCompile Include="src\Conv420to444Generic.cpp" />
     <ClCompile Include="src\Conv420to444NN.cpp" />
     <ClCompile Include="src\Conv422to420Generic.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="inc\ColorTransformYAdjustXYZ.H" />
     <ClInclude Include="inc\Conv420to422Generic.H" />
     <ClInclude Include="inc\Conv420to444Adaptive.H" />
+    <ClInclude Include="inc\Conv420to444CrBounds.H" />
     <ClInclude Include="inc\Conv420to444Generic.H" />
     <ClInclude Include="inc\Conv420to444NN.H" />
     <ClInclude Include="inc\Conv422to420Generic.H" />
