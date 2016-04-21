@@ -86,7 +86,6 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast( ColorTransformParams *para
   }
   m_memoryAllocated = FALSE;
   
-  printf("hello corrupted\n");
   // Method is only allowed for RGB to YCbCr conversion
   if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr) {
     if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {

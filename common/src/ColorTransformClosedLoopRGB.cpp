@@ -526,7 +526,6 @@ void ColorTransformClosedLoopRGB::process ( Frame* out, const Frame *inp) {
         else {
           // First compute the linear value of the target Y (given original data)
           //yLinear = (*this.*pt2Convert)((double)floatComp[0][i] * scale, (double) floatComp[1][i] * scale,(double) floatComp[2][i] * scale);
-          //printf("hello there too\n");
           
           
           // The conversion below basically puts us back to the original space.          
