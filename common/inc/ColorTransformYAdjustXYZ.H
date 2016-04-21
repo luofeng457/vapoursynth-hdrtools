@@ -82,10 +82,8 @@ private:
   int                 m_compSize[4];       // number of samples in each color component
   int                 m_height[4];         // height of each color component
   int                 m_width[4];          // width of each color component
-  int                 m_useMinMax;
   bool                m_memoryAllocated;
   bool                m_tfDistance;
-  bool                m_useFloatPrecision;
   
   int                 m_mode;
   int                 m_invMode;
@@ -93,16 +91,8 @@ private:
 
   int                 m_modeRGB2XYZ;
 
-  SampleRange         m_range;
-  int                 m_bitDepth;
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;
-  int                 m_downMethod;
-  int                 m_upMethod;
-  ChromaFormat        m_oChromaFormat;
-  ChromaLocation      m_oChromaLocation[FP_TOTAL];
-  ColorSpace          m_oColorSpace;
-  ColorPrimaries      m_oColorPrimaries;
   
   Convert            *m_fwdConvertProcess; 
   Convert            *m_invConvertProcess;
@@ -119,10 +109,6 @@ private:
   int                 m_iLumaWeight;
   int                 m_interval;
 
-  int                 m_useAdaptiveDownsampler;
-  int                 m_useAdaptiveUpsampler;
-
-  TransferFunctions   m_transferFunctions;
   TransferFunction   *m_transferFunction;
 
   void                calcBoundsFast(int &ypBufLowPix, int &ypBufHighPix, double yLinear, const double rColor, const double gColor, const double bColor);
@@ -139,24 +125,7 @@ private:
   void                convertToXYZLinear(const double yValue, const double rColor, const double gColor, const double bColor, double *xComp,  double *yComp, double *zComp);
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustXYZ( ColorSpace        iColorSpace, 
-                            ColorPrimaries    iColorPrimaries, 
-                            ColorSpace        oColorSpace, 
-                            ColorPrimaries    oColorPrimaries, 
-                            int               useHighPrecision,
-                            TransferFunctions transferFunctions = TF_PQ,
-                            int               downMethod = 2,
-                            int               upMethod = 4,
-                            int               useAdaptiveDownsampler = 0,
-                            int               useAdaptiveUpsampler = 0,
-                            int               useMinMax = 3,
-                            int               bitDepth = 10, 
-                            SampleRange       range = SR_FULL, 
-                            int               maxIterations = 20,
-                            ChromaFormat      oChromaFormat = CF_420,
-                            ChromaLocation    *oChromaLocationType = NULL,
-                            bool              useFloatPrecision = TRUE
-                           );
+  ColorTransformYAdjustXYZ( ColorTransformParams *params );
                         
   virtual ~ColorTransformYAdjustXYZ();
   

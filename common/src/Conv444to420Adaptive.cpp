@@ -144,8 +144,6 @@ Conv444to420Adaptive::Conv444to420Adaptive(int width, int height, int method, Ch
   m_horFilterUp[0] = new ScaleFilter(UF_LS4, 1, 2, offset, scale, &upOffset, &upScale, hPhaseUp[0]); //even
   m_verFilterUp[1] = new ScaleFilter(UF_LS4, 1, 0,      0,     0, &upOffset, &upScale, vPhaseUp[1]); //odd
   m_horFilterUp[1] = new ScaleFilter(UF_LS4, 1, 2, offset, scale, &upOffset, &upScale, hPhaseUp[1]); //odd
-  
-  m_useMinMax = useMinMax;
 }
 
 Conv444to420Adaptive::~Conv444to420Adaptive() {

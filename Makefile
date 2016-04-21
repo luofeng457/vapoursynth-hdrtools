@@ -37,7 +37,7 @@ export MMX
 
 default: all
 
-all: $(SUBDIRS)
+all: | $(SUBDIRS) 
 
 $(SUBDIRS):
 	$(MAKE) -C $@

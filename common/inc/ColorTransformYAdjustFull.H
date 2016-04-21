@@ -80,29 +80,17 @@ private:
   int                 m_compSize[4];       // number of samples in each color component
   int                 m_height[4];         // height of each color component
   int                 m_width[4];          // width of each color component
-  int                 m_useMinMax;
   bool                m_memoryAllocated;
   bool                m_tfDistance;
-  bool                m_useFloatPrecision;
   
   int                 m_mode;
   int                 m_invMode;
   int                 m_modeRGB2XYZ;
   bool                m_isICtCp;
   
-  SampleRange         m_range;
-  int                 m_bitDepth;
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;
-  int                 m_downMethod;
-  int                 m_upMethod;
-  int                 m_maxIterations;
-  ChromaFormat        m_oChromaFormat;
-  
-  
-  ColorSpace          m_oColorSpace;
-  ColorPrimaries      m_oColorPrimaries;
-  ChromaLocation      m_oChromaLocation[FP_TOTAL];
+    
   
   Convert            *m_fwdConvertProcess; 
   Convert            *m_invConvertProcess;
@@ -116,10 +104,6 @@ private:
   double              m_lumaOffset;
   double              m_chromaOffset;
   TransferFunction   *m_transferFunction;
-  TransferFunctions   m_transferFunctions;
-  int                 m_useAdaptiveDownsampler;
-  int                 m_useAdaptiveUpsampler;
-  
 
   void                allocateMemory(Frame* out, const Frame *inp);
   double              convertToYLinear(const double rComp, const double gComp, const double bComp);
@@ -130,24 +114,7 @@ private:
 
 public:
   // Construct/Deconstruct
-  ColorTransformYAdjustFull( ColorSpace        iColorSpace, 
-                         ColorPrimaries    iColorPrimaries, 
-                         ColorSpace        oColorSpace, 
-                         ColorPrimaries    oColorPrimaries, 
-                         int               useHighPrecision,
-                         TransferFunctions transferFunction = TF_PQ,
-                         int               downMethod = 2,
-                         int               upMethod = 4,
-                         int               useAdaptiveDownsampler = 0,
-                         int               useAdaptiveUpsampler = 0,
-                         int               useMinMax = 3,
-                         int               bitDepth = 10, 
-                         SampleRange       range = SR_FULL, 
-                         int               maxIterations = 20,
-                         ChromaFormat      oChromaFormat = CF_420,
-                         ChromaLocation    *oChromaLocationType = NULL,
-                         bool              useFloatPrecision = TRUE
-                         );
+  ColorTransformYAdjustFull( ColorTransformParams *params );
                         
   virtual ~ColorTransformYAdjustFull();
   

@@ -77,6 +77,10 @@ private:
   int             m_width[4];          // width of each color component
   bool            m_memoryAllocated;
   
+  ColorSpace      m_iColorSpace;
+  ColorSpace      m_oColorSpace;
+  ColorPrimaries  m_iColorPrimaries;
+  ColorPrimaries  m_oColorPrimaries;
   int             m_mode;
   bool            m_isForward;
   ClosedLoopTrans m_closedLoopTransform;
@@ -85,7 +89,7 @@ private:
    
 public:
   // Construct/Deconstruct
-  ColorTransformClosedLoop(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int useHighPrecision, ClosedLoopTrans closedLoopTransform = CLT_BASE, int bitDepth = 10, SampleRange range = SR_FULL);
+  ColorTransformClosedLoop( ColorTransformParams *params );
   virtual ~ColorTransformClosedLoop();
   
   virtual void process(Frame *out,  const Frame *inp);

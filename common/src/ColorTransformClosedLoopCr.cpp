@@ -64,42 +64,15 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformClosedLoopCr::ColorTransformClosedLoopCr( 
-                                              ColorSpace        iColorSpace, 
-                                              ColorPrimaries    iColorPrimaries, 
-                                              ColorSpace        oColorSpace, 
-                                              ColorPrimaries    oColorPrimaries, 
-                                              int               useHighPrecision,
-                                              TransferFunctions transferFunctions,
-                                              int               downMethod,
-                                              int               upMethod,
-                                              int               useAdaptiveDownsampler,
-                                              int               useAdaptiveUpsampler,
-                                              int               useMinMax,
-                                              int               bitDepth, 
-                                              SampleRange       range, 
-                                              int               maxIterations,
-                                              ChromaFormat      oChromaFormat, 
-                                              ChromaLocation    *oChromaLocationType,
-                                              bool              useFloatPrecision) {
+ColorTransformClosedLoopCr::ColorTransformClosedLoopCr( ColorTransformParams *params ) {
   
+  setupParams(params);
+
   m_mode = CTF_IDENTITY; 
   m_invMode = m_mode;
-  m_range = range;
-  m_bitDepth = bitDepth;
-  m_transferFunctions = transferFunctions;
 
   m_size = 0;
-  m_maxIterations = maxIterations;
   m_tfDistance = FALSE;
-  m_useFloatPrecision = useFloatPrecision;
-  m_oColorSpace = oColorSpace;
-  m_oColorPrimaries = oColorPrimaries;
-  m_oChromaLocation[0] = oChromaLocationType[0];
-  m_oChromaLocation[1] = oChromaLocationType[1];
-  
-  m_useAdaptiveDownsampler = useAdaptiveDownsampler;
-  m_useAdaptiveUpsampler   = useAdaptiveUpsampler;
 
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
@@ -109,22 +82,20 @@ ColorTransformClosedLoopCr::ColorTransformClosedLoopCr(
     m_width[index] = 0;          // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_oChromaFormat = oChromaFormat;
-  m_useMinMax     = useMinMax;
   
   // Method is only allowed for RGB to YCbCr conversion
-  if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
-    if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr) {
+    if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGB709_2_XYZ;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-      if (useHighPrecision == 0) {
+    else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
+      if (params->m_useHighPrecision == 0) {
         m_mode = CTF_RGB2020_2_YUV2020;
         m_invMode = m_mode;
       }
-      else if (useHighPrecision == 1) {
+      else if (params->m_useHighPrecision == 1) {
         m_mode = CTF_RGB2020_2_YUV2020;
         m_invMode = CTF_RGB2020_2_YUV2020_HP;
       }
@@ -134,50 +105,50 @@ ColorTransformClosedLoopCr::ColorTransformClosedLoopCr(
       }
       m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+    else if (m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+    else if (m_iColorPrimaries == CP_P3D60 && m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_YUVP3D60;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+    else if (m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_YUVEXT;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBEXT_2_XYZ;
     }
-    else if (oColorPrimaries == CP_AMT) {
+    else if (m_oColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
       m_invMode = m_mode;
-      if (iColorPrimaries == CP_709) {
+      if (m_iColorPrimaries == CP_709) {
         m_modeRGB2XYZ = CTF_RGB709_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_2020) {
+      else if (m_iColorPrimaries == CP_2020) {
         m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D65) {
+      else if (m_iColorPrimaries == CP_P3D65) {
         m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D60) {
+      else if (m_iColorPrimaries == CP_P3D60) {
         m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;        
       }
     }
-    else if ( oColorPrimaries == CP_YCOCG) {
+    else if (m_oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
       m_invMode = m_mode;
-      if (iColorPrimaries == CP_709) {
+      if (m_iColorPrimaries == CP_709) {
         m_modeRGB2XYZ = CTF_RGB709_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_2020) {
+      else if (m_iColorPrimaries == CP_2020) {
         m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D65) {
+      else if (m_iColorPrimaries == CP_P3D65) {
         m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D60) {
+      else if (m_iColorPrimaries == CP_P3D60) {
         m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;        
       }
     }
@@ -210,9 +181,6 @@ ColorTransformClosedLoopCr::ColorTransformClosedLoopCr(
   m_fwdFrameStore2  = NULL; 
   m_invFrameStore2  = NULL;
 
-  m_downMethod = downMethod;
-  m_upMethod   = upMethod;
-
   if (m_range == SR_STANDARD) {
     m_lumaWeight   = (double) (1 << (m_bitDepth - 8)) * 219.0;
     m_lumaOffset   = (double) (1 << (m_bitDepth - 8)) * 16.0;
@@ -235,7 +203,7 @@ ColorTransformClosedLoopCr::ColorTransformClosedLoopCr(
   m_iLumaWeight = (int) m_lumaWeight;
   m_interval    = iMax(4, (int) dRound(m_lumaWeight / 16));
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformClosedLoopCr::~ColorTransformClosedLoopCr() {
