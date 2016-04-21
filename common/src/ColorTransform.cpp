@@ -134,7 +134,8 @@ ColorTransform *ColorTransform::create(
                                        int               maxIterations,
                                        ChromaFormat      oChromaFormat,
                                        ChromaLocation    *oChromaLocationType,
-                                       bool              useFloatPrecision
+                                       bool              useFloatPrecision, 
+                                       bool              enableTFLuts
                                        ) {
   ColorTransformParams params;
   ColorTransform *result = NULL;
@@ -160,6 +161,7 @@ ColorTransform *ColorTransform::create(
   params.m_oChromaFormat = oChromaFormat;
   params.m_oChromaLocationType = oChromaLocationType;
   params.m_useFloatPrecision = useFloatPrecision;
+  params.m_enableLUTs = enableTFLuts;
 
   if ((iColorSpace == oColorSpace) && (iColorPrimaries == oColorPrimaries) && ((iConstantLuminance == oConstantLuminance) || (iColorSpace != CM_YCbCr && iColorSpace != CM_ICtCp)))
     result = new ColorTransformNull();

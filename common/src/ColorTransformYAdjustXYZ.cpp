@@ -453,8 +453,8 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
         floatComp[0] = inp->m_altFrame->m_floatComp[0];
         floatComp[1] = inp->m_altFrame->m_floatComp[1];
         floatComp[2] = inp->m_altFrame->m_floatComp[2];
-        scale       = 1.0 / inp->m_altFrameNorm;
-        pt2Convert  = &ColorTransformYAdjustXYZ::convertToXYZ;
+        scale        = 1.0 / inp->m_altFrameNorm;
+        pt2Convert   = &ColorTransformYAdjustXYZ::convertToXYZ;
       }
       else {
         floatComp[0] = inp->m_floatComp[0];

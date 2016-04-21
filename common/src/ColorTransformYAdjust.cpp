@@ -201,9 +201,6 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorTransformParams *params )
   m_fwdFrameStore2  = NULL; 
   m_invFrameStore2  = NULL;
   
-  m_downMethod = params->m_downMethod;
-  m_upMethod   = params->m_upMethod;
-
   if (m_range == SR_STANDARD) {
     m_lumaWeight   = (double) (1 << (m_bitDepth - 8)) * 219.0;
     m_lumaOffset   = (double) (1 << (m_bitDepth - 8)) * 16.0;

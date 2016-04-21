@@ -82,6 +82,7 @@ public:
   bool              m_useSingleTransferStep;     //!< Use single or multiple steps (for normalization) when applying PQ
   bool              m_filterInFloat;             //!< Use floating precision for filtering
   bool              m_enableTFunctionLUT;        //!< Use Transfer function LUT for some operations
+  bool              m_enableTFLUTs;
   int               m_chromaDownsampleFilter;    //!< Chroma downsampling filter
   int               m_chromaUpsampleFilter;      //!< Chroma upsampling filter
   bool              m_outputSinglePrecision;     //!< Set output, for OpenEXR files, to single instead of half precision

@@ -114,6 +114,9 @@ public:
 };
 
 class ColorTransform {
+// shared parameters across all functions
+// maybe using "protected" variables might not be 
+// the best way to go, but somehow this saves us some code.
 protected: 
 
   SampleRange         m_range;
@@ -137,7 +140,6 @@ protected:
   TransferFunctions   m_transferFunctions;
   int                 m_maxIterations;
   int                 m_useMinMax;
-
 
 
   void setupParams( ColorTransformParams *params );
@@ -169,7 +171,8 @@ public:
                                 int               maxIterations = 20,
                                 ChromaFormat      oChromaFormat = CF_420,
                                 ChromaLocation    *oChromaLocationType = NULL,
-                                bool              useFloatPrecision = TRUE
+                                bool              useFloatPrecision = TRUE,
+                                bool              enableTFLuts = FALSE
                                 );
   
   virtual void process(Frame *out,  const Frame *inp) = 0;

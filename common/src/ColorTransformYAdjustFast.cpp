@@ -75,6 +75,8 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast( ColorTransformParams *para
   m_size = 0;
   m_tfDistance = TRUE;
 
+  m_isICtCp = FALSE;
+
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
     
@@ -84,6 +86,7 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast( ColorTransformParams *para
   }
   m_memoryAllocated = FALSE;
   
+  printf("hello corrupted\n");
   // Method is only allowed for RGB to YCbCr conversion
   if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr) {
     if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
@@ -157,10 +160,10 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast( ColorTransformParams *para
   else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_ICtCp) {
     if (m_iColorPrimaries == CP_LMSD && m_oColorPrimaries == CP_LMSD) {
       printf("Conversion not supported for ICtCp space\n");
-
       m_mode = CTF_LMSD_2_ICtCp;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
+      m_isICtCp = FALSE;
     }
     else {
       m_mode = CTF_IDENTITY;
@@ -197,9 +200,6 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast( ColorTransformParams *para
   m_fwdFrameStore2  = NULL; 
   m_invFrameStore2  = NULL;
 
-  m_downMethod = params->m_downMethod;
-  m_upMethod   = params->m_upMethod;
-
   if (m_range == SR_STANDARD) {
     m_lumaWeight   = (double) (1 << (m_bitDepth - 8)) * 219.0;
     m_lumaOffset   = (double) (1 << (m_bitDepth - 8)) * 16.0;
@@ -222,7 +222,7 @@ ColorTransformYAdjustFast::ColorTransformYAdjustFast( ColorTransformParams *para
   m_iLumaWeight = (int) m_lumaWeight;
   m_interval    = iMax(4, (int) dRound(m_lumaWeight / 16));
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_transferFunction);
 }
 
 ColorTransformYAdjustFast::~ColorTransformYAdjustFast() {

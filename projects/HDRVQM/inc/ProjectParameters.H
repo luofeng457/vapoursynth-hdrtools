@@ -79,6 +79,7 @@ public:
   int                  m_cropOffsetTop   [2];
   int                  m_cropOffsetRight [2];
   int                  m_cropOffsetBottom[2];
+  bool                 m_enableTFLUTs;
 
   DistortionParameters m_distortionParameters;
   

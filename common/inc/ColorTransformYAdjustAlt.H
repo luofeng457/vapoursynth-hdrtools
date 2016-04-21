@@ -89,8 +89,6 @@ private:
 
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;
-  int                 m_downMethod;
-  int                 m_upMethod;
   
   Convert            *m_fwdConvertProcess; 
   Convert            *m_invConvertProcess;

@@ -96,6 +96,8 @@ public:
   bool            m_bUseWienerFiltering;
   bool            m_bUse2DSepFiltering;
   bool            m_b2DSepMode;
+  bool            m_enableTFLUTs;
+
 
   // Cropping parameters
   int             m_cropOffsetLeft;

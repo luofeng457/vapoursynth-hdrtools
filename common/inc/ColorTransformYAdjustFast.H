@@ -81,7 +81,7 @@ private:
   int                 m_width[4];          // width of each color component
   bool                m_memoryAllocated;
   bool                m_tfDistance;
-  bool                m_useFloatPrecision;
+  bool                m_isICtCp;
   
   int                 m_mode;
   int                 m_invMode;
