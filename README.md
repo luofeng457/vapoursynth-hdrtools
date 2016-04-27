@@ -1,6 +1,8 @@
 HDRTools package
 ================
-This package shall be used by VCEG, JCTVC, and MPEG members solely for 
-video coding standard development activities. 
+This software package is under development to support 
+video standardization work and may eventually be formally 
+published as reference software, e.g., by ITU-T and ISO/IEC. 
+
 Please do not use this package for any other applications without 
 the knowledge or permission from the software owners/creators.
