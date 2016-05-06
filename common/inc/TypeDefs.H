@@ -267,6 +267,8 @@ typedef enum {
   CLT_YADJTELE = 13,
   CLT_FRGB     = 14,
   CLT_YADJFULL = 15,
+  CLT_YLIN     = 16,
+  CLT_YSUMLIN  = 17,
   CLT_TOTAL
 } ClosedLoopTrans;
 

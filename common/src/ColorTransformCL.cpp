@@ -112,8 +112,8 @@ ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColor
   
   m_transformY = FWD_TRANSFORM[m_mode][Y_COMP];
     
-  m_lumaTF   = TransferFunction::create(transferFunctionLuma,   1, scale, 2.6f, minValue, maxValue);
-  m_chromaTF = TransferFunction::create(transferFunctionChroma, 1, scale, 2.6f, minValue, maxValue);
+  m_lumaTF   = TransferFunction::create(transferFunctionLuma,   TRUE, scale, 2.6f, minValue, maxValue);
+  m_chromaTF = TransferFunction::create(transferFunctionChroma, TRUE, scale, 2.6f, minValue, maxValue);
 
   if (forceRange == TRUE) {
     m_nB = m_pB = 0.9407f;

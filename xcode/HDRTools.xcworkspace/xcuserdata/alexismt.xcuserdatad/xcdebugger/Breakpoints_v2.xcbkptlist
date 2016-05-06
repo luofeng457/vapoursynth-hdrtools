@@ -185,7 +185,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "88"
             endingLineNumber = "88"
-            landmarkName = "TransferFunction::create(int method, int singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT)"
+            landmarkName = "TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -201,7 +201,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "173"
             endingLineNumber = "173"
-            landmarkName = "TransferFunction::create(int method, int singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT)"
+            landmarkName = "TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

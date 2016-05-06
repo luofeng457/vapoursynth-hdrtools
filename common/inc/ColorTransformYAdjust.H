@@ -103,7 +103,6 @@ private:
   double              m_lumaOffset;
   double              m_chromaOffset;
   TransferFunction   *m_transferFunction;
-  bool                m_enableLUTs;
 
   void                allocateMemory(Frame* out, const Frame *inp);
   double              convertToYLinear(const double rComp, const double gComp, const double bComp);

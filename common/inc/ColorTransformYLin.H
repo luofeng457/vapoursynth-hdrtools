@@ -4,12 +4,11 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Apple Inc
+ * <ORGANIZATION> = Netflix Inc, Ericsson, Apple Inc
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Apple Inc
+ * Copyright (c) 2015, Netflix Inc, Ericsson, Apple Inc
  * All rights reserved.
- 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,20 +37,29 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformClosedLoopY.H
+ * \file ColorTransformYLin.H
+ *
+ * \class 
+ *    ColorTransformYLin
  *
  * \brief
- *    ColorTransformClosedLoopY Class Header
+ *    Luma adjustment method using Taylor Series approximation
+ *
+ * \date
+ *    $Date: 10/26/2015
  *
  * \author
+ *     - Andrey Norkin
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
+ *     - Jacob Strom                     <jacob.strom@ericsson.com>
+ *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
  *
  *************************************************************************************
  */
 
 
-#ifndef __ColorTransformClosedLoopY_H__
-#define __ColorTransformClosedLoopY_H__
+#ifndef __ColorTransformYLin_H__
+#define __ColorTransformYLin_H__
 
 #include "Global.H"
 #include "Frame.H"
@@ -61,7 +69,7 @@
 #include "TransferFunction.H"
 #include "Convert.H"
 
-class ColorTransformClosedLoopY : public ColorTransform {
+class ColorTransformYLin : public ColorTransform {
 private:
   
   const double       *m_transform0;
@@ -70,11 +78,6 @@ private:
   const double       *m_invTransform0;
   const double       *m_invTransform1;
   const double       *m_invTransform2;
-  const double       *m_transformRGBtoY;  // Y in XYZ
-  
-  double              m_weightRed;
-  double              m_weightGreen;
-  double              m_weightBlue;
 
   vector<float>       m_floatData;
   float              *m_floatComp[4];
@@ -84,11 +87,10 @@ private:
   int                 m_width[4];          // width of each color component
   bool                m_memoryAllocated;
   bool                m_tfDistance;
+  bool                m_isICtCp;
   
   int                 m_mode;
   int                 m_invMode;
-
-  int                 m_modeRGB2XYZ;
 
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;
@@ -98,9 +100,9 @@ private:
   
   Frame              *m_fwdFrameStore2; 
   Frame              *m_invFrameStore2; 
-
   Frame              *m_fwdFrameStore;
   Frame              *m_invFrameStore;
+  
   double              m_lumaWeight;
   double              m_chromaWeight;
   double              m_lumaOffset;
@@ -108,17 +110,15 @@ private:
   int                 m_iLumaWeight;
 
   TransferFunction   *m_transferFunction;
+
   void                allocateMemory(Frame* out, const Frame *inp);
-
-  double              computeRGBDistortion(const double rComp, const double gComp, const double bComp, const int yValue, const double lumaWeight );
-
-  double              computeYDistortion(const double rYComp, const double gYComp, const double bYComp, const double yValue );
+  
 
 public:
   // Construct/Deconstruct
-  ColorTransformClosedLoopY( ColorTransformParams *params );
+  ColorTransformYLin( ColorTransformParams *params );
                         
-  virtual ~ColorTransformClosedLoopY();
+  virtual ~ColorTransformYLin();
   
   virtual void process(Frame *out,  const Frame *inp);
 };

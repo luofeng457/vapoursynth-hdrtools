@@ -83,9 +83,7 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorTransformParams *params )
     m_width    [index] = 0;       // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_isICtCp         = FALSE;
-  m_enableLUTs      = params->m_enableLUTs;
-  
+  m_isICtCp         = FALSE;  
   
   // Method supports mainly RGB to YCbCr conversion. LMS to ICtCp is partially supported but
   // due to monotonicity issues it might not always result in best performance.
@@ -220,7 +218,7 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorTransformParams *params )
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformYAdjust::~ColorTransformYAdjust() {

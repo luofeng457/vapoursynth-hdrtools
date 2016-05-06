@@ -56,6 +56,11 @@
 #include "Parameters.H"
 #include "Frame.H"
 
+
+static const double DERIV_STEP         = 0.0000001;
+static const double DERIV_LOWER_BOUND  = 0.0000000;
+static const double DERIV_HIGHER_BOUND = 1.0000000;
+
 class TransferFunctionParams {
 public:
   int   m_method;
@@ -80,6 +85,7 @@ class TransferFunction {
 protected:
   double                  m_normalFactor;
   double                  m_invNormalFactor;
+
   // LUT related
   bool                    m_enableLUT;
   uint32                  m_binsLUT;
@@ -89,30 +95,32 @@ protected:
   vector<vector<double> > m_invTransformLUT;
   vector<vector<double> > m_fwdTransformLUT;
 
-  void initLUT();
-  double inverseLUT(double value);
-  double forwardLUT(double value);
+  void   initLUT();
+  double inverseLUT         (double value);
+  double forwardLUT         (double value);
   
 public:
 
   // Construct/Deconstruct
   virtual ~TransferFunction() {};
-  static TransferFunction *create(int method, int singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE);
+  static TransferFunction *create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE);
   
-  void    forward(Frame *frame);
-  void    forward(Frame *frame, int component);
-  void    inverse(Frame *frame);
-  void    inverse(Frame *frame, int component);
-  double  getForward(double value);
-  double  getInverse(double value);
-  
-  virtual double forward(double value) = 0;
-  virtual double inverse(double value) = 0;
+  void    forward           (Frame *frame);
+  void    forward           (Frame *frame, int component);
+  void    inverse           (Frame *frame);
+  void    inverse           (Frame *frame, int component);
 
-  virtual void forward(Frame *out,  const Frame *inp);
-  virtual void forward(Frame *out,  const Frame *inp, int component);
-  virtual void inverse(Frame *out,  const Frame *inp);
-  virtual void inverse(Frame *out,  const Frame *inp, int component);
+  double  getForward        (double value);
+  double  getInverse        (double value);  
+  double  forwardDerivative (double value);
+  double  inverseDerivative (double value);
+   
+  virtual double forward    (double value) = 0;
+  virtual double inverse    (double value) = 0;
+  virtual void forward      (Frame *out,  const Frame *inp);
+  virtual void forward      (Frame *out,  const Frame *inp, int component);
+  virtual void inverse      (Frame *out,  const Frame *inp);
+  virtual void inverse      (Frame *out,  const Frame *inp, int component);
 };
 
 #endif

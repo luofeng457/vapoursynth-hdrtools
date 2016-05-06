@@ -78,106 +78,6 @@
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-// Public methods
-//-----------------------------------------------------------------------------
-TransferFunction *TransferFunction::create(int method, int singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT) {
-  TransferFunction *result = NULL;
-  
-  switch (method){
-    case TF_NULL:
-      result = new TransferFunctionNull();
-      break;
-    case TF_APH:
-      if (singleStep)
-        result = new TransferFunctionAPH(scale, minValue, maxValue);
-      else
-        result = new TransferFunctionAPH(minValue, maxValue);
-      break;
-    case TF_APQ:
-      if (singleStep)
-        result = new TransferFunctionAPQ(scale, minValue, maxValue);
-      else
-        result = new TransferFunctionAPQ(minValue, maxValue);
-      break;
-    case TF_APQS:
-      if (singleStep)
-        result = new TransferFunctionAPQScaled(scale, maxValue);
-      else
-        result = new TransferFunctionAPQScaled(maxValue);
-      break;
-    case TF_PQ:
-      if (singleStep)
-        result = new TransferFunctionPQ(scale);
-      else
-        result = new TransferFunctionPQ();
-      break;
-    case TF_HPQ:
-      if (singleStep)
-        result = new TransferFunctionHPQ(scale);
-      else
-        result = new TransferFunctionHPQ();
-      break;
-    case TF_HPQ2:
-      if (singleStep)
-        result = new TransferFunctionHPQ2(scale);
-      else
-        result = new TransferFunctionHPQ2();
-      break;
-    case TF_PH:
-      if (singleStep)
-        result = new TransferFunctionPH(scale);
-      else
-        result = new TransferFunctionPH();
-      break;
-    case TF_HG:
-      result = new TransferFunctionHG(systemGamma);
-      break;
-    case TF_HLG:
-      result = new TransferFunctionHLG();
-      break;
-    case TF_NORMAL:
-      result = new TransferFunctionNormalize(scale);
-      break;
-    case TF_POWER:
-      result = new TransferFunctionPower(systemGamma, scale);
-      break;
-    case TF_MPQ:
-      if (singleStep)
-        result = new TransferFunctionMPQ(0.1f, 1.5f, scale);
-      else
-        result = new TransferFunctionMPQ(0.00001f, 1.5f);
-      break;
-    case TF_AMPQ:
-      if (singleStep)
-        result = new TransferFunctionAMPQ(0.1f, 1.5f, scale, minValue, maxValue);
-      else
-        result = new TransferFunctionAMPQ(0.00001f, 1.5f, minValue, maxValue);
-      break;
-    case TF_BiasedMPQ:
-      if (singleStep)
-        result = new TransferFunctionBiasedMPQ(0.1f, 2.0f, scale);
-      else
-        result = new TransferFunctionBiasedMPQ(0.00001f, 2.0f);
-      break;
-#ifdef __SIM2_SUPPORT_ENABLED__
-    case TF_SIM2:
-      result = new TransferFunctionSim2();
-      break;
-#endif
-    default:
-      fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
-      exit(EXIT_FAILURE);
-  }
-  
-  result->m_enableLUT = enableLUT;
-
-  result->initLUT();
-  
-  return result;
-}
-
 void TransferFunction::initLUT() {  
   if (m_enableLUT == FALSE) {
     m_binsLUT = 0;
@@ -217,7 +117,7 @@ double TransferFunction::inverseLUT(double value) {
   if (value <= 0.0)
     return m_invTransformLUT[0][0];
   else if (value >= 1.0) {
-  // top value, most likely 1.0
+    // top value, most likely 1.0
     return m_invTransformLUT[m_binsLUT - 1][m_elementsLUT[m_binsLUT - 1] - 1];
   }
   else { // now search for value in the table
@@ -254,6 +154,155 @@ double TransferFunction::forwardLUT(double value) {
     }
   }
   return 0.0;
+}
+
+//-----------------------------------------------------------------------------
+// Public methods
+//-----------------------------------------------------------------------------
+TransferFunction *TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT) {
+  TransferFunction *result = NULL;
+  
+  if (singleStep == TRUE) {
+    switch (method){
+      case TF_NULL:
+        result = new TransferFunctionNull();
+        break;
+      case TF_APH:
+        result = new TransferFunctionAPH(scale, minValue, maxValue);
+        break;
+      case TF_APQ:
+        result = new TransferFunctionAPQ(scale, minValue, maxValue);
+        break;
+      case TF_APQS:
+        result = new TransferFunctionAPQScaled(scale, maxValue);
+        break;
+      case TF_PQ:
+        result = new TransferFunctionPQ(scale);
+        break;
+      case TF_HPQ:
+        result = new TransferFunctionHPQ(scale);
+        break;
+      case TF_HPQ2:
+        result = new TransferFunctionHPQ2(scale);
+        break;
+      case TF_PH:
+        result = new TransferFunctionPH(scale);
+        break;
+      case TF_HG:
+        result = new TransferFunctionHG(systemGamma);
+        break;
+      case TF_HLG:
+        result = new TransferFunctionHLG();
+        break;
+      case TF_NORMAL:
+        result = new TransferFunctionNormalize(scale);
+        break;
+      case TF_POWER:
+        result = new TransferFunctionPower(systemGamma, scale);
+        break;
+      case TF_MPQ:
+        result = new TransferFunctionMPQ(0.1f, 1.5f, scale);
+        break;
+      case TF_AMPQ:
+        result = new TransferFunctionAMPQ(0.1f, 1.5f, scale, minValue, maxValue);
+        break;
+      case TF_BiasedMPQ:
+        result = new TransferFunctionBiasedMPQ(0.1f, 2.0f, scale);
+        break;
+#ifdef __SIM2_SUPPORT_ENABLED__
+      case TF_SIM2:
+        result = new TransferFunctionSim2();
+        break;
+#endif
+      default:
+        fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
+        exit(EXIT_FAILURE);
+    }
+  }
+  else {
+    switch (method){
+      case TF_NULL:
+        result = new TransferFunctionNull();
+        break;
+      case TF_APH:
+        result = new TransferFunctionAPH(minValue, maxValue);
+        break;
+      case TF_APQ:
+        result = new TransferFunctionAPQ(minValue, maxValue);
+        break;
+      case TF_APQS:
+        result = new TransferFunctionAPQScaled(maxValue);
+        break;
+      case TF_PQ:
+        result = new TransferFunctionPQ();
+        break;
+      case TF_HPQ:
+        result = new TransferFunctionHPQ();
+        break;
+      case TF_HPQ2:
+        result = new TransferFunctionHPQ2();
+        break;
+      case TF_PH:
+        result = new TransferFunctionPH();
+        break;
+      case TF_HG:
+        result = new TransferFunctionHG(systemGamma);
+        break;
+      case TF_HLG:
+        result = new TransferFunctionHLG();
+        break;
+      case TF_NORMAL:
+        result = new TransferFunctionNormalize(scale);
+        break;
+      case TF_POWER:
+        result = new TransferFunctionPower(systemGamma, scale);
+        break;
+      case TF_MPQ:
+        result = new TransferFunctionMPQ(0.00001f, 1.5f);
+        break;
+      case TF_AMPQ:
+        result = new TransferFunctionAMPQ(0.00001f, 1.5f, minValue, maxValue);
+        break;
+      case TF_BiasedMPQ:
+        result = new TransferFunctionBiasedMPQ(0.00001f, 2.0f);
+        break;
+#ifdef __SIM2_SUPPORT_ENABLED__
+      case TF_SIM2:
+        result = new TransferFunctionSim2();
+        break;
+#endif
+      default:
+        fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
+        exit(EXIT_FAILURE);
+    }
+  }
+  
+  result->m_enableLUT = enableLUT;
+  
+  result->initLUT();
+  
+  return result;
+}
+
+
+double TransferFunction::forwardDerivative(double value)
+{
+  double low  = value - DERIV_STEP;
+  double high = value + DERIV_STEP;
+  low  = ( low  > DERIV_LOWER_BOUND  ) ? low  : DERIV_LOWER_BOUND;
+  high = ( high < DERIV_HIGHER_BOUND ) ? high : DERIV_HIGHER_BOUND;
+  
+  return (getForward(high) - getForward(low)) / (high - low) ;
+}
+
+double TransferFunction::inverseDerivative(double value)
+{
+  double low  = value - DERIV_STEP;
+  double high = value + DERIV_STEP;
+  low  = ( low  > DERIV_LOWER_BOUND  ) ? low  : DERIV_LOWER_BOUND;
+  high = ( high < DERIV_HIGHER_BOUND ) ? high : DERIV_HIGHER_BOUND;
+  
+  return (getInverse(high) - getInverse(low)) / (high - low) ;
 }
 
 
@@ -353,7 +402,7 @@ void TransferFunction::forward( Frame* out, const Frame *inp, int component ) {
       }
     }
     else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-
+      
       out->copy((Frame *) inp, component);
     }
   }

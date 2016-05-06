@@ -69,6 +69,8 @@
 #include "ColorTransformYAdjustLFast.H"
 #include "ColorTransformYAdjustTele.H"
 #include "ColorTransformYAdjustXYZ.H"
+#include "ColorTransformYLin.H"
+#include "ColorTransformYSumLin.H"
 #include "ColorTransformFVDO.H"
 #include "ColorTransformCL.H"
 
@@ -204,6 +206,10 @@ ColorTransform *ColorTransform::create(
     result = new ColorTransformYAdjustLFast( &params );
   else if (closedLoopTransform == CLT_YADJTELE)
     result = new ColorTransformYAdjustTele( &params );
+  else if (closedLoopTransform == CLT_YLIN)
+    result = new ColorTransformYLin( &params );
+  else if (closedLoopTransform == CLT_YSUMLIN)
+    result = new ColorTransformYSumLin( &params );
   else
     result = new ColorTransformClosedLoop( &params );
   

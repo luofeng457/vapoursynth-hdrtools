@@ -209,9 +209,8 @@ ColorTransformClosedLoopY::ColorTransformClosedLoopY( ColorTransformParams *para
   }
 
   m_iLumaWeight = (int) m_lumaWeight;
-  m_interval    = iMax(4, (int) dRound(m_lumaWeight / 16));
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformClosedLoopY::~ColorTransformClosedLoopY() {
