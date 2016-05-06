@@ -56,6 +56,7 @@
 #include "AddNoise.H"
 #include "ToneMapping.H"
 #include "TransferFunction.H"
+#include "ColorTransform.H"
 
 #define DEFAULTCONFIGFILENAME "HDRConvert.cfg"
 
@@ -115,6 +116,8 @@ public:
   ToneMappingParams      m_tmParams;
   // Transfer function parameters
   TransferFunctionParams m_tfParams;
+  // Color Transform function parameters
+  ColorTransformParams   m_ctParams;
 
   virtual void update();
   virtual void refresh();

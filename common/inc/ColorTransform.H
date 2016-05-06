@@ -83,6 +83,7 @@ public:
   ChromaLocation    *m_oChromaLocationType;
   bool              m_useFloatPrecision;
   bool              m_enableLUTs;
+  char              m_yAdjustModelFile[MAX_LINE_LEN];
   
   ColorTransformParams() {
     m_iColorSpace = CM_RGB;
@@ -172,7 +173,8 @@ public:
                                 ChromaFormat      oChromaFormat = CF_420,
                                 ChromaLocation    *oChromaLocationType = NULL,
                                 bool              useFloatPrecision = TRUE,
-                                bool              enableTFLuts = FALSE
+                                bool              enableTFLuts = FALSE,
+                                ColorTransformParams *iParams = NULL
                                 );
   
   virtual void process(Frame *out,  const Frame *inp) = 0;

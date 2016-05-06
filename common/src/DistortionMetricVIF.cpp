@@ -56,8 +56,9 @@
  */
 
 
-#include "DistortionMetricVIF.h"
-#include "math.h"
+#include "DistortionMetricVIF.H"
+#include "ColorSpaceMatrix.H"
+#include <math.h>
 #include <vector>
 #include "Eigenvalue.H"
 #include <iostream>
@@ -72,6 +73,8 @@ DistortionMetricVIF::DistortionMetricVIF(const FrameFormat *format, VIFParams *v
   m_vifFrame = 0; 
   m_vifFrameStats.reset();
   m_vifYBitDepth = vifParams->m_vifBitDepth;
+  
+  m_transferFunction = TransferFunction::create(TF_PQ, TRUE, 1.0, 1.0, 0.0, 1.0, TRUE);
 }
 
 DistortionMetricVIF::~DistortionMetricVIF()
@@ -337,7 +340,6 @@ void DistortionMetricVIF::inverseMatrix(vector<vector<double> > &input, int n, v
   }
 }
 
-
 //compute mean of a matrix
 void DistortionMetricVIF::mean (vector<vector<double> >  &input, int w, int h, double* mcu)
 {
@@ -371,7 +373,6 @@ void DistortionMetricVIF::vectorMax (int* input, int size , int imax)
   }
 }
 
-
 void DistortionMetricVIF::differenceVector(vector<vector<double> >  &input1, vector<vector<double> >  &input2, int w, int h, vector<vector<double> >  &output)
 {
   for (int i = 0; i < w; i++)	{
@@ -381,8 +382,6 @@ void DistortionMetricVIF::differenceVector(vector<vector<double> >  &input1, vec
     }
   }
 }
-
-
 
 void DistortionMetricVIF::invertVector(vector<vector<double> >  &input1,int w, int h, vector<vector<double> >  &output)
 {
@@ -403,73 +402,35 @@ void DistortionMetricVIF::invertVector(vector<vector<double> >  &input1,int w, i
 //convert RGB to R'G'B' then compute the non constant luminance 
 //This function accepts r:red, g:green and b:blue of the RGB and fist it PQ codes the RGB frame 
 //Then it converts the pq coded RGB to luminace based on the color primaires and bit depth of the frame.
-double DistortionMetricVIF::rgbPQYuv (double r, double g, double b, int bitdepth,  ColorPrimaries cp)
+double DistortionMetricVIF::rgbPQYuv (double r, double g, double b, int bitdepth,  ColorPrimaries colorPrimaries)
 {
-  r = SMPTE_ST_2084(r, TRUE, 10000.0);
-  g = SMPTE_ST_2084(g, TRUE, 10000.0);
-  b = SMPTE_ST_2084(b, TRUE, 10000.0);
+  r = m_transferFunction->getInverse(r / 10000.0);
+  g = m_transferFunction->getInverse(g / 10000.0);
+  b = m_transferFunction->getInverse(b / 10000.0);
   
   double y=0;
-  if (cp == CP_709)  {
-    y=0.2126 * r + 0.7152 * g + 0.0722 * b;
+  
+  int mode = CTF_IDENTITY;
+  
+  if (colorPrimaries == CP_709) {
+    mode = CTF_RGB709_2_YUV709;
   }
-  else  {
-    if (cp == CP_2020)    {
-      y = 0.2627 * r + 0.6780 * g + 0.0593 * b;
-    }
-    else    {
-      printf (" The Current version of VIF only supports BT709 and BT2020 ! ");
-      exit(EXIT_FAILURE);
-    }
+  else if (colorPrimaries == CP_2020) {
+    mode = CTF_RGB2020_2_YUV2020;
   }
+  else if (colorPrimaries == CP_P3D65) {
+    mode = CTF_RGBP3D65_2_YUVP3D65;
+  }
+  
+  const double *transform = FWD_TRANSFORM[mode][Y_COMP];
+
+  y = transform[0] * r + transform[1] * g + transform[2] * b;
   
   // % Scaling and quantization
   //Taken from ITU. (2002). RECOMMENDATION ITU-R BT.1361.
-  y = (219 * y + 16) * pow(2.0,(double) bitdepth - 8.0);
+  y = (219 * y + 16) * (1 << (bitdepth - 8));
   
   return(y);
-}
-
-// This code should be removed completely. This process already exists and it is best to try and 
-// reuse the existing code.
-double DistortionMetricVIF::SMPTE_ST_2084(double x, bool Inverse, double MaxLum)
-{
-  //SMPTE_ST_2084 - implement the SMPTE ST 2084 as described in the
-  // MPEG Call for Evidence in Section B.1.5.3.1
-  //Inputs:
-  //   - x: input image, if Inverse = 1 : RGB, otherwise R'G'B'.
-  //    - Inverse: Inverse EOTF (encoding)
-  //    - MaxLum: maximum luminance (default= 10,000 nits).
-  //
-  // Outputs:
-  //    -y: output image, if Inverse = 1 : encoded image, otherwise decoded
-  
-  double m1 = 2610 / 4096.0 / 4;
-  double m2 = 2523 / 4096.0 * 128;
-  double c1 = 3424 / 4096.0;
-  double c2 = 2413 / 4096.0 * 32;
-  double c3 = 2392 / 4096.0 * 32;
-  double y=0;
-  if (Inverse)  {
-    // Normalize The input by the Maximum authorized luminance
-    x = x / MaxLum;
-    x = dClip(x, 0.0, 1.0);
-    
-    // Apply the inverse EOTF on the input image
-    double  y1 = ((c2 * (pow (x, m1)) + c1) / (1 + c3 * (pow (x, m1))));
-    y = pow(y1, m2);
-  }
-  else
-  {
-    //Remove values outside [0-1] for example caused by overflow in coding
-    x = dClip(x, 0.0, 1.0);
-    // % Apply the EOTF on the input image
-    double y0 = ((pow(x,(1 / m2))- c1) / (c2 - c3 * pow(x,(1 / m2))));
-    double y  = pow(y0, 1/m1);
-    // Scale the output to the maximum luminance
-    y = y * MaxLum; 
-  }
-  return y;
 }
 
 

@@ -71,6 +71,7 @@
 #include "ColorTransformYAdjustXYZ.H"
 #include "ColorTransformYLin.H"
 #include "ColorTransformYSumLin.H"
+#include "ColorTransformYAdjust2ndOrder.H"
 #include "ColorTransformFVDO.H"
 #include "ColorTransformCL.H"
 
@@ -116,31 +117,34 @@ void ColorTransform::setupParams( ColorTransformParams *params ){
 // Public methods
 //-----------------------------------------------------------------------------
 ColorTransform *ColorTransform::create( 
-                                       ColorSpace        iColorSpace, 
-                                       ColorPrimaries    iColorPrimaries, 
-                                       ColorSpace        oColorSpace, 
-                                       ColorPrimaries    oColorPrimaries, 
-                                       bool              transformPrecision, 
-                                       int               useHighPrecision,
-                                       ClosedLoopTrans   closedLoopTransform, 
-                                       int               iConstantLuminance, 
-                                       int               oConstantLuminance, 
-                                       TransferFunctions transferFunction,
-                                       int               bitDepth,
-                                       SampleRange       range,
-                                       int               downMethod,
-                                       int               upMethod,
-                                       int               useAdaptiveDownsampler,
-                                       int               useAdaptiveUpsampler,
-                                       int               useMinMax,
-                                       int               maxIterations,
-                                       ChromaFormat      oChromaFormat,
-                                       ChromaLocation    *oChromaLocationType,
-                                       bool              useFloatPrecision, 
-                                       bool              enableTFLuts
+                                       ColorSpace            iColorSpace, 
+                                       ColorPrimaries        iColorPrimaries, 
+                                       ColorSpace            oColorSpace, 
+                                       ColorPrimaries        oColorPrimaries, 
+                                       bool                  transformPrecision, 
+                                       int                   useHighPrecision,
+                                       ClosedLoopTrans       closedLoopTransform, 
+                                       int                   iConstantLuminance, 
+                                       int                   oConstantLuminance, 
+                                       TransferFunctions     transferFunction,
+                                       int                   bitDepth,
+                                       SampleRange           range,
+                                       int                   downMethod,
+                                       int                   upMethod,
+                                       int                   useAdaptiveDownsampler,
+                                       int                   useAdaptiveUpsampler,
+                                       int                   useMinMax,
+                                       int                   maxIterations,
+                                       ChromaFormat          oChromaFormat,
+                                       ChromaLocation        *oChromaLocationType,
+                                       bool                  useFloatPrecision, 
+                                       bool                  enableTFLuts,
+                                       ColorTransformParams *iParams
                                        ) {
   ColorTransformParams params;
   ColorTransform *result = NULL;
+  if (iParams != NULL)
+    params = *iParams;
     
   params.m_iColorSpace = iColorSpace;
   params.m_oColorSpace = oColorSpace;
@@ -210,6 +214,8 @@ ColorTransform *ColorTransform::create(
     result = new ColorTransformYLin( &params );
   else if (closedLoopTransform == CLT_YSUMLIN)
     result = new ColorTransformYSumLin( &params );
+  else if (closedLoopTransform == CLT_YADJ2ORD)
+    result = new ColorTransformYAdjust2ndOrder( &params );
   else
     result = new ColorTransformClosedLoop( &params );
   

@@ -4,11 +4,11 @@
  * granted under this license.
  *
  * <OWNER> = ITU/ISO
- * <ORGANIZATION> = Netflix Inc, Ericsson, Apple Inc
+ * <ORGANIZATION> = CISRA, Apple Inc, Ericsson
  * <YEAR> = 2015
  *
- * Copyright (c) 2015, Netflix Inc, Ericsson, Apple Inc
- * All rights reserved.
+ * Copyright (c) 2016, CISRA, Apple Inc, Ericsson
+ * All rights reserved. 
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -37,20 +37,17 @@
 
 /*!
  *************************************************************************************
- * \file ColorTransformYSumLin.cpp
+ * \file ColorTransformYAdjust2ndOrder.cpp
  *
  * \class 
- *    ColorTransformYSumLin
+ *    ColorTransformYAdjust2ndOrder
  *
  * \brief
- *    Closed-form luma adjustment method using Taylor Series approximation 
- *    for minimizing the error in linear luminance
- *
- * \date
- *    $Date: 11/11/2015
+ *    2nd order approximation model method using LUTs for luma adjustment
+ *    JCTVC-W0056: CE1-related: LUT-based luma sample adjustment
  *
  * \author
- *     - Andrey Norkin                   <anorkin@netflix.com>
+ *     - Vladimir Kolesnikov             <vladimir.kolesnikov@cisra.canon.com.au>
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>
@@ -63,7 +60,9 @@
 //-----------------------------------------------------------------------------
 
 #include "Global.H"
-#include "ColorTransformYSumLin.H"
+#include "ColorTransformYAdjust2ndOrder.H"
+#include <fstream>
+#include <cassert>
 
 //-----------------------------------------------------------------------------
 // Macros / Constants
@@ -73,27 +72,27 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformYSumLin::ColorTransformYSumLin( ColorTransformParams *params ) {
-  
+ColorTransformYAdjust2ndOrder::ColorTransformYAdjust2ndOrder( ColorTransformParams *params ) 
+{  
   m_mode = CTF_IDENTITY; 
   m_invMode = m_mode;
+  
   setupParams(params);
   
   m_size = 0;
   m_tfDistance = TRUE;
   
-  m_isICtCp = FALSE;
-  
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
-    
-    m_compSize[index] = 0;       // number of samples in each color component
-    m_height[index] = 0;         // height of each color component
-    m_width[index] = 0;          // width of each color component
+    m_compSize [index] = 0;       // number of samples in each color component
+    m_height   [index] = 0;       // height of each color component
+    m_width    [index] = 0;       // width of each color component
   }
   m_memoryAllocated = FALSE;
+  m_isICtCp         = FALSE;  
   
-  // Method is only allowed for RGB to YCbCr conversion
+  // Method supports mainly RGB to YCbCr conversion. LMS to ICtCp is partially supported but
+  // due to monotonicity issues it might not always result in best performance.
   if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr) {
     if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
@@ -102,8 +101,8 @@ ColorTransformYSumLin::ColorTransformYSumLin( ColorTransformParams *params ) {
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
       if (params->m_useHighPrecision == 0) {
-        m_mode = CTF_RGB2020_2_YUV2020;
-        m_invMode = m_mode;
+      m_mode = CTF_RGB2020_2_YUV2020;
+      m_invMode = m_mode;
       }
       else if (params->m_useHighPrecision == 1) {
         m_mode = CTF_RGB2020_2_YUV2020;
@@ -165,13 +164,13 @@ ColorTransformYSumLin::ColorTransformYSumLin( ColorTransformParams *params ) {
   }
   else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_ICtCp) {
     if (m_iColorPrimaries == CP_LMSD && m_oColorPrimaries == CP_LMSD) {
-      printf("Conversion not supported for ICtCp space\n");
       m_mode = CTF_LMSD_2_ICtCp;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
-      m_isICtCp = FALSE;
+      m_isICtCp = TRUE;
     }
     else {
+    // Not supported properly yet
       m_mode = CTF_IDENTITY;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_IDENTITY;
@@ -182,17 +181,17 @@ ColorTransformYSumLin::ColorTransformYSumLin( ColorTransformParams *params ) {
     m_invMode = m_mode;
     m_modeRGB2XYZ = CTF_IDENTITY;
   }
-  
+
   // Forward Transform coefficients 
   m_transform0 = FWD_TRANSFORM[m_mode][Y_COMP];
   m_transform1 = FWD_TRANSFORM[m_mode][U_COMP];
   m_transform2 = FWD_TRANSFORM[m_mode][V_COMP];
-  
+
   // Inverse Transform coefficients 
   m_invTransform0 = INV_TRANSFORM[m_invMode][Y_COMP];
   m_invTransform1 = INV_TRANSFORM[m_invMode][U_COMP];
   m_invTransform2 = INV_TRANSFORM[m_invMode][V_COMP];
-  
+
   // Transform coefficients for conversion to Y in XYZ
   m_transformRGBtoY = FWD_TRANSFORM[m_modeRGB2XYZ][1];
   
@@ -224,13 +223,13 @@ ColorTransformYSumLin::ColorTransformYSumLin( ColorTransformParams *params ) {
     m_chromaWeight = (double) (1 << (m_bitDepth - 8)) * 253.0;
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
-  
-  m_iLumaWeight = (int) m_lumaWeight;
-  
+  m_lumaRange = (double) (1 << m_bitDepth);
+
   m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
+  setModelFile(params->m_yAdjustModelFile);
 }
 
-ColorTransformYSumLin::~ColorTransformYSumLin() {
+ColorTransformYAdjust2ndOrder::~ColorTransformYAdjust2ndOrder() {
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -246,7 +245,7 @@ ColorTransformYSumLin::~ColorTransformYSumLin() {
     m_invColorFormat = NULL;
   }
   
-  // Color format conversion frame stores
+   // Color format conversion frame stores
   if (m_fwdFrameStore) {
     delete m_fwdFrameStore;
     m_fwdFrameStore = NULL;
@@ -283,7 +282,7 @@ ColorTransformYSumLin::~ColorTransformYSumLin() {
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-void ColorTransformYSumLin::allocateMemory(Frame* out, const Frame *inp) {
+void ColorTransformYAdjust2ndOrder::allocateMemory(Frame* out, const Frame *inp) {
   m_width [Y_COMP] = inp->m_width[ Y_COMP];
   m_width [Y_COMP] = inp->m_width[ U_COMP];
   m_width [Y_COMP] = inp->m_width[ V_COMP];
@@ -298,7 +297,7 @@ void ColorTransformYSumLin::allocateMemory(Frame* out, const Frame *inp) {
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
   m_floatData.resize((unsigned int) m_size);
   if (m_floatData.size() != (unsigned int) m_size) {
-    fprintf(stderr, "ColorTransformYSumLin: Not enough memory to create array m_floatData, of size %d", (int) m_size);
+    fprintf(stderr, "ColorTransformYAdjust2ndOrder: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }
   
@@ -309,7 +308,7 @@ void ColorTransformYSumLin::allocateMemory(Frame* out, const Frame *inp) {
   m_fwdColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], inp->m_chromaFormat, m_oChromaFormat, m_downMethod, (ChromaLocation *) &(inp->m_format.m_chromaLocation[0]), (ChromaLocation *)  &(m_oChromaLocation[0]), m_useAdaptiveDownsampler, m_useMinMax);
   
   m_invColorFormat = ConvertColorFormat::create(m_width[Y_COMP], m_height[Y_COMP], m_oChromaFormat, inp->m_chromaFormat, m_upMethod, (ChromaLocation *) &(m_oChromaLocation[0]), (ChromaLocation *)  &(inp->m_format.m_chromaLocation[0]), m_useAdaptiveUpsampler);
-  
+    
   if (m_useFloatPrecision == FALSE) {
     // Format conversion process
     FrameFormat inFormat  = out->m_format;
@@ -333,9 +332,96 @@ void ColorTransformYSumLin::allocateMemory(Frame* out, const Frame *inp) {
   else {
     m_fwdFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, out->m_colorSpace, out->m_colorPrimaries, m_oChromaFormat, out->m_sampleRange, out->m_bitDepthComp[Y_COMP], FALSE, m_transferFunctions, 1.0);      
     m_invFrameStore  = new Frame(m_width[Y_COMP], m_height[Y_COMP], TRUE, inp->m_colorSpace, inp->m_colorPrimaries, inp->m_chromaFormat, inp->m_sampleRange, inp->m_bitDepthComp[Y_COMP], FALSE, m_transferFunctions, 1.0);      
-  }  
-  
+  }
+
   m_memoryAllocated = TRUE;
+}
+
+void ColorTransformYAdjust2ndOrder::setModelFile(const char *modelFile) {
+  
+  m_modelFile.assign(modelFile); 
+  
+  int sz;
+  ifstream is(m_modelFile.c_str());
+  is >> sz;
+  
+  // Do some very basic error handling
+  // This needs to be revised
+  if (is.rdstate() == 0 && sz > 0) {   
+    m_searchTable.resize(sz);
+    
+    for (int i = 0; i < sz; i++) {
+      is >> m_searchTable[i].m_index;
+      is >> m_searchTable[i].m_leaf;
+    }
+    
+    is >> sz;
+    m_coeffTable.resize(sz * m_modelCoeffs);
+    for (int i = 0; i < sz * m_modelCoeffs; i+= m_modelCoeffs) {
+      is >> m_coeffTable[i + 0];
+      is >> m_coeffTable[i + 1];
+      is >> m_coeffTable[i + 2];
+      is >> m_coeffTable[i + 3];
+      is >> m_coeffTable[i + 4];
+      is >> m_coeffTable[i + 5];
+      is >> m_coeffTable[i + 6];
+    }
+    
+    if (is.rdstate() == 0)
+    return;
+  }
+  
+  // if we encountered an error, lets use defaults
+    sz = 10;
+    m_searchTable.resize(10);
+    for (int i = 0; i < sz; i++) {
+      m_searchTable[i].m_index = i;
+      m_searchTable[i].m_leaf = TRUE;
+    }
+    
+    m_coeffTable.resize(sz * m_modelCoeffs);
+    for (int i = 0; i < sz * m_modelCoeffs; i+= m_modelCoeffs) {
+      m_coeffTable[i + 0] = 1;
+      m_coeffTable[i + 1] = 1;
+      m_coeffTable[i + 2] = 1;
+      m_coeffTable[i + 3] = 1;
+      m_coeffTable[i + 4] = 1;
+      m_coeffTable[i + 5] = 1;
+      m_coeffTable[i + 6] = 1;
+    }
+}
+
+
+double ColorTransformYAdjust2ndOrder::convertToYLinear(const double rComp, const double gComp, const double bComp) {
+  return (m_transformRGBtoY[0] * m_transferFunction->getForward(rComp) + m_transformRGBtoY[1] * m_transferFunction->getForward(gComp) + m_transformRGBtoY[2] * m_transferFunction->getForward(bComp));
+}
+
+double ColorTransformYAdjust2ndOrder::convertToY(const double rComp, const double gComp, const double bComp) {
+  return (m_transformRGBtoY[0] * rComp + m_transformRGBtoY[1] * gComp + m_transformRGBtoY[2] * bComp);
+}
+
+int ColorTransformYAdjust2ndOrder::tableSearch(unsigned comp0, unsigned comp1, unsigned comp2) const
+{
+  for (int offset = 0, bitno  = sizeof(unsigned) * 8 - 1; ; bitno--) {
+    
+    offset += ((comp0 >> (bitno - 2)) & 4) + ((comp1 >> (bitno - 1)) & 2) + ((comp2 >> bitno) & 1);
+    
+    if (m_searchTable[offset].m_leaf) {
+      return offset;
+    }
+    
+    offset = m_searchTable[offset].m_index;
+  }
+}
+
+int ColorTransformYAdjust2ndOrder::calcYprime(int ylin, int cb, int cr, const double *coeffs)
+{
+  const double yd  = (double)(ylin * ylin);
+  const double cbd = (double)(cb * cb);
+  const double crd = (double)(cr * cr);
+  
+  return (int)(coeffs[0] * yd + coeffs[1] * ylin + coeffs[2] * cbd +
+               coeffs[3] * cb + coeffs[4] * crd  + coeffs[5] * cr + coeffs[6] + 0.5);
 }
 
 
@@ -343,7 +429,8 @@ void ColorTransformYSumLin::allocateMemory(Frame* out, const Frame *inp) {
 // Public methods
 //-----------------------------------------------------------------------------
 
-void ColorTransformYSumLin::process ( Frame* out, const Frame *inp) {
+
+void ColorTransformYAdjust2ndOrder::process ( Frame* out, const Frame *inp) {
   out->m_frameNo = inp->m_frameNo;
   out->m_isAvailable = TRUE;
   
@@ -352,7 +439,28 @@ void ColorTransformYSumLin::process ( Frame* out, const Frame *inp) {
   // but this keeps our code more flexible for now.
   
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])  {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {      
+    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {
+      double yLinear;
+      double uComp, vComp;
+      float *floatComp[3];
+      double scale = 1.0;
+      double (ColorTransformYAdjust2ndOrder::*pt2Convert)(double, double, double) = NULL;
+      
+      if (inp->m_hasAlternate == TRUE) {
+        floatComp[0] = inp->m_altFrame->m_floatComp[0];
+        floatComp[1] = inp->m_altFrame->m_floatComp[1];
+        floatComp[2] = inp->m_altFrame->m_floatComp[2];
+        scale       = 1.0 / inp->m_altFrameNorm;
+        pt2Convert  = &ColorTransformYAdjust2ndOrder::convertToY;
+      }
+      else {
+        floatComp[0] = inp->m_floatComp[0];
+        floatComp[1] = inp->m_floatComp[1];
+        floatComp[2] = inp->m_floatComp[2];
+        scale        = 1.0;        
+        pt2Convert  = &ColorTransformYAdjust2ndOrder::convertToYLinear;
+      }
+
       // Allocate memory. Note that current code does not permit change of resolution. TBDL
       if (m_memoryAllocated == FALSE) { 
         allocateMemory(out, inp);
@@ -364,10 +472,10 @@ void ColorTransformYSumLin::process ( Frame* out, const Frame *inp) {
         out->m_floatComp[1][i] = (float) (m_transform1[0] * (double) inp->m_floatComp[0][i] + m_transform1[1] * (double) inp->m_floatComp[1][i] + m_transform1[2] * (double) inp->m_floatComp[2][i]);
         out->m_floatComp[2][i] = (float) (m_transform2[0] * (double) inp->m_floatComp[0][i] + m_transform2[1] * (double) inp->m_floatComp[1][i] + m_transform2[2] * (double) inp->m_floatComp[2][i]);
       }
-      
+ 
       if (m_useFloatPrecision == FALSE) {       // Integer conversion
-                                                // convert float to fixed
-                                                // convert bitdepth
+        // convert float to fixed
+        // convert bitdepth
         m_fwdConvertProcess->process(m_fwdFrameStore2, out);
         
         // Downscale (if needed)
@@ -380,46 +488,52 @@ void ColorTransformYSumLin::process ( Frame* out, const Frame *inp) {
         m_invConvertProcess->process(m_invFrameStore, m_invFrameStore2);
       }
       else {   // Floating conversion
-               // Downconvert if needed
+        // Downscale (if needed)
         m_fwdColorFormat->process (m_fwdFrameStore, out);
         
+        // Quantize/DeQuantize components
         // Luma only if adaptive upsampler is enabled
         if (m_useAdaptiveUpsampler == TRUE) {
           for (int i = 0; i < m_fwdFrameStore->m_compSize[0]; i++) {
             m_fwdFrameStore->m_floatComp[0][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[0][i] * m_lumaWeight) / m_lumaWeight);
           }          
         }
-        
-        // Quantize/DeQuantize Chroma components
+        // /Now also chroma - if m_useAdaptiveUpsampler is false, then we do not need to quantize that
         for (int i = 0; i < m_fwdFrameStore->m_compSize[1]; i++) {
           m_fwdFrameStore->m_floatComp[1][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[1][i] * m_chromaWeight) / m_chromaWeight);
           m_fwdFrameStore->m_floatComp[2][i] = (float) (dRound((double) m_fwdFrameStore->m_floatComp[2][i] * m_chromaWeight) / m_chromaWeight);
         }
         
-        // Now convert back to 4:4:4
+        // Now convert back to 4:4:4 (if needed)
         m_invColorFormat->process (m_invFrameStore, m_fwdFrameStore);
       }
-            
-      for (int i = 0; i < inp->m_compSize[0]; i++) {
-        double deriv0 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[0][i] ) * m_transformRGBtoY[0];
-        double deriv1 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[1][i] ) * m_transformRGBtoY[1];
-        double deriv2 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[2][i] ) * m_transformRGBtoY[2];
-        
-        double uCompNewDiff = (double) m_invFrameStore->m_floatComp[1][i] - (double) out->m_floatComp[1][i];
-        double vCompNewDiff = (double) m_invFrameStore->m_floatComp[2][i] - (double) out->m_floatComp[2][i];
-                
-        double y =  (double) out->m_floatComp[0][i];
-        
-        // Note that the actual computation also involves subtracting the value of y from er, eg, and eb
-        // however, we can save on computations by subtracting this at the end from the overall error factor.
-        double er = uCompNewDiff * m_invTransform0[1] + vCompNewDiff *  m_invTransform0[2];
-        double eg = uCompNewDiff * m_invTransform1[1] + vCompNewDiff *  m_invTransform1[2];
-        double eb = uCompNewDiff * m_invTransform2[1] + vCompNewDiff *  m_invTransform2[2];
-                
-        out->m_floatComp[0][i] = (float) dClip( y - ( deriv0 * er  + deriv1 * eg + deriv2 * eb ) / ( deriv0  + deriv1 + deriv2 ), 0.0, 1.0 );
-
-      }
       
+      for (int i = 0; i < inp->m_compSize[0]; i++) {
+        // get target y linear value
+        yLinear = (*this.*pt2Convert)((double) floatComp[0][i] * scale, (double) floatComp[1][i] * scale,(double) floatComp[2][i] * scale);
+
+        // apply OETF, quantize, get 1st LUT index
+        double doubleIndex = m_transferFunction->getInverse(dClip((double) yLinear, 0.0, 1.0));       
+        int yLinearIndex = (int)(doubleIndex * m_lumaRange + 0.5);
+        
+        uComp = (double) m_invFrameStore->m_floatComp[1][i];
+        vComp = (double) m_invFrameStore->m_floatComp[2][i];
+                
+        int cbIndex = (int) ((m_chromaWeight * uComp + m_chromaOffset) + 0.5);
+        int crIndex = (int) ((m_chromaWeight * vComp + m_chromaOffset) + 0.5);
+        
+        unsigned comp0 = (yLinearIndex << 22);
+        unsigned comp1 = (cbIndex << 22);
+        unsigned comp2 = (crIndex << 22);
+        
+        int searchIndex = tableSearch(comp0, comp1, comp2);
+        int modelIndex  = m_searchTable[searchIndex].m_index;
+        
+        int yprime = calcYprime(yLinearIndex, cbIndex, crIndex, &m_coeffTable[modelIndex * m_modelCoeffs]) - m_lumaOffset;
+        
+        out->m_floatComp[0][i] = (float)((double) yprime / m_lumaWeight);
+      }
+
     }
     else { 
       // fixed precision, integer image data. 

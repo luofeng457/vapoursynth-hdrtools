@@ -43,13 +43,14 @@
  *    ColorTransformYSumLin
  *
  * \brief
- *    Luma adjustment method using Taylor Series approximation
+ *    Closed-form luma adjustment method using Taylor Series approximation 
+ *    for minimizing the error in linear luminance
  *
  * \date
  *    $Date: 11/11/2015
  *
  * \author
- *     - Andrey Norkin
+ *     - Andrey Norkin                   <anorkin@netflix.com>
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
  *     - Jacob Strom                     <jacob.strom@ericsson.com>
  *     - Jonatan Samuelsson              <jonatan.samuelsson@ericsson.com>

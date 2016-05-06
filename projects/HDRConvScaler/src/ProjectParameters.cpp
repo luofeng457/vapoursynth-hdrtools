@@ -71,17 +71,19 @@
 ProjectParameters ccParams;
 ProjectParameters *pParams = &ccParams;
 
-FrameFormat *src  = &pParams->m_source;
-FrameFormat *out  = &pParams->m_output;
+FrameFormat          *src  = &pParams->m_source;
+FrameFormat          *out  = &pParams->m_output;
+ColorTransformParams *ctp  = &pParams->m_ctParams;
 
 static char def_logfile[]  = "log.txt";
 static char def_out_file[] = "output_conv.yuv";
 
 StringParameter stringParameterList[] = {
-  { "SourceFile",          pParams->m_inputFile.m_fName,              NULL, "Source file name"           },
-  { "OutputFile",          pParams->m_outputFile.m_fName,     def_out_file, "Output file name"           },
-  { "LogFile",             pParams->m_logFile,                 def_logfile, "Output Log file name"       },
-  { "",                    NULL,                                      NULL, "String Termination entry"   }
+  { "SourceFile",          pParams->m_inputFile.m_fName,              NULL, "Source file name"                            },
+  { "OutputFile",          pParams->m_outputFile.m_fName,     def_out_file, "Output file name"                            },
+  { "LogFile",             pParams->m_logFile,                 def_logfile, "Output Log file name"                        },
+  { "YAdjustModelFile",    ctp->m_yAdjustModelFile,                   NULL, "Luma adjustment (2nd order) model file name" },
+  { "",                    NULL,                                      NULL, "String Termination entry"                    }
 };
 
 IntegerParameter intParameterList[] = {

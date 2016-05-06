@@ -61,6 +61,7 @@
 #include "Global.H"
 #include "Frame.H"
 #include "DistortionMetric.H"
+#include "TransferFunction.H"
 #include <vector>
 //#define FILE_REF_IN_NITS_DOUBLE     1.0
 
@@ -217,7 +218,8 @@ private:
   vector<double>    m_temp;
   vector<double>    m_image0; 
   vector<double>    m_image1;
-
+  
+  TransferFunction   *m_transferFunction;
   
   int internalReduce(double* image, int x_idim, int y_idim, const double *filt, double *temp, int xFDim, int yFDim, int xStart, int xStep, int xStop, int yStart, int yStep, int yStop, double *result);
   int reflect1( const double * filt,int xDim,int yDim,int xPos,int yPos,double* result,int rOrE);
@@ -250,7 +252,6 @@ private:
   void vectorAddFixNum             (vector<vector<double> > &input1, int w1, int h1, double input2,  vector<vector<double> > &output);
   void invertVector                (vector<vector<double> > &input1, int w, int h, vector<vector<double> > &output);
   void reshape                     (vector<vector<double> > &input, int newW, int newH , vector<vector<double> >  &s);
-  double SMPTE_ST_2084             (double x, bool Inverse, double MaxLum);
   int maxPyrHt                     (int imsize_w, int imsize_h,int filtsize); 
   int buildSteerablePyramidLevels                (double* lo0, int ht, int w, int h, vector<vector<double> > &pyr, int max_ht,  int pyrElement, vector<vector<double> >  &pyrArr, vector<bool> &subbandUsed); 
   
