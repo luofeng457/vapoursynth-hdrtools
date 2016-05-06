@@ -1,7 +1,11 @@
 Changes in HDRTools Version 0.11 (since 0.10)
 ---------------------------------------------
-- Additional luma adjustment methods (AT)
-- Implementation of Adaptive downsampling (AT)
+- Additional luma adjustment methods - JCTVC-W0052 (AT)
+- Addition of Canon's JCTVC-W0056 luma adjustment method (VK, AT)
+- Addition of Netflix's JCTVC-W0107 luma adjustment method (AN, AT)
+- LUT support for Transfer Functions (both for conversions and metrics) (AT)
+- Implementation of Adaptive downsampling - JCTVC-W0051 (AT)
+- Implementation of Adaptive upsampling - JCTVC-W0051 (AT)
 - VIF support (HRZ, MA, MTP, PN, AT)
 - VQM support (SS, KP, AT)
 - limited DPX file input support (AT)
@@ -9,7 +13,7 @@ Changes in HDRTools Version 0.11 (since 0.10)
 - Support of HLG (MN, MP, AT)
 - ICtCp support (AT)
 - Various bug fixes, optimizations, and code improvements (AT)
-
+- Memory restructuring (AT)
 
 Changes in HDRTools Version 0.10 (since 0.9)
 ---------------------------------------------
@@ -128,6 +132,7 @@ Changes in HDRTools Version 0.2 (since 0.1)
 People:
 AT      Alexis Michael Tourapis 	(alexismt@ieee.org)
 
+AN      Andrey Norkin
 CA      Cheung Auyeung
 CC      Christophe Chevance
 CF      Chad Fogg
@@ -149,6 +154,7 @@ PY      Peng Yin
 RB      Robert Brondijk
 SS      Sarvesh Sahota
 TL      Taoran Lu
+VK      Vladimir Kolesnikov
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
