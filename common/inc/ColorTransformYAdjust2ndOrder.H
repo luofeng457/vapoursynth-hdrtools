@@ -114,7 +114,7 @@ private:
   Frame                     *m_invFrameStore2; 
   Frame                     *m_fwdFrameStore;
   Frame                     *m_invFrameStore;
-  double                     m_lumaRange;
+  double                     m_luminanceRange;
   double                     m_lumaWeight;
   double                     m_chromaWeight;
   double                     m_lumaOffset;

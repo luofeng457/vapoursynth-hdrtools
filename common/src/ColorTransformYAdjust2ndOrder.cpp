@@ -223,7 +223,7 @@ ColorTransformYAdjust2ndOrder::ColorTransformYAdjust2ndOrder( ColorTransformPara
     m_chromaWeight = (double) (1 << (m_bitDepth - 8)) * 253.0;
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
-  m_lumaRange = (double) (1 << m_bitDepth);
+  m_luminanceRange = (double) (1 << m_bitDepth);
 
   m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
   setModelFile(params->m_yAdjustModelFile);
@@ -514,7 +514,7 @@ void ColorTransformYAdjust2ndOrder::process ( Frame* out, const Frame *inp) {
 
         // apply OETF, quantize, get 1st LUT index
         double doubleIndex = m_transferFunction->getInverse(dClip((double) yLinear, 0.0, 1.0));       
-        int yLinearIndex = (int)(doubleIndex * m_lumaRange + 0.5);
+        int yLinearIndex = (int)(doubleIndex * m_luminanceRange + 0.5);
         
         uComp = (double) m_invFrameStore->m_floatComp[1][i];
         vComp = (double) m_invFrameStore->m_floatComp[2][i];
