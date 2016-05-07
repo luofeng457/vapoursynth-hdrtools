@@ -529,7 +529,7 @@ void ColorTransformYAdjust2ndOrder::process ( Frame* out, const Frame *inp) {
         int searchIndex = tableSearch(comp0, comp1, comp2);
         int modelIndex  = m_searchTable[searchIndex].m_index;
         
-        int yprime = calcYprime(yLinearIndex, cbIndex, crIndex, &m_coeffTable[modelIndex * m_modelCoeffs]) - m_lumaOffset;
+        int yprime = calcYprime(yLinearIndex, cbIndex, crIndex, &m_coeffTable[modelIndex * m_modelCoeffs]) - (int) m_lumaOffset;
         
         out->m_floatComp[0][i] = (float)((double) yprime / m_lumaWeight);
       }

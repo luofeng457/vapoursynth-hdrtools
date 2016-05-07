@@ -150,6 +150,7 @@
     <ClCompile Include="src\ColorTransformRGBAdjust.cpp" />
     <ClCompile Include="src\ColorTransformXYZ2YUpVp.cpp" />
     <ClCompile Include="src\ColorTransformYAdjust.cpp" />
+    <ClCompile Include="src\ColorTransformYAdjust2ndOrder.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustAlt.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustFast.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustFull.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="inc\ColorTransformRGBAdjust.H" />
     <ClInclude Include="inc\ColorTransformXYZ2YUpVp.H" />
     <ClInclude Include="inc\ColorTransformYAdjust.H" />
+    <ClInclude Include="inc\ColorTransformYAdjust2ndOrder.H" />
     <ClInclude Include="inc\ColorTransformYAdjustAlt.H" />
     <ClInclude Include="inc\ColorTransformYAdjustFast.H" />
     <ClInclude Include="inc\ColorTransformYAdjustFull.H" />

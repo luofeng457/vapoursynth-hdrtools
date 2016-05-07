@@ -384,6 +384,9 @@
     <ClCompile Include="src\ColorTransformYSumLin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColorTransformYAdjust2ndOrder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -792,6 +795,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\ColorTransformYSumLin.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjust2ndOrder.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
