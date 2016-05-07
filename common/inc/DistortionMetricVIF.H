@@ -222,8 +222,8 @@ private:
   TransferFunction   *m_transferFunction;
   
   int internalReduce(double* image, int x_idim, int y_idim, const double *filt, double *temp, int xFDim, int yFDim, int xStart, int xStep, int xStop, int yStart, int yStep, int yStop, double *result);
-  int reflect1( const double * filt,int xDim,int yDim,int xPos,int yPos,double* result,int rOrE);
-  void INPROD(int XCNR,int YCNR,int xDim, int xFDim, int filtSize, int resPos, double* result, double* temp, double* image);
+  int  reflect1( const double * filt,int xDim,int yDim,int xPos,int yPos,double* result,int rOrE);
+  void innerProduct(int XCNR,int YCNR,int xDim, int xFDim, int filtSize, int resPos, double* result, double* temp, double* image);
   void inverseMatrix(vector<vector<double> > &input, int n, vector<vector<double> > &output);
 
   

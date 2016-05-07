@@ -150,19 +150,16 @@ ColorTransformClosedLoop::ColorTransformClosedLoop( ColorTransformParams *params
       m_mode = CTF_RGB_2_YCOCG;
     }
     else if (m_iColorPrimaries == CP_LMSD && m_oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_YCbCrLMS;
     } 
   }
   else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_ICtCp) {
     if (m_oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_ICtCp;
     } 
   }
   else if (m_iColorSpace == CM_ICtCp && m_oColorSpace == CM_RGB) {
     if (m_iColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_ICtCp;
     } 
     m_isForward = FALSE;
@@ -195,7 +192,6 @@ ColorTransformClosedLoop::ColorTransformClosedLoop( ColorTransformParams *params
       m_mode = CTF_RGB_2_YCOCG;
     } 
     else if (m_iColorPrimaries == CP_LMSD && m_oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_YCbCrLMS;
     } 
     m_isForward = FALSE;

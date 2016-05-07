@@ -111,7 +111,7 @@ DistortionMetricVIF::~DistortionMetricVIF()
  ------------------------------------------------------------------------ */
 
 /* abstract out the inner product computation */
-void DistortionMetricVIF::INPROD(int XCNR,int YCNR,int xDim, int xFDim, int filtSize, int resPos, double* result,  double* temp, double* image)
+void DistortionMetricVIF::innerProduct(int XCNR,int YCNR,int xDim, int xFDim, int filtSize, int resPos, double* result,  double* temp, double* image)
 {
   double sum       = 0.0; 
   int    imPos     = YCNR * xDim + XCNR;
@@ -139,8 +139,8 @@ int DistortionMetricVIF::internalReduce(double* image, int xDim, int yDim,
   int xResDim = (xStop - xStart + xStep - 1) / xStep;
   int xCtrStart = ((xFDim == 1) ? 0 : 1);
   int yCtrStart = ((yFDim == 1) ? 0 : 1);
-  int xFMid = xFDim / 2;
-  int yFMid = yFDim / 2;
+  int xFMid = xFDim >> 1;
+  int yFMid = yFDim >> 1;
   int baseResPos;
   // fptr reflect = edge_function(edges);  /* look up edge-handling function */
   //  if (!reflect) return(-1);
@@ -161,19 +161,19 @@ int DistortionMetricVIF::internalReduce(double* image, int xDim, int yDim,
     /* TOP-LEFT CORNER */
     for (xPos = xStart; xPos < xCtrStart; xPos += xStep, resPos++)    {
       reflect1(filt, xFDim, yFDim, xPos - 1, yPos - 1, temp, 0);
-      INPROD(0, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(0, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
     }
     
     reflect1(filt, xFDim,yFDim,0,yPos-1,temp, 0);
     
     /* TOP EDGE */
     for (; xPos < xCtrStop; xPos += xStep, resPos++) 
-      INPROD(xPos, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(xPos, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
     
     /* TOP-RIGHT CORNER */
     for (;xPos < xStop; xPos += xStep, resPos++) {
       reflect1(filt, xFDim, yFDim, xPos - xCtrStop + 1, yPos - 1, temp, 0);
-      INPROD(xCtrStop, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(xCtrStop, 0, xDim, xFDim, filtSize, resPos, result, temp, image);
     }
   } /* end TOP ROWS */   
   
@@ -183,20 +183,20 @@ int DistortionMetricVIF::internalReduce(double* image, int xDim, int yDim,
   for (baseResPos = resPos, xPos = xStart; xPos < xCtrStart; xPos += xStep, baseResPos++) {
     reflect1(filt, xFDim, yFDim, xPos - 1, 0, temp, 0);
     for (yPos = yCtrStart, resPos = baseResPos; yPos < yCtrStop; yPos += yStep, resPos += xResDim)
-      INPROD(0, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(0, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
   }
   
   reflect1(filt,xFDim,yFDim,0,0,temp, 0);
   /* CENTER */
   for (; xPos < xCtrStop; xPos += xStep, baseResPos++) {
     for (yPos = yCtrStart, resPos = baseResPos; yPos < yCtrStop; yPos += yStep, resPos += xResDim)
-      INPROD(xPos, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(xPos, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
   }
   /* RIGHT EDGE */
   for (; xPos < xStop; xPos += xStep, baseResPos++)  {
     reflect1(filt, xFDim, yFDim, xPos - xCtrStop + 1, 0, temp, 0);    
     for (yPos = yCtrStart, resPos = baseResPos; yPos<yCtrStop; yPos += yStep, resPos += xResDim)
-      INPROD(xCtrStop, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(xCtrStop, yPos, xDim, xFDim, filtSize, resPos, result, temp, image);
   }
   
   /* BOTTOM ROWS */
@@ -204,18 +204,18 @@ int DistortionMetricVIF::internalReduce(double* image, int xDim, int yDim,
     /* BOTTOM-LEFT CORNER */
     for (xPos = xStart; xPos < xCtrStart; xPos+=xStep, resPos++) {
       reflect1(filt, xFDim, yFDim, xPos - 1, yPos - yCtrStop + 1, temp, 0);
-      INPROD(0, yCtrStop, xDim, xFDim, filtSize, resPos, result,  temp,  image);
+      innerProduct(0, yCtrStop, xDim, xFDim, filtSize, resPos, result,  temp,  image);
     }
     
     reflect1(filt, xFDim, yFDim, 0, yPos - yCtrStop + 1, temp, 0);
     /* BOTTOM EDGE */
     for (;xPos < xCtrStop; xPos += xStep, resPos++) 
-      INPROD(xPos, yCtrStop, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(xPos, yCtrStop, xDim, xFDim, filtSize, resPos, result, temp, image);
     
     /* BOTTOM-RIGHT CORNER */
     for (; xPos < xStop; xPos += xStep, resPos++) {
       reflect1(filt, xFDim, yFDim, xPos - xCtrStop + 1, yPos - yCtrStop + 1,temp, 0);
-      INPROD(xCtrStop, yCtrStop, xDim, xFDim, filtSize, resPos, result, temp, image);
+      innerProduct(xCtrStop, yCtrStop, xDim, xFDim, filtSize, resPos, result, temp, image);
     }
   } /* end BOTTOM */
   return(0);
@@ -234,7 +234,7 @@ int DistortionMetricVIF::internalReduce(double* image, int xDim, int yDim,
 
 /* abstract out the inner product computation */
 
-int DistortionMetricVIF::reflect1( const double * filt,int xDim,int yDim,int xPos,int yPos,double* result,int rOrE)
+int DistortionMetricVIF::reflect1( const double * filt, int xDim, int yDim, int xPos, int yPos, double *result, int rOrE)
 {
   int filtSz = xDim * yDim;
   int yFilt,xFilt, yRes, xRes;
@@ -243,10 +243,10 @@ int DistortionMetricVIF::reflect1( const double * filt,int xDim,int yDim,int xPo
   int xOverhang = (xPos > 0) ? (xPos - 1) : ((xPos < 0) ? (xPos + 1) : 0);
   int yOverhang = xDim * ((yPos > 0) ? (yPos - 1) : ((yPos < 0) ? (yPos + 1) : 0));
   int i;
-  int mXPos = (xPos < 0) ? (xDim / 2) : ((xDim - 1) / 2);
-  int mYPos = xDim * ((yPos < 0) ? (yDim / 2) : ((yDim - 1) / 2));
+  int mXPos = (xPos < 0) ? (xDim >> 1) : ((xDim - 1) >> 1);
+  int mYPos = xDim * ((yPos < 0) ? (yDim >> 1) : ((yDim - 1) >> 1));
   
-  for (i=0; i<filtSz; i++) 
+  for (i = 0; i < filtSz; i++) 
     result[i] = 0.0;
   
   if (rOrE == 0) {
@@ -309,8 +309,7 @@ void DistortionMetricVIF::inverseMatrix(vector<vector<double> > &input, int n, v
     }
   }
   
-  for (int i = n-1; i > 0; i--)
-  {
+  for (int i = n-1; i > 0; i--)  {
     if (a[i-1][1] < a[i][1]) {
       for(int j = 0; j < n * 2; j++) {
         swap(&a[i][j], &a[i - 1][j]);
@@ -354,7 +353,7 @@ void DistortionMetricVIF::mean (vector<vector<double> >  &input, int w, int h, d
 
 void DistortionMetricVIF::reshape (vector<vector<double> >  &input, int newW, int newH ,  vector<vector<double> >  &s)
 {
-  int k=0;
+  int k = 0;
   for (int i = 0; i < newW; i++)	{
     for (int j = 0; j < newH; j++) {
       s[i][j] = input[0][k++];
@@ -365,7 +364,7 @@ void DistortionMetricVIF::reshape (vector<vector<double> >  &input, int newW, in
 
 void DistortionMetricVIF::vectorMax (int* input, int size , int imax)
 {
-  imax=input[0];
+  imax = input[0];
   for (int j = 0; j < size; j++) {
     if (input[j] > imax) {
       imax = input[j];
@@ -440,7 +439,7 @@ void DistortionMetricVIF::vectorMultiplication(vector<vector<double> >  &input1,
   for (int i = 0;i < w1; i++)	{
     output[i].resize(h2);
     for (int i1 = 0; i1 < h2; i1++)	{
-      double sum=0;
+      double sum = 0;
       for (int j = 0; j < h1; j++) {
         sum += (input1[i][j] * input2[j][i1]);
       }
@@ -451,9 +450,9 @@ void DistortionMetricVIF::vectorMultiplication(vector<vector<double> >  &input1,
 
 void DistortionMetricVIF::vectorMultiplicationInverse (vector<vector<double> >  &input1, int w1,int h1,vector<vector<double> >  &input2,  vector<vector<double> >  &output)
 {
-  int h2=w1;
+  int h2 = w1;
   //	int w2=h1;
-  for (int i = 0;i < w1; i++) {
+  for (int i = 0; i < w1; i++) {
     output[i].resize(h2);    
     for (int i1 = 0; i1 < h2; i1++) {
       double sum=0;
@@ -468,7 +467,7 @@ void DistortionMetricVIF::vectorMultiplicationInverse (vector<vector<double> >  
 //output=input1/input2
 void DistortionMetricVIF::vectorMultiplyFixNum(vector<vector<double> >  &input1, int w1, int h1,double input2,  vector<vector<double> >  &output)
 {
-  for (int i = 0;i < w1; i++) {
+  for (int i = 0; i < w1; i++) {
     output[i].resize(h1);
     for (int j = 0; j < h1; j++) {
       output[i][j]=(input1[i][j] * input2);
@@ -479,7 +478,7 @@ void DistortionMetricVIF::vectorMultiplyFixNum(vector<vector<double> >  &input1,
 //output=input1+input2
 void DistortionMetricVIF::vectorAddFixNum(vector<vector<double> >  &input1, int w1, int h1,double input2,  vector<vector<double> >  &output)
 {
-  for (int i = 0;i < w1; i++) {
+  for (int i = 0; i < w1; i++) {
     output[i].resize(h1);
     for (int j = 0; j < h1; j++) {
       output[i][j]=(input1[i][j]+input2);
@@ -490,7 +489,7 @@ void DistortionMetricVIF::vectorAddFixNum(vector<vector<double> >  &input1, int 
 //output=input1.*input2
 void DistortionMetricVIF::vectorMultiplicationSameSize(vector<vector<double> >  &input1, int w1, int h1, vector<vector<double> >  &input2,  vector<vector<double> >  &output)
 {
-  for (int i = 0;i < w1; i++)	{
+  for (int i = 0; i < w1; i++)	{
     output[i].resize(h1);
     for (int j = 0; j < h1; j++) {
       output[i][j]= (input1[i][j] * input2[i][j]);
@@ -501,13 +500,13 @@ void DistortionMetricVIF::vectorMultiplicationSameSize(vector<vector<double> >  
 
 double DistortionMetricVIF::sumSumLog2GGSSLambdaDivVV(vector<vector<double> >  &g, int w1, int h1, vector<vector<double> >  &ss, double lambda, double eps, vector<vector<double> >  &vv)
 {
-  static const double iLn2 = 1.0 / log(2.0);
-  double sum=0.0;
-  for (int i = 0;i < w1; i++) {
+  double sum = 0.0;
+  for (int i = 0; i < w1; i++) {
     for (int j = 0; j < h1; j++) {
-      sum+= log(1.0 + g[i][j] * g[i][j] * ss[i][j] * lambda / (vv[i][j] + eps)) * iLn2;
+      sum+= log(1.0 + g[i][j] * g[i][j] * ss[i][j] * lambda / (vv[i][j] + eps));
     }
   }
+  sum /= log(2.0);
   return sum;
 }
 
@@ -516,11 +515,12 @@ double DistortionMetricVIF::sumSumLog2GGSSLambdaDivVV(vector<vector<double> >  &
 double DistortionMetricVIF::sumSumLog2SSLambdaDivSigma(vector<vector<double> > &ss, int w1, int h1,double lambda, double eps)
 {
   double sum = 0.0;
-  for (int i = 0 ;i < w1; i++) {
+  for (int i = 0; i < w1; i++) {
     for (int j = 0; j < h1; j++) {
-      sum += log(1.0 + ss[i][j] * lambda/(eps))/log(2.0);  //reference image information
+      sum += log(1.0 + ss[i][j] * lambda/(eps));  //reference image information
     }
   }
+  sum /= log(2.0);
   return sum;
 }
 
@@ -531,9 +531,9 @@ void DistortionMetricVIF::sumSSTempMM(vector<vector<double> >  &input1, int w1, 
   for (int j = 0; j < h1; j++)	{
     double sum = 0.0;
     for (int i = 0;i < w1; i++)	{
-      sum += (input1[i][j] * input2[i][j]) / input3;
+      sum += (input1[i][j] * input2[i][j]);
     }
-    output[0][j]=sum;
+    output[0][j]=sum / input3;
   }
 }
 
@@ -556,7 +556,7 @@ void DistortionMetricVIF::repmat (double* input, int w, int h, vector<vector<dou
   for (int i = 0; i < w; i++)	{
     output[i].resize(h);
     for (int j = 0; j < h; j++)	{
-      output[i][j]= (input[i]);
+      output[i][j]= input[i];
     }
   }
 }
@@ -597,28 +597,28 @@ void DistortionMetricVIF::setCompareWithOther (double *compInput, double *setInp
 }
 
 //output=input1-input2
-void DistortionMetricVIF::difference (double* input1, double* input2, int size,   double* output )
+void DistortionMetricVIF::difference (double* input1, double* input2, int size, double* output )
 {
   for (int i = 0; i < size; i++)
     output[i] = input1[i] - input2[i];
 }
 
 //output=input+num
-void DistortionMetricVIF::addFix (double* input, int size, double num,   double* output )
+void DistortionMetricVIF::addFix (double* input, int size, double num, double* output )
 {
   for (int i = 0; i < size; i++)
     output[i] = input[i] + num ;
 }
 
 //output=input/num
-void DistortionMetricVIF::divFix (double* input, int size, double num,   double* output )
+void DistortionMetricVIF::divFix (double* input, int size, double num, double* output )
 {
   for (int i = 0; i < size; i++)
     output[i] = input[i] / num ;
 }
 
 //output=input/input2
-void DistortionMetricVIF::div (double* input, double* input2, int size,   double* output )
+void DistortionMetricVIF::div (double* input, double* input2, int size, double* output )
 {
   for (int i = 0; i < size; i++)
     output[i] = input[i] / input2[i] ;
@@ -661,12 +661,12 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
   Eigenvalue eg1;
   int MxM = M * M;
   
-  for (int subi=0;subi<sizeSubBand;subi++)	{
+  for (int subi = 0; subi < sizeSubBand; subi++)	{
     int   sub = subbands[subi];
     
     //force subband size to be multiple of M
-    int newSizeYWidth  = (int) ((floor(lenWh[sub][0] /((double) M))) * (double) M);
-    int newSizeYHeight = (int) ((floor(lenWh[sub][1] /((double) M))) * (double) M);
+    int newSizeYWidth  = (lenWh[sub][0] / M) * M;
+    int newSizeYHeight = (lenWh[sub][1] / M) * M;
     
     vector<vector<double> > yMM(newSizeYWidth);
     for (int w = 0; w < newSizeYWidth; w++) {
@@ -687,19 +687,18 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     for (int k = 0; k < M; k++)	{
       for (int j = 0; j < M; j++)	{
         int totalSize= (newSizeYWidth - (M - 1 - k) - k) * (newSizeYHeight - (M - 1 - j) - j);
-        temp [count].resize(totalSize);
-        sizeTempH=0;
+        temp[count].resize(totalSize);
+        sizeTempH = 0;
         for (int w0 = k; w0 < newSizeYWidth - (M - 1 - k); w0++) {
           for (int h0 = j; h0 < newSizeYHeight - (M - 1 - j); h0++) {
-            temp[count][sizeTempH] = (yMM[w0][h0]);
-            sizeTempH++;
+            temp[count][sizeTempH++] = (yMM[w0][h0]);
           }
         }
         count++;
       }
     }
     
-    int totalSize= (newSizeYWidth - (M - 1)) * (newSizeYHeight - (M - 1));
+    int totalSize = (newSizeYWidth - (M - 1)) * (newSizeYHeight - (M - 1));
     
     //estimate mean 
     vector<double> mcu(MxM);
@@ -715,7 +714,7 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     vectorMultiplicationInverse (cu1, MxM, sizeTempH, cu1, cu2);
     for (int ii = 0; ii < MxM; ii++)	{
       for (int jj = 0;jj < MxM; jj++) {
-        cuArr[sub] [ii][jj]=(cu2[ii][jj]/sizeTempH); //% covariance matrix for U
+        cuArr[sub] [ii][jj]=(cu2[ii][jj] / sizeTempH); //% covariance matrix for U
       }
     }
     
@@ -728,7 +727,7 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     int temp1Size = 0;
     for (int k = 0; k < M; k++)		{
       for (int j = 0;j < M; j++)			{
-        temp1Size=0;
+        temp1Size = 0;
         temp1[count].resize(newSizeYWidth * newSizeYHeight);
         for (int w0 = k; w0 < newSizeYWidth; w0 += M) {
           for (int h0 = j; h0 < newSizeYHeight;h0 += M) {
@@ -759,7 +758,7 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     //Eigen-decomposition
     vector<double> a(MxM * MxM);
     
-    int k=0;
+    int k = 0;
     for (int i = 0; i < MxM; i++)	{
       for (int j = 0;j < MxM; j++)	{
         a[k++] = (cuArr[sub][i][j]);
@@ -788,7 +787,7 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
                                       )
 {
   double tol = 1e-15; 
-  for (int i=0;i<sizeSubBand;i++) {
+  for (int i = 0; i < sizeSubBand; i++) {
     int sub = subbands[i];
     int sizeY = lenWh[sub][0] * lenWh[sub][1];
     vector<double> y (sizeY);
@@ -798,26 +797,26 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     memcpy (&yn[0],&dist[sub][0], sizeY * sizeof (double));
     
     //compute the size of the window used in the distortion channel estimation
-    int  lev = (int) ceil((sub-1)/6.0);
+    int  lev = (int) ceil((sub - 1)/6.0);
     int winSize= (1 << lev) + 1; // pow(2.0, lev) + 1; 
                                  //    double offset=(winSize-1)/2.0;
-    vector<double> win       (winSize * winSize);
+    vector<double> win      (winSize * winSize);
     vector<double> winNormal(winSize * winSize);
     
     for (int j = 0; j < winSize * winSize; j++) {
-      win[j]=1.0; 
-      winNormal[j]=1.0 / (((double) winSize)*((double)winSize)) ;
+      win[j] = 1.0; 
+      winNormal[j] = 1.0 / (double)(winSize * winSize);
     }
     
     //force subband size to be multiple of M
-    int newSizeYWidth  = (int) (floor(lenWh[sub][0]/((double)M))*(double) M);
-    int newSizeYHeight = (int) (floor(lenWh[sub][1]/((double)M))*(double) M);
+    int newSizeYWidth  = (lenWh[sub][0] / M) * M;
+    int newSizeYHeight = (lenWh[sub][1] / M) * M;
     
-    vector<double> yMM (newSizeYWidth*newSizeYHeight);
-    vector<double> ynMM(newSizeYWidth*newSizeYHeight);
+    vector<double> yMM (newSizeYWidth * newSizeYHeight);
+    vector<double> ynMM(newSizeYWidth * newSizeYHeight);
     
-    for (int w=0;w<newSizeYWidth;w++) {
-      for (int h=0;h<newSizeYHeight;h++) {
+    for (int w = 0; w < newSizeYWidth; w++) {
+      for (int h = 0; h < newSizeYHeight; h++) {
         yMM [w + h * newSizeYWidth] = y [w + h * lenWh[sub][0]];
         ynMM[w + h * newSizeYWidth] = yn[w + h * lenWh[sub][0]];
       }
@@ -825,17 +824,20 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     
     //Correlation with downsampling. This is faster than downsampling after
     //computing full correlation.
-    int winStepX  = M; 
-    int winStepY  = M;
-    int winStartX = (int) floor(M / 2.0); 
-    int winStartY = winStartX;
-    int winStopX  = newSizeYWidth  - (int) ceil(M / 2.0) + 1; 
-    int winStopY  = newSizeYHeight - (int) ceil(M / 2.0) + 1; 
+    int winStepX       = M; 
+    int winStepY       = M;
+    int winStartX      = winStepX >> 1; 
+    int winStartY      = winStartX;
+    int winStopX       = newSizeYWidth  - ((winStepX + 1) >> 1) + 1; 
+    int winStopY       = newSizeYHeight - ((winStepY + 1) >> 1) + 1; 
+    int newBlockWidth  = newSizeYWidth  / winStepX;
+    int newBlockHeight = newSizeYHeight / winStepY;
+    int newSizeBlocks  = (newSizeYWidth * newSizeYHeight) / (winStepX * winStepY);
     
     //mean
-    int meanXSize = (int)((double) newSizeYWidth / (double) M * (double)newSizeYHeight / (double) M);
+    int meanXSize = newSizeBlocks;
     vector<double> meanX(meanXSize);
-    vector<double> meanY((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
+    vector<double> meanY(newSizeBlocks);
     vector<double> temp  (newSizeYWidth * newSizeYHeight);
     
     internalReduce(&yMM[0],  newSizeYWidth, newSizeYHeight, &winNormal[0], &temp[0], winSize, winSize, winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &meanX[0]);    
@@ -846,81 +848,81 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     
     multiply (&yMM[0], &ynMM[0], newSizeYWidth * newSizeYHeight, 1.0, &yMMYnMM[0]);
     
-    vector<double> covXY ((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> covXY1((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> covXY2((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
+    vector<double> covXY (newSizeBlocks);
+    vector<double> covXY1(newSizeBlocks);
+    vector<double> covXY2(newSizeBlocks);
     
-    multiply (&meanX[0], &meanY[0], (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M) , winSize * winSize, &covXY2[0]);    
+    multiply (&meanX[0], &meanY[0], newSizeBlocks, winSize * winSize, &covXY2[0]);    
     
     internalReduce(&yMMYnMM[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0], winSize, winSize, winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &covXY1[0]); 
     
-    difference (&covXY1[0],&covXY2[0], (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M), &covXY[0]);    
+    difference (&covXY1[0],&covXY2[0], newSizeBlocks, &covXY[0]);    
     //varx
-    vector<double> SsX1((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> SsX2((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> SsX ((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
+    vector<double> SsX1(newSizeBlocks);
+    vector<double> SsX2(newSizeBlocks);
+    vector<double> SsX (newSizeBlocks);
     vector<double> yMM_2(newSizeYWidth * newSizeYHeight);
     
-    multiply (&yMM[0], &yMM[0], newSizeYWidth * newSizeYHeight ,1.0, &yMM_2[0]);
+    multiply (&yMM[0], &yMM[0], newSizeYWidth * newSizeYHeight, 1.0, &yMM_2[0]);
     internalReduce(&yMM_2[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0], winSize, winSize,	winStartX, winStepX, winStopX, winStartY, winStepY, winStopY, &SsX1[0]); 
     
-    multiply (&meanX[0], &meanX[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), winSize * winSize,  &SsX2[0]);
-    difference (&SsX1[0], &SsX2[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), &SsX[0]);
+    multiply (&meanX[0], &meanX[0],  newSizeBlocks, winSize * winSize,  &SsX2[0]);
+    difference (&SsX1[0], &SsX2[0],  newSizeBlocks, &SsX[0]);
     
     //vary 
-    vector<double> SsY1((int)(newSizeYWidth / (double) M * newSizeYHeight / (double)M));
-    vector<double> SsY2((int)(newSizeYWidth / (double) M * newSizeYHeight / (double)M));
-    vector<double> SsY ((int)(newSizeYWidth / (double) M * newSizeYHeight / (double)M));
+    vector<double> SsY1 (newSizeBlocks);
+    vector<double> SsY2 (newSizeBlocks);
+    vector<double> SsY  (newSizeBlocks);
     vector<double> ynMM2(newSizeYWidth * newSizeYHeight);
     
     multiply (&ynMM[0], &ynMM[0], newSizeYWidth * newSizeYHeight, 1.0, &ynMM2[0]);
     
     internalReduce(&ynMM2[0], newSizeYWidth,  newSizeYHeight, &win[0], &temp[0],  winSize,  winSize, winStartX,  winStepX,  winStopX, winStartY, winStepY, winStopY, &SsY1[0]); 
     
-    multiply (&meanY[0], &meanY[0],  (int) (newSizeYWidth/(double) M * newSizeYHeight / (double) M), winSize * winSize,  &SsY2[0] );
-    difference (&SsY1[0], &SsY2[0],  (int) (newSizeYWidth/(double) M * newSizeYHeight / (double) M), &SsY[0]);
+    multiply   (&meanY[0], &meanY[0],  newSizeBlocks, winSize * winSize,  &SsY2[0] );
+    difference (&SsY1[0],   &SsY2[0],  newSizeBlocks, &SsY[0]);
     
     // get rid of numerical problems, very small negative numbers, or very
     // small positive numbers, or other theoretical impossibilities.
-    setCompare(&SsX[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight /(double) M), 0, 0, FALSE, &SsX[0]);
-    setCompare(&SsY[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight /(double) M), 0, 0, FALSE, &SsY[0]);
+    setCompare(&SsX[0],  newSizeBlocks, 0, 0, FALSE, &SsX[0]);
+    setCompare(&SsY[0],  newSizeBlocks, 0, 0, FALSE, &SsY[0]);
     
     // Regression 
-    vector<double> gNum((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> g   ((int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M));
+    vector<double> gNum(newSizeBlocks);
+    vector<double> g   (newSizeBlocks);
     
-    addFix(&SsX[0],  (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol,&gNum[0]);
-    div (&covXY[0], &gNum[0], (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M), &g[0]);
+    addFix(&SsX[0],  newSizeBlocks, tol,&gNum[0]);
+    div (&covXY[0], &gNum[0], newSizeBlocks, &g[0]);
     
     //Variance of error in regression
-    vector<double> vv    ((int)(newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> vvNum1((int)(newSizeYWidth / (double) M * newSizeYHeight / (double) M));
-    vector<double> vvNum ((int)(newSizeYWidth / (double) M * newSizeYHeight / (double) M));
+    vector<double> vv    (newSizeBlocks);
+    vector<double> vvNum1(newSizeBlocks);
+    vector<double> vvNum (newSizeBlocks);
     
-    multiply   (&g[0],&covXY[0],  (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M), 1.0, &vvNum1[0]);
-    difference (&SsY[0], &vvNum1[0],  (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M), &vvNum[0]);
-    divFix     (&vvNum[0],  (int) (newSizeYWidth / (double) M* newSizeYHeight / (double) M), winSize * winSize, &vv[0]);
+    multiply   (&g[0],    &covXY[0],  newSizeBlocks, 1.0, &vvNum1[0]);
+    difference (&SsY[0], &vvNum1[0],  newSizeBlocks, &vvNum[0]);
+    divFix     (&vvNum[0],            newSizeBlocks, winSize * winSize, &vv[0]);
     
     
     // get rid of numerical problems, very small negative numbers, or very
     // small positive numbers, or other theoretical impossibilities.
-    setCompare          (&SsX[0],           (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol,   0, FALSE, &g[0]);
-    setCompareWithOther (&SsX[0],  &SsY[0], (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol,      FALSE, &vv[0]);
-    setCompare          (&SsX[0],           (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol,   0, FALSE, &SsX[0]);
-    setCompare          (&SsY[0],           (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol,   0, FALSE, &g[0]);
-    setCompare          (&SsY[0],           (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol,   0, FALSE, &vv[0]);
+    setCompare          (&SsX[0],           newSizeBlocks, tol,   0, FALSE, &g[0]);
+    setCompareWithOther (&SsX[0],  &SsY[0], newSizeBlocks, tol,      FALSE, &vv[0]);
+    setCompare          (&SsX[0],           newSizeBlocks, tol,   0, FALSE, &SsX[0]);
+    setCompare          (&SsY[0],           newSizeBlocks, tol,   0, FALSE, &g[0]);
+    setCompare          (&SsY[0],           newSizeBlocks, tol,   0, FALSE, &vv[0]);
     
     //constrain g to be non-negative. 
-    setCompareWithOther (&g[0],    &SsY[0], (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M),        0, FALSE, &vv[0]);
-    setCompare          (&g[0],             (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M),   0,   0, FALSE, &g[0]);
+    setCompareWithOther (&g[0],    &SsY[0], newSizeBlocks,        0, FALSE, &vv[0]);
+    setCompare          (&g[0],             newSizeBlocks,   0,   0, FALSE, &g[0]);
     
     //take care of numerical errors, vv could be very small negative
-    setCompare          (&vv[0],            (int) (newSizeYWidth / (double) M * newSizeYHeight / (double) M), tol, tol,  TRUE, &vv[0]);
+    setCompare          (&vv[0],            newSizeBlocks, tol, tol,  TRUE, &vv[0]);
     
-    for (int jj = 0; jj < newSizeYWidth  / (double) M; jj++) {
-      for (int h = 0; h < newSizeYHeight / (double) M;h++) {
-        gAll [sub][jj][h] = g [jj + h * (int)(newSizeYWidth / (double) M)];
-        VvAll[sub][jj][h] = vv[jj + h * (int)(newSizeYWidth / (double) M)];
+    for (int jj = 0; jj < newBlockWidth; jj++) {
+      for (int h = 0; h < newBlockHeight; h++) {
+        gAll [sub][jj][h] = g [jj + h * newBlockWidth];
+        VvAll[sub][jj][h] = vv[jj + h * newBlockWidth];
       }
     }
   }
@@ -972,7 +974,7 @@ int DistortionMetricVIF::buildSteerablePyramidLevels(double* lo0,
       for (int k = 0, i = 0; i < bFiltsZ  ; i ++) {
         for (int j = i; j < i + bFiltsZ * bFiltsZ ; j += bFiltsZ) {
           //reshape the filter
-          bFiltsOneRow  [j] = bfilts[b][k];
+          bFiltsOneRow[j] = bfilts[b][k];
           k++;
         }
       }
@@ -1173,12 +1175,12 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   
   for (int ii=0; ii<sizeSubBand;ii++)	{
     int sub = subbands [ii];
-    int  newSizeYWidth = (int) (floor(lenWh[sub][0] / ((double) m_blockLength)) * (double) m_blockLength);
-    int newSizeYHeight = (int) (floor(lenWh[sub][1] / ((double) m_blockLength)) * (double) m_blockLength);
+    int  newSizeYWidth = (lenWh[sub][0] / m_blockLength) * m_blockLength;
+    int newSizeYHeight = (lenWh[sub][1] / m_blockLength) * m_blockLength;
     
-    lenWhGAll [sub][0] = (int) (newSizeYWidth  / (double) m_blockLength);  
-    lenWhGAll [sub][1] = (int) (newSizeYHeight / (double) m_blockLength); 
-    gAll[sub].resize(lenWhGAll [sub][0]);
+    lenWhGAll [sub][0] = newSizeYWidth  / m_blockLength;  
+    lenWhGAll [sub][1] = newSizeYHeight / m_blockLength; 
+    gAll[sub].resize ( lenWhGAll [sub][0]);
     VvAll[sub].resize( lenWhGAll [sub][0]);
     for (int jj = 0;jj < lenWhGAll [sub][0]; jj++)		{
       gAll[sub][jj].resize( lenWhGAll [sub][1]);
@@ -1195,19 +1197,19 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   
   for (int ii = 0;ii < sizeSubBand; ii++)  {
     int i = subbands[ii];
-    int newSizeYWidth  = (int) ((floor(lenWh[i][0] / ((double) m_blockLength))) * (double) m_blockLength);
-    int newSizeYHeight = (int) ((floor(lenWh[i][1] / ((double) m_blockLength))) * (double) m_blockLength);
+    int  newSizeYWidth = (lenWh[i][0] / m_blockLength) * m_blockLength;
+    int newSizeYHeight = (lenWh[i][1] / m_blockLength) * m_blockLength;
     
     cuArr[i].resize(m_blockSize);
-    ssArr[i].resize((int(newSizeYWidth / (double) m_blockLength)));
+    ssArr[i].resize(newSizeYWidth / m_blockLength);
     lArr[i].resize (m_blockSize);
     
     for (int j = 0; j < m_blockSize; j++) {
       cuArr[i][j].resize( m_blockSize );
     }
     
-    for (int j=0;j<int(newSizeYWidth / (double) m_blockLength);j++)  {
-      ssArr[i][j].resize( int(newSizeYHeight / (double) m_blockLength));
+    for (int j = 0;j < newSizeYWidth / m_blockLength; j++)  {
+      ssArr[i][j].resize(newSizeYHeight / m_blockLength);
     }
   }
   
@@ -1246,9 +1248,9 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
       int h1=0;	
       for (int h=offset;h<lenWhGAll[sub][1]-offset; h++)  {
         // select only valid portion of the output.
-        g [w1][h1] = gAll [sub][w][h]; //(offset+1:end-offset,offset+1:end-offset);
-        vv[w1][h1] = VvAll[sub][w][h]; //(offset+1:end-offset,offset+1:end-offset);
-        ss[w1][h1] = ssArr[sub][w][h]; //(offset+1:end-offset,offset+1:end-offset);
+        g [w1][h1] = gAll [sub][w][h];
+        vv[w1][h1] = VvAll[sub][w][h];
+        ss[w1][h1] = ssArr[sub][w][h];
         h1++;
       }
       w1++;
@@ -1265,10 +1267,10 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
     den[i] = temp2;
     
     //compute IFC and normalize to size of the image
-    double ifc1=0;
-    double sumNum=0;
-    double sumDen=0;
-    for (int j=0;j<sizeSubBand; j++) {
+    double ifc1 = 0;
+    double sumNum = 0;
+    double sumDen = 0;
+    for (int j = 0;j < sizeSubBand; j++) {
       sumNum += num[j];
       sumDen += den[j];
       ifc1   += num[j] / (inp0->m_width[Y_COMP] * inp0->m_height[Y_COMP]);

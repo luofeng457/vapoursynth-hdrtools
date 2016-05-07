@@ -135,19 +135,16 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
       m_mode = CTF_RGB_2_YCOCG;
     }
     else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_YCbCrLMS;
     } 
   }
   else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
     if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_ICtCp;
     } 
   }
   else if (iColorSpace == CM_ICtCp && oColorSpace == CM_RGB) {
     if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_ICtCp;
     } 
     m_isForward = FALSE;
@@ -179,7 +176,6 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
       m_mode = CTF_RGB_2_YCOCG;
     } 
     else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
-      printf("Experimental mode\n");
       m_mode = CTF_LMSD_2_YCbCrLMS;
     } 
     m_isForward = FALSE;
@@ -435,7 +431,6 @@ void ColorTransformGeneric::setColorConversion(int colorPrimaries, const double 
   *transform0 = FWD_TRANSFORM[mode][Y_COMP];
   *transform1 = FWD_TRANSFORM[mode][U_COMP];
   *transform2 = FWD_TRANSFORM[mode][V_COMP];
-  
 }
 
 
