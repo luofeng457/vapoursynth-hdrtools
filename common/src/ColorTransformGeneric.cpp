@@ -438,13 +438,6 @@ void ColorTransformGeneric::process ( Frame* out, const Frame *inp) {
   out->m_frameNo = inp->m_frameNo;
   out->m_isAvailable = TRUE;
 
-#if 0
-  printf("Transform used\n");
-  printf("[ %10.7f %10.7f %10.7f\n", m_transform0[0], m_transform0[1], m_transform0[2]);
-  printf("  %10.7f %10.7f %10.7f\n", m_transform1[0], m_transform1[1], m_transform1[2]);
-  printf("  %10.7f %10.7f %10.7f]\n", m_transform2[0], m_transform2[1], m_transform2[2]);
-#endif
-
   // Current condition to perform this is that Frames are of same size and in 4:4:4
   // Can add more code to do the interpolation on the fly (and save memory/improve speed),
   // but this keeps our code more flexible for now.
