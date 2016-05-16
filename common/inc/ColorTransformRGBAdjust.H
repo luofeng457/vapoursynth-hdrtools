@@ -103,8 +103,6 @@ public:
   
   virtual void process(Frame *out,  const Frame *inp);
   
-  //virtual void RGB2YCbCrConstantLuminance(Frame *out,  const Frame *inp);
-  //virtual void YCbCrConstantLuminance2RGB(Frame *out,  const Frame *inp);
 };
 
 #endif

@@ -454,6 +454,8 @@ void ColorTransformGeneric::process ( Frame* out, const Frame *inp) {
   // but this keeps our code more flexible for now.
   if (inp->m_compSize[Y_COMP] == out->m_compSize[Y_COMP] && inp->m_compSize[Y_COMP] == inp->m_compSize[U_COMP])
   {
+    // This mode is actually obsolete and should not be used.
+    // To be removed in an upcoming version
     if( m_mode == CTF_RGB2020_2_YUV2020CL  && (inp->m_bitDepth == out->m_bitDepth))
       // ITU-R BT.2020 constant luminance ?
     {
