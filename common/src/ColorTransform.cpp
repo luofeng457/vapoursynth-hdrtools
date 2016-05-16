@@ -85,33 +85,35 @@
 
 void ColorTransform::setupParams( ColorTransformParams *params ){
   
-  m_range                  = params->m_range;
-  m_bitDepth               = params->m_bitDepth;
-  m_transferFunctions      = params->m_transferFunction;
-  m_useMinMax              = params->m_useMinMax;
+  m_range                      = params->m_range;
+  m_bitDepth                   = params->m_bitDepth;
+  m_transferFunctions          = params->m_transferFunction;
+  m_useMinMax                  = params->m_useMinMax;
   
+  m_useHighPrecision           = params->m_useHighPrecision;
   //m_size = 0;
-  m_maxIterations          = params->m_maxIterations;
+  m_maxIterations              = params->m_maxIterations;
   //m_tfDistance = TRUE;
-  m_useFloatPrecision      = params->m_useFloatPrecision;
+  m_useFloatPrecision          = params->m_useFloatPrecision;
   
-  m_iChromaFormat          = params->m_iChromaFormat;
-  m_iColorSpace            = params->m_iColorSpace;
-  m_iColorPrimaries        = params->m_iColorPrimaries;
+  m_iChromaFormat              = params->m_iChromaFormat;
+  m_iColorSpace                = params->m_iColorSpace;
+  m_iColorPrimaries            = params->m_iColorPrimaries;
   
-  m_oChromaFormat          = params->m_oChromaFormat;
-  m_oColorSpace            = params->m_oColorSpace;
-  m_oColorPrimaries        = params->m_oColorPrimaries;
-  m_oChromaLocation[0]     = params->m_oChromaLocationType[0];
-  m_oChromaLocation[1]     = params->m_oChromaLocationType[1];
-  m_useAdaptiveDownsampler = params->m_useAdaptiveDownsampler;
-  m_useAdaptiveUpsampler   = params->m_useAdaptiveUpsampler;
+  m_oChromaFormat              = params->m_oChromaFormat;
+  m_oColorSpace                = params->m_oColorSpace;
+  m_oColorPrimaries            = params->m_oColorPrimaries;
+  m_oChromaLocation[FP_TOP   ] = params->m_oChromaLocationType[0];
+  m_oChromaLocation[FP_BOTTOM] = params->m_oChromaLocationType[1];
+  m_useAdaptiveDownsampler     = params->m_useAdaptiveDownsampler;
+  m_useAdaptiveUpsampler       = params->m_useAdaptiveUpsampler;
   
-  m_downMethod             = params->m_downMethod;
-  m_upMethod               = params->m_upMethod;
+  m_downMethod                 = params->m_downMethod;
+  m_upMethod                   = params->m_upMethod;
   
-  m_iSystemGamma           = params->m_iSystemGamma;
-  m_oSystemGamma           = params->m_oSystemGamma;
+  m_iSystemGamma               = params->m_iSystemGamma;
+  m_oSystemGamma               = params->m_oSystemGamma;
+  m_transformPrecision         = params->m_transformPrecision;
 }
 
 //-----------------------------------------------------------------------------
@@ -166,9 +168,12 @@ ColorTransform *ColorTransform::create(
   params.m_useMinMax = useMinMax;
   params.m_maxIterations = maxIterations;
   params.m_oChromaFormat = oChromaFormat;
-  params.m_oChromaLocationType = oChromaLocationType;
   params.m_useFloatPrecision = useFloatPrecision;
   params.m_enableLUTs = enableTFLuts;
+  if (oChromaLocationType != NULL) {
+    params.m_oChromaLocationType[FP_TOP   ] = oChromaLocationType[FP_TOP   ];
+    params.m_oChromaLocationType[FP_BOTTOM] = oChromaLocationType[FP_BOTTOM];
+  }
 
   if ((iColorSpace == oColorSpace) && (iColorPrimaries == oColorPrimaries) && ((iConstantLuminance == oConstantLuminance) || (iColorSpace != CM_YCbCr && iColorSpace != CM_ICtCp)))
     result = new ColorTransformNull();
@@ -179,12 +184,17 @@ ColorTransform *ColorTransform::create(
   else if ((iColorPrimaries == oColorPrimaries) && 
            (((oColorSpace == CM_YCbCr) && (oConstantLuminance == 1) && (iColorSpace == CM_RGB)) ||
             ((iColorSpace == CM_YCbCr) && (iConstantLuminance == 1) && (oColorSpace == CM_RGB)))){
-             result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, transferFunction, TRUE);
+             result = new ColorTransformCL( &params, 0);
            }
   else if ((iColorPrimaries == oColorPrimaries) && 
            (((oColorSpace == CM_YCbCr) && (oConstantLuminance == 2) && (iColorSpace == CM_RGB)) ||
             ((iColorSpace == CM_YCbCr) && (iConstantLuminance == 2) && (oColorSpace == CM_RGB)))){
-             result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, transferFunction, FALSE);
+             result = new ColorTransformCL(&params, 1);
+           }
+  else if ((iColorPrimaries == oColorPrimaries) && 
+           (((oColorSpace == CM_YCbCr) && (oConstantLuminance == 3) && (iColorSpace == CM_RGB)) ||
+            ((iColorSpace == CM_YCbCr) && (iConstantLuminance == 3) && (oColorSpace == CM_RGB)))){
+             result = new ColorTransformCL(&params, 2);
            }
   else if (closedLoopTransform == CLT_NULL) {
     result = new ColorTransformGeneric( &params );

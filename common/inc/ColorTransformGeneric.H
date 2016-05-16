@@ -64,8 +64,6 @@ private:
   const double   *m_transform0;
   const double   *m_transform1;
   const double   *m_transform2;
-  bool            m_transformPrecision;
-  int             m_useHighPrecision;
   unsigned short  m_sClip;
   double          m_crDivider;
   double          m_cbDivider;

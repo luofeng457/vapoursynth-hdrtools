@@ -58,36 +58,36 @@
 
 class ColorTransformParams {
 public:
-  ColorSpace        m_iColorSpace;
-  ColorPrimaries    m_iColorPrimaries; 
-  ChromaFormat      m_iChromaFormat;
+  ColorSpace              m_iColorSpace;
+  ColorPrimaries          m_iColorPrimaries; 
+  ChromaFormat            m_iChromaFormat;
 
-  ColorSpace        m_oColorSpace;
-  ColorPrimaries    m_oColorPrimaries; 
-  ChromaFormat      m_oChromaFormat;
+  ColorSpace              m_oColorSpace;
+  ColorPrimaries          m_oColorPrimaries; 
+  ChromaFormat            m_oChromaFormat;
 
-  bool              m_transformPrecision; 
-  int               m_useHighPrecision;
-  ClosedLoopTrans   m_closedLoopTransform; 
-  int               m_iConstantLuminance;
-  int               m_oConstantLuminance; 
-  TransferFunctions m_transferFunction;
-  int               m_bitDepth;
-  SampleRange       m_range;
-  int               m_downMethod;
-  int               m_upMethod;
-  int               m_useAdaptiveDownsampler;
-  int               m_useAdaptiveUpsampler;
-  int               m_useMinMax;
-  int               m_maxIterations;
-  ChromaLocation    *m_oChromaLocationType;
-  bool              m_useFloatPrecision;
-  bool              m_enableLUTs;
-  char              m_yAdjustModelFile[MAX_LINE_LEN];
-  float             m_min;
-  float             m_max;
-  float             m_iSystemGamma;
-  float             m_oSystemGamma;
+  bool                    m_transformPrecision; 
+  int                     m_useHighPrecision;
+  ClosedLoopTrans         m_closedLoopTransform; 
+  int                     m_iConstantLuminance;
+  int                     m_oConstantLuminance; 
+  TransferFunctions       m_transferFunction;
+  int                     m_bitDepth;
+  SampleRange             m_range;
+  int                     m_downMethod;
+  int                     m_upMethod;
+  int                     m_useAdaptiveDownsampler;
+  int                     m_useAdaptiveUpsampler;
+  int                     m_useMinMax;
+  int                     m_maxIterations;
+  vector <ChromaLocation> m_oChromaLocationType;
+  bool                    m_useFloatPrecision;
+  bool                    m_enableLUTs;
+  char                    m_yAdjustModelFile[MAX_LINE_LEN];
+  float                   m_min;
+  float                   m_max;
+  float                   m_iSystemGamma;
+  float                   m_oSystemGamma;
   
   ColorTransformParams() {
     m_iColorSpace = CM_RGB;
@@ -112,14 +112,16 @@ public:
     m_useMinMax = 0;
     m_maxIterations = 0;
     m_oChromaFormat = CF_444;
-    m_oChromaLocationType = NULL;
+    m_oChromaLocationType.resize(FP_TOTAL);
+    m_oChromaLocationType[FP_TOP   ] = CL_TWO;
+    m_oChromaLocationType[FP_BOTTOM] = CL_TWO;
     m_useFloatPrecision = TRUE;
     m_enableLUTs = TRUE;
     m_min = 0.0f;
     m_max = 1.0f;
     m_iSystemGamma = 1.0f;
     m_oSystemGamma = 1.0f;
-  }
+   }
 };
 
 class ColorTransform {
@@ -130,6 +132,7 @@ protected:
 
   SampleRange         m_range;
   int                 m_bitDepth;
+  bool                m_transformPrecision;
 
   ChromaFormat        m_iChromaFormat;
   ColorSpace          m_iColorSpace;
@@ -152,6 +155,7 @@ protected:
   
   float               m_iSystemGamma;
   float               m_oSystemGamma;
+  int                 m_useHighPrecision;
 
 
 

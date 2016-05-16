@@ -69,11 +69,10 @@ ColorTransformClosedLoop::ColorTransformClosedLoop( ColorTransformParams *params
   m_isForward = TRUE;
   m_crDivider = 1.0;
   m_cbDivider = 1.0;
+  setupParams(params);
   m_transformPrecision = FALSE;
   m_closedLoopTransform = params->m_closedLoopTransform;
   m_clip = FALSE;
-  m_range = params->m_range;
-  m_bitDepth = params->m_bitDepth;
   
   m_size = 0;
   for (int index = 0; index < 4; index++) {
@@ -84,10 +83,6 @@ ColorTransformClosedLoop::ColorTransformClosedLoop( ColorTransformParams *params
     m_width[index] = 0;          // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_iColorSpace = params->m_iColorSpace;
-  m_oColorSpace = params->m_oColorSpace;
-  m_iColorPrimaries = params->m_iColorPrimaries;
-  m_oColorPrimaries = params->m_oColorPrimaries;
   
   if (m_iColorSpace == CM_XYZ && m_oColorSpace == CM_YDZDX ) {
     m_mode = CTF_XYZ_2_DZDX;  // SMPTE 2085
@@ -126,7 +121,7 @@ ColorTransformClosedLoop::ColorTransformClosedLoop( ColorTransformParams *params
       m_transformPrecision = params->m_transformPrecision;
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
-      if (params->m_useHighPrecision == 1)
+      if (m_useHighPrecision == 1)
         m_mode = CTF_RGB2020_2_YUV2020_HP;
       else
       m_mode = CTF_RGB2020_2_YUV2020;
@@ -171,7 +166,7 @@ ColorTransformClosedLoop::ColorTransformClosedLoop( ColorTransformParams *params
       m_mode = CTF_RGB709_2_YUV709;
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
-      if (params->m_useHighPrecision == 2)
+      if (m_useHighPrecision == 2)
         m_mode = CTF_RGB2020_2_YUV2020_HP;
       else
       m_mode = CTF_RGB2020_2_YUV2020;

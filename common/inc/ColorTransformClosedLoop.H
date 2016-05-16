@@ -64,7 +64,6 @@ private:
   const double   *m_transform0;
   const double   *m_transform1;
   const double   *m_transform2;
-  bool            m_transformPrecision;
   bool            m_clip;
   double          m_crDivider;
   double          m_cbDivider;
@@ -77,15 +76,9 @@ private:
   int             m_width[4];          // width of each color component
   bool            m_memoryAllocated;
   
-  ColorSpace      m_iColorSpace;
-  ColorSpace      m_oColorSpace;
-  ColorPrimaries  m_iColorPrimaries;
-  ColorPrimaries  m_oColorPrimaries;
   int             m_mode;
   bool            m_isForward;
   ClosedLoopTrans m_closedLoopTransform;
-  SampleRange     m_range;
-  int             m_bitDepth;
    
 public:
   // Construct/Deconstruct

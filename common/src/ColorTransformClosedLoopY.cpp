@@ -94,11 +94,11 @@ ColorTransformClosedLoopY::ColorTransformClosedLoopY( ColorTransformParams *para
       m_modeRGB2XYZ = CTF_RGB709_2_XYZ;
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
-      if (params->m_useHighPrecision == 0) {
+      if (m_useHighPrecision == 0) {
         m_mode = CTF_RGB2020_2_YUV2020;
         m_invMode = m_mode;
       }
-      else if (params->m_useHighPrecision == 1) {
+      else if (m_useHighPrecision == 1) {
         m_mode = CTF_RGB2020_2_YUV2020;
         m_invMode = CTF_RGB2020_2_YUV2020_HP;
       }
