@@ -201,8 +201,19 @@ void DistortionMetricTFPSNR::compute(Frame* inp0, Frame* inp1)
   for (int c = 0; c < m_totalComponents; c++) {
     m_sse[c] = 0.0;
   }
-  
+  //printf("\n");
+
   for (int i = 0; i < inp0->m_compSize[Y_COMP]; i++) {
+#if 0
+    // TF inp0
+    rgb0Normal[R_COMP] = dClip(inp0->m_floatComp[R_COMP][i] / m_maxValue[R_COMP], 0.0, 1.0);
+    rgb0Normal[G_COMP] = dClip(inp0->m_floatComp[G_COMP][i] / m_maxValue[G_COMP], 0.0, 1.0);
+    rgb0Normal[B_COMP] = dClip(inp0->m_floatComp[B_COMP][i] / m_maxValue[B_COMP], 0.0, 1.0);
+    // TF inp1
+    rgb1Normal[R_COMP] = dClip(inp1->m_floatComp[R_COMP][i] / m_maxValue[R_COMP], 0.0, 1.0);
+    rgb1Normal[G_COMP] = dClip(inp1->m_floatComp[G_COMP][i] / m_maxValue[G_COMP], 0.0, 1.0);
+    rgb1Normal[B_COMP] = dClip(inp1->m_floatComp[B_COMP][i] / m_maxValue[B_COMP], 0.0, 1.0);
+#else
     // TF inp0
     rgb0Normal[R_COMP] = inp0->m_floatComp[R_COMP][i] / m_maxValue[R_COMP];
     rgb0Normal[G_COMP] = inp0->m_floatComp[G_COMP][i] / m_maxValue[G_COMP];
@@ -211,7 +222,8 @@ void DistortionMetricTFPSNR::compute(Frame* inp0, Frame* inp1)
     rgb1Normal[R_COMP] = inp1->m_floatComp[R_COMP][i] / m_maxValue[R_COMP];
     rgb1Normal[G_COMP] = inp1->m_floatComp[G_COMP][i] / m_maxValue[G_COMP];
     rgb1Normal[B_COMP] = inp1->m_floatComp[B_COMP][i] / m_maxValue[B_COMP];
-    
+#endif    
+
     if (m_computePsnrInRgb == TRUE || m_computePsnrInYCbCr == TRUE) {
       rgb0Double[R_COMP] = m_transferFunction->performCompute( rgb0Normal[R_COMP] );
       rgb0Double[G_COMP] = m_transferFunction->performCompute( rgb0Normal[G_COMP] );

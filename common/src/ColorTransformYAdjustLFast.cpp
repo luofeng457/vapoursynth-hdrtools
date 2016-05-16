@@ -220,7 +220,7 @@ ColorTransformYAdjustLFast::ColorTransformYAdjustLFast( ColorTransformParams *pa
 
   m_iLumaWeight = (int) m_lumaWeight;
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
   
   m_mapSize = 10000000; // should be a big enough size to handle the range from 0.001 to 10000
   //m_mapSize =    1048576; // reduced size just to test performance with lower precision

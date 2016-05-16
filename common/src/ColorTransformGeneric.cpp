@@ -64,7 +64,7 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int useHighPrecision) {
+ColorTransformGeneric::ColorTransformGeneric(ColorTransformParams *params) {
   
   m_mode = CTF_IDENTITY; 
   m_isForward = TRUE;
@@ -72,208 +72,215 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
   m_cbDivider = 1.0;
   m_transformPrecision = FALSE;
   m_sClip = 0;
-  m_useHighPrecision = useHighPrecision;
+  m_useHighPrecision = params->m_useHighPrecision;
      
-  if (iColorSpace == CM_XYZ && oColorSpace == CM_YDZDX ) {
+  if (params->m_iColorSpace == CM_XYZ && params->m_oColorSpace == CM_YDZDX ) {
     m_mode = CTF_XYZ_2_DZDX;  // SMPTE 2085
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_XYZ) {
-    if (iColorPrimaries == CP_709) {
+  else if (params->m_iColorSpace == CM_RGB && params->m_oColorSpace == CM_XYZ) {
+    if (params->m_iColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_XYZ;
     }
-    else if (iColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_2020) {
       m_mode = CTF_RGB2020_2_XYZ;
     }
-    else if (iColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_XYZ;
     }
-    else if (iColorPrimaries == CP_EXT) {
+    else if (params->m_iColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_XYZ;
     }
-    else if (oColorPrimaries == CP_LMSD) {
+    else if (params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_LMSD_2_XYZ;
     }
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr_CL && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+  else if (params->m_iColorSpace == CM_RGB && params->m_oColorSpace == CM_YCbCr_CL && params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_2020) {
     m_mode = CTF_RGB2020_2_YUV2020CL;
     m_isForward = TRUE;
   }
-  else if (iColorSpace == CM_YCbCr_CL && oColorSpace == CM_RGB && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+  else if (params->m_iColorSpace == CM_YCbCr_CL && params->m_oColorSpace == CM_RGB && params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_2020) {
     m_mode = CTF_RGB2020_2_YUV2020CL;
     m_isForward = FALSE;
     m_sClip = 1;
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
-    if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  else if (params->m_iColorSpace == CM_RGB && params->m_oColorSpace == CM_YCbCr) {
+    if (params->m_iColorPrimaries == CP_709 && params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
       m_crDivider = 1.5748;
       m_cbDivider = 1.8556;
-      m_transformPrecision = transformPrecision;
+      m_transformPrecision = params->m_transformPrecision;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_2020) {
       if (m_useHighPrecision == 1)
         m_mode = CTF_RGB2020_2_YUV2020_HP;
       else
         m_mode = CTF_RGB2020_2_YUV2020;
       m_crDivider = 1.4746;
       m_cbDivider = 1.8814;
-      m_transformPrecision = transformPrecision;
+      m_transformPrecision = params->m_transformPrecision;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_P3D65 && params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+    else if (params->m_iColorPrimaries == CP_P3D60 && params->m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_YUVP3D60;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+    else if (params->m_iColorPrimaries == CP_EXT && params->m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_YUVEXT;
     }
-    else if (oColorPrimaries == CP_AMT) {
+    else if (params->m_oColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
     }
-    else if ( oColorPrimaries == CP_YCOCG) {
+    else if ( params->m_oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     }
-    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+    else if (params->m_iColorPrimaries == CP_LMSD && params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_LMSD_2_YCbCrLMS;
     } 
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_ICtCp) {
-    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+  else if (params->m_iColorSpace == CM_RGB && params->m_oColorSpace == CM_ICtCp) {
+    if (params->m_iColorPrimaries == CP_LMSD && params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_LMSD_2_ICtCp;
     } 
   }
-  else if (iColorSpace == CM_ICtCp && oColorSpace == CM_RGB) {
-    if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+  else if (params->m_iColorSpace == CM_ICtCp && params->m_oColorSpace == CM_RGB) {
+    if (params->m_iColorPrimaries == CP_LMSD && params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_LMSD_2_ICtCp;
     } 
     m_isForward = FALSE;
     m_sClip = 1;
   }
-  else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB) {
-    if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  else if (params->m_iColorSpace == CM_YCbCr && params->m_oColorSpace == CM_RGB) {
+    if (params->m_iColorPrimaries == CP_709 && params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_2020) {
       if (m_useHighPrecision == 2)
         m_mode = CTF_RGB2020_2_YUV2020_HP;
       else    
         m_mode = CTF_RGB2020_2_YUV2020;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_P3D65 && params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+    else if (params->m_iColorPrimaries == CP_P3D60 && params->m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_YUVP3D60;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+    else if (params->m_iColorPrimaries == CP_EXT && params->m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_YUVEXT;
     }
-    else if (iColorPrimaries == CP_AMT) {
+    else if (params->m_iColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
     }
-    else if (iColorPrimaries == CP_YCOCG) {
+    else if (params->m_iColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     } 
-    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_LMSD) {
+    else if (params->m_iColorPrimaries == CP_LMSD && params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_LMSD_2_YCbCrLMS;
     } 
     m_isForward = FALSE;
     m_sClip = 1;
   }
-  else if (iColorSpace == CM_XYZ && oColorSpace == CM_RGB) {
-    if (oColorPrimaries == CP_709) {
+  else if (params->m_iColorSpace == CM_XYZ && params->m_oColorSpace == CM_RGB) {
+    if (params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_XYZ;
     }
-    else if (oColorPrimaries == CP_2020) {
+    else if (params->m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB2020_2_XYZ;
     }
-    else if (oColorPrimaries == CP_P3D65) {
+    else if (params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_XYZ;
     }
-    else if (oColorPrimaries == CP_EXT) {
+    else if (params->m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_XYZ;
     }
-    else if (oColorPrimaries == CP_LMSD) {
+    else if (params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_LMSD_2_XYZ;
     }
     m_isForward = FALSE;
     m_sClip = 1;
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_RGB) { // RGB to RGB conversion
+  else if (params->m_iColorSpace == CM_RGB && params->m_oColorSpace == CM_RGB) { // RGB to RGB conversion
     m_mode = CTF_IDENTITY; // just for safety
 
-    if (iColorPrimaries == CP_709 && oColorPrimaries == CP_2020) {
+    if (params->m_iColorPrimaries == CP_709 && params->m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB709_2_RGB2020;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_709) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGB2020;
       m_isForward = FALSE;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_P3D65 && params->m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGBP3D65_2_RGB2020;
+      m_sClip = 1;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_RGB2020;
       m_isForward = FALSE;
+      m_sClip = 1;
     }
-    else if (iColorPrimaries == CP_709 && oColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_709 && params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGB709_2_RGBP3D65;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_709) {
+    else if (params->m_iColorPrimaries == CP_P3D65 && params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGBP3D65;
       m_isForward = FALSE;
+      m_sClip = 1;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_P3D60 && params->m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGBP3D60_2_RGB2020;
+      m_sClip = 1;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_P3D60) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_RGB2020;
       m_isForward = FALSE;
     }
-    else if (iColorPrimaries == CP_709 && oColorPrimaries == CP_P3D60) {
+    else if (params->m_iColorPrimaries == CP_709 && params->m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGB709_2_RGBP3D60;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_709) {
+    else if (params->m_iColorPrimaries == CP_P3D60 && params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGBP3D60;
       m_isForward = FALSE;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_EXT) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGB2020_2_RGBEXT;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_EXT && params->m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB2020_2_RGBEXT;
       m_isForward = FALSE;
     }
-    else if (iColorPrimaries == CP_709 && oColorPrimaries == CP_EXT) {
+    else if (params->m_iColorPrimaries == CP_709 && params->m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGB709_2_RGBEXT;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_709) {
+    else if (params->m_iColorPrimaries == CP_EXT && params->m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGBEXT;
       m_isForward = FALSE;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_EXT) {
+    else if (params->m_iColorPrimaries == CP_P3D65 && params->m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBP3D65_2_RGBEXT;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_EXT && params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_RGBEXT;
       m_isForward = FALSE;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_LMSD) {
+    else if (params->m_iColorPrimaries == CP_2020 && params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_RGB2020_2_LMSD;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_LMSD) {
+    else if (params->m_iColorPrimaries == CP_P3D65 && params->m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_RGBP3D65_2_LMSD;
     }
-    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_2020) {
+    else if (params->m_iColorPrimaries == CP_LMSD && params->m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB2020_2_LMSD;
       m_isForward = FALSE;
+      m_sClip = 1;
     }
-    else if (iColorPrimaries == CP_LMSD && oColorPrimaries == CP_P3D65) {
+    else if (params->m_iColorPrimaries == CP_LMSD && params->m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_LMSD;
       m_isForward = FALSE;
+      m_sClip = 1;
     }
     //m_sClip = 2;
+	  // Force clipping into the desirable color space. This means that both negative and values > 1.0 will be thrown out
   }
   else {
     m_mode = CTF_IDENTITY;
@@ -290,6 +297,10 @@ ColorTransformGeneric::ColorTransformGeneric(ColorSpace iColorSpace, ColorPrimar
     m_transform2 = INV_TRANSFORM[m_mode][V_COMP];
   }
   
+  m_min = params->m_min;
+  m_max = params->m_max;
+  
+  //printf("limits %10.7f %10.7f\n", params->m_min, params->m_max);
 }
 
 ColorTransformGeneric::~ColorTransformGeneric() {
@@ -457,9 +468,9 @@ void ColorTransformGeneric::process ( Frame* out, const Frame *inp) {
           if (m_sClip == 1) {
             for (int i = 0; i < inp->m_compSize[0]; i++) {
               // Note that since the input and output may be either RGB or YUV, it might be "better" not to use Y_COMP/R_COMP here to avoid confusion.
-              out->m_floatComp[0][i] = fClip((float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i]), 0.0f, 1.0f);
-              out->m_floatComp[1][i] = fClip((float) (m_transform1[0] * inp->m_floatComp[0][i] + m_transform1[1] * inp->m_floatComp[1][i] + m_transform1[2] * inp->m_floatComp[2][i]), 0.0f, 1.0f);
-              out->m_floatComp[2][i] = fClip((float) (m_transform2[0] * inp->m_floatComp[0][i] + m_transform2[1] * inp->m_floatComp[1][i] + m_transform2[2] * inp->m_floatComp[2][i]), 0.0f, 1.0f);
+              out->m_floatComp[0][i] = fClip((float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i]), m_min, m_max);
+              out->m_floatComp[1][i] = fClip((float) (m_transform1[0] * inp->m_floatComp[0][i] + m_transform1[1] * inp->m_floatComp[1][i] + m_transform1[2] * inp->m_floatComp[2][i]), m_min, m_max);
+              out->m_floatComp[2][i] = fClip((float) (m_transform2[0] * inp->m_floatComp[0][i] + m_transform2[1] * inp->m_floatComp[1][i] + m_transform2[2] * inp->m_floatComp[2][i]), m_min, m_max);
             }
           }
           else if (m_sClip == 2) {

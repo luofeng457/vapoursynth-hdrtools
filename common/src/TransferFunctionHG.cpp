@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file TransferFunctionHGold.cpp
+ * \file TransferFunctionHG.cpp
  *
  * \brief
- *    TransferFunctionHGold class implementation for the BBC Hybrid Gamma (HG) Transfer Function
+ *    TransferFunctionHG class implementation for the BBC Hybrid Gamma (HG) Transfer Function
  *
  * \author
  *     - Matteo Naccari         <matteo.naccari@bbc.co.uk>

@@ -65,6 +65,7 @@
 
 TransferFunctionNormalize::TransferFunctionNormalize(float scale) {
   m_scale = scale;
+  m_normalFactor = 1.0;
 }
 
 TransferFunctionNormalize::~TransferFunctionNormalize() {

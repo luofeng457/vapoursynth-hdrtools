@@ -629,6 +629,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
       }
       else {
         if (!(output->m_iConstantLuminance != 0 && (output->m_colorSpace == CM_YCbCr || output->m_colorSpace == CM_ICtCp))) {
+
           // Apply transfer function
           if ( m_useSingleTransferStep == FALSE ) {
             processFrame = m_pFrameStore[1];

@@ -84,33 +84,34 @@
 //-----------------------------------------------------------------------------
 
 void ColorTransform::setupParams( ColorTransformParams *params ){
-  //m_mode = CTF_IDENTITY; 
-  //m_invMode = m_mode;
   
-  m_range = params->m_range;
-  m_bitDepth = params->m_bitDepth;
-  m_transferFunctions = params->m_transferFunction;
-  m_useMinMax = params->m_useMinMax;
+  m_range                  = params->m_range;
+  m_bitDepth               = params->m_bitDepth;
+  m_transferFunctions      = params->m_transferFunction;
+  m_useMinMax              = params->m_useMinMax;
   
   //m_size = 0;
-  m_maxIterations = params->m_maxIterations;
+  m_maxIterations          = params->m_maxIterations;
   //m_tfDistance = TRUE;
-  m_useFloatPrecision = params->m_useFloatPrecision;
+  m_useFloatPrecision      = params->m_useFloatPrecision;
   
-  m_iChromaFormat   = params->m_iChromaFormat;
-  m_iColorSpace     = params->m_iColorSpace;
-  m_iColorPrimaries = params->m_iColorPrimaries;
+  m_iChromaFormat          = params->m_iChromaFormat;
+  m_iColorSpace            = params->m_iColorSpace;
+  m_iColorPrimaries        = params->m_iColorPrimaries;
   
-  m_oChromaFormat   = params->m_oChromaFormat;
-  m_oColorSpace     = params->m_oColorSpace;
-  m_oColorPrimaries = params->m_oColorPrimaries;
-  m_oChromaLocation[0] = params->m_oChromaLocationType[0];
-  m_oChromaLocation[1] = params->m_oChromaLocationType[1];
+  m_oChromaFormat          = params->m_oChromaFormat;
+  m_oColorSpace            = params->m_oColorSpace;
+  m_oColorPrimaries        = params->m_oColorPrimaries;
+  m_oChromaLocation[0]     = params->m_oChromaLocationType[0];
+  m_oChromaLocation[1]     = params->m_oChromaLocationType[1];
   m_useAdaptiveDownsampler = params->m_useAdaptiveDownsampler;
   m_useAdaptiveUpsampler   = params->m_useAdaptiveUpsampler;
   
-  m_downMethod = params->m_downMethod;
-  m_upMethod   = params->m_upMethod;
+  m_downMethod             = params->m_downMethod;
+  m_upMethod               = params->m_upMethod;
+  
+  m_iSystemGamma           = params->m_iSystemGamma;
+  m_oSystemGamma           = params->m_oSystemGamma;
 }
 
 //-----------------------------------------------------------------------------
@@ -186,7 +187,7 @@ ColorTransform *ColorTransform::create(
              result = new ColorTransformCL(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, useHighPrecision, transferFunction, transferFunction, FALSE);
            }
   else if (closedLoopTransform == CLT_NULL) {
-    result = new ColorTransformGeneric(iColorSpace, iColorPrimaries, oColorSpace, oColorPrimaries, transformPrecision, useHighPrecision);
+    result = new ColorTransformGeneric( &params );
   }
   else if (closedLoopTransform == CLT_YADJ)
     result = new ColorTransformYAdjust( &params );

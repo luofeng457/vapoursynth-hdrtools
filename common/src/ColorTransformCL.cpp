@@ -168,11 +168,15 @@ void ColorTransformCL::forward ( Frame* out, const Frame *inp) {
       compC = (compC / (2.0 * m_pR) );
     
     out->m_floatComp[Cr_COMP][i] = (float) compC;
+    
+    //printf("values %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f \n", inp->m_floatComp[R_COMP][i] , inp->m_floatComp[G_COMP][i] , inp->m_floatComp[B_COMP][i] , out->m_floatComp[Y_COMP][i], out->m_floatComp[Cb_COMP][i], out->m_floatComp[Cr_COMP][i]);
+
   }
 }
 
 void ColorTransformCL::inverse ( Frame* out, const Frame *inp) {
   double compY, compC, compB, compR, compG;
+  
   for (int i = 0; i < inp->m_compSize[Y_COMP]; i++) {
     compY = m_lumaTF->forward( (double) inp->m_floatComp[Y_COMP][i] );
     /* 
@@ -228,6 +232,8 @@ void ColorTransformCL::inverse ( Frame* out, const Frame *inp) {
     out->m_floatComp[R_COMP][i] = (float) compR;
     out->m_floatComp[G_COMP][i] = (float) compG;
     out->m_floatComp[B_COMP][i] = (float) compB;
+    
+    //printf("values %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f \n", compR, compG, compB, inp->m_floatComp[Y_COMP][i], inp->m_floatComp[Cb_COMP][i], inp->m_floatComp[Cr_COMP][i]);
     
   }
 }

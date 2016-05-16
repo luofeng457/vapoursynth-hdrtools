@@ -84,6 +84,10 @@ public:
   bool              m_useFloatPrecision;
   bool              m_enableLUTs;
   char              m_yAdjustModelFile[MAX_LINE_LEN];
+  float             m_min;
+  float             m_max;
+  float             m_iSystemGamma;
+  float             m_oSystemGamma;
   
   ColorTransformParams() {
     m_iColorSpace = CM_RGB;
@@ -111,6 +115,10 @@ public:
     m_oChromaLocationType = NULL;
     m_useFloatPrecision = TRUE;
     m_enableLUTs = TRUE;
+    m_min = 0.0f;
+    m_max = 1.0f;
+    m_iSystemGamma = 1.0f;
+    m_oSystemGamma = 1.0f;
   }
 };
 
@@ -141,6 +149,10 @@ protected:
   TransferFunctions   m_transferFunctions;
   int                 m_maxIterations;
   int                 m_useMinMax;
+  
+  float               m_iSystemGamma;
+  float               m_oSystemGamma;
+
 
 
   void setupParams( ColorTransformParams *params );

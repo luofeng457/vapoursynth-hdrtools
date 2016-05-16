@@ -205,7 +205,7 @@ ColorTransformClosedLoopRGB::ColorTransformClosedLoopRGB( ColorTransformParams *
 
   m_iLumaWeight = (int) m_lumaWeight;
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformClosedLoopRGB::~ColorTransformClosedLoopRGB() {

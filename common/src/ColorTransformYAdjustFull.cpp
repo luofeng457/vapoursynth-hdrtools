@@ -216,7 +216,7 @@ ColorTransformYAdjustFull::ColorTransformYAdjustFull( ColorTransformParams *para
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0, params->m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformYAdjustFull::~ColorTransformYAdjustFull() {

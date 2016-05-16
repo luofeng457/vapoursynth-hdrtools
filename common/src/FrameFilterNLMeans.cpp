@@ -99,9 +99,7 @@ FrameFilterNLMeans::FrameFilterNLMeans(int width, int height, int wSizeX, int wS
   m_weightFactTable = weightFactor * stretch;
   
   m_diffMax = tableSize / m_weightFactTable;
-  
-  printf("value %10.7f\n", m_diffMax);  
-  
+    
   for (int i = 0; i < tableSize; i++) {
     m_expTable[i] = exp(-i / stretch);
   }

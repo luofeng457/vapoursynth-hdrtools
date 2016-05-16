@@ -110,19 +110,19 @@ IntegerParameter intParameterList[] = {
 
   
   // Currently we do not need rescaling so we can keep these parameters disabled (could be added in the future if needed).
-  { "OutputWidth",             &out->m_width[0],                             176,           0,         4096,    "Output/Processing width"                  },
-  { "OutputHeight",            &out->m_height[0],                            144,           0,         4096,    "Output/Processing height"                 },
-  { "OutputChromaFormat",      (int *) &out->m_chromaFormat,              CF_420,      CF_400,       CF_444,    "Output Chroma Format"                     },
-  { "OutputChromaLocationTop", (int *) &out->m_chromaLocation[FP_TOP],   CL_ZERO,    CL_ZERO,   CL_TOTAL-1,     "Output Chroma Location Type (Top/Frame)"  },
-  { "OutputChromaLocationBottom", (int *) &out->m_chromaLocation[FP_BOTTOM], CL_ZERO, CL_ZERO,  CL_TOTAL-1,     "Output Chroma Location Type (Bottom)"     },
-  { "OutputFourCCCode",       (int *) &out->m_pixelFormat,              PF_UYVY,     PF_UYVY,       PF_XYZ,     "Output Pixel Format"                      },
-  { "OutputBitDepthCmp0",      &out->m_bitDepthComp[Y_COMP],                   8,           8,           16,    "Output Bitdepth Cmp0"                     },
-  { "OutputBitDepthCmp1",      &out->m_bitDepthComp[U_COMP],                   8,           8,           16,    "Output Bitdepth Cmp1"                     },
-  { "OutputBitDepthCmp2",      &out->m_bitDepthComp[V_COMP],                   8,           8,           16,    "Output Bitdepth Cmp2"                     },
-  { "OutputColorSpace",        (int *) &out->m_colorSpace,              CM_YCbCr,    CM_YCbCr,   CM_TOTAL-1,    "Output Color Space"                       },
-  { "OutputColorPrimaries",    (int *) &out->m_colorPrimaries,            CP_709,      CP_709,   CP_TOTAL-1,    "Output Color Primaries"                   },
-  { "OutputTransferFunction",  (int *) &out->m_transferFunction,           TF_PQ,     TF_NULL,   TF_TOTAL-1,    "Output Transfer Function"                 },
-  { "OutputSampleRange",       (int *) &out->m_sampleRange,          SR_STANDARD, SR_STANDARD,     SR_TOTAL-1,    "Output Sample Range"                      },
+  { "OutputWidth",             &out->m_width[0],                             176,           0,            4096,    "Output/Processing width"                  },
+  { "OutputHeight",            &out->m_height[0],                            144,           0,            4096,    "Output/Processing height"                 },
+  { "OutputChromaFormat",      (int *) &out->m_chromaFormat,              CF_420,      CF_400,          CF_444,    "Output Chroma Format"                     },
+  { "OutputChromaLocationTop", (int *) &out->m_chromaLocation[FP_TOP],   CL_ZERO,     CL_ZERO,      CL_TOTAL-1,    "Output Chroma Location Type (Top/Frame)"  },
+  { "OutputChromaLocationBottom", (int *) &out->m_chromaLocation[FP_BOTTOM], CL_ZERO, CL_ZERO,      CL_TOTAL-1,    "Output Chroma Location Type (Bottom)"     },
+  { "OutputFourCCCode",        (int *) &out->m_pixelFormat,              PF_UYVY,     PF_UYVY,          PF_XYZ,    "Output Pixel Format"                      },
+  { "OutputBitDepthCmp0",      &out->m_bitDepthComp[Y_COMP],                   8,           8,              16,    "Output Bitdepth Cmp0"                     },
+  { "OutputBitDepthCmp1",      &out->m_bitDepthComp[U_COMP],                   8,           8,              16,    "Output Bitdepth Cmp1"                     },
+  { "OutputBitDepthCmp2",      &out->m_bitDepthComp[V_COMP],                   8,           8,              16,    "Output Bitdepth Cmp2"                     },
+  { "OutputColorSpace",        (int *) &out->m_colorSpace,              CM_YCbCr,    CM_YCbCr,      CM_TOTAL-1,    "Output Color Space"                       },
+  { "OutputColorPrimaries",    (int *) &out->m_colorPrimaries,            CP_709,      CP_709,      CP_TOTAL-1,    "Output Color Primaries"                   },
+  { "OutputTransferFunction",  (int *) &out->m_transferFunction,           TF_PQ,     TF_NULL,      TF_TOTAL-1,    "Output Transfer Function"                 },
+  { "OutputSampleRange",       (int *) &out->m_sampleRange,          SR_STANDARD, SR_STANDARD,      SR_TOTAL-1,    "Output Sample Range"                      },
   { "OutputDisplayAdjustment", (int *) &out->m_displayAdjustment,        DA_NULL,     DA_NULL,      DA_TOTAL-1,    "Output Gamma Display Adjustment"          },
 
   //! Various Params
@@ -182,17 +182,19 @@ DoubleParameter doubleParameterList[] = {
 
 
 FloatParameter floatParameterList[] = {
-  { "SourceRate",                  &src->m_frameRate,                       24.00F,       0.01F,      120.00F,    "Input Source Frame Rate"                     },
-  { "SourceSystemGamma",           &src->m_systemGamma,                      1.00F,       0.00F,       10.00F,    "Overall System gamma for Hybrid Gamma TF"    },
-  { "OutputRate",                  &out->m_frameRate,                       24.00F,       0.01F,      120.00F,    "Image Output Frame Rate"                     },
-  { "OutputSystemGamma",           &out->m_systemGamma,                      1.00F,       0.00F,       10.00F,    "Overall System gamma for Hybrid Gamma TF"    },
+  { "SourceRate",                  &src->m_frameRate,                       24.00F,       0.01F,      120.00F,    "Input Source Frame Rate"                           },
+  { "OutputRate",                  &out->m_frameRate,                       24.00F,       0.01F,      120.00F,    "Image Output Frame Rate"                           },
+  { "SourceSystemGamma",           &src->m_systemGamma,                      1.00F,       0.00F,       10.00F,    "Overall System gamma for Hybrid Gamma TF"            },
+  { "OutputSystemGamma",           &out->m_systemGamma,                      1.00F,       0.00F,       10.00F,    "Overall System gamma for Hybrid Gamma TF"            },
+  { "SourceSystemGamma",           &ctp->m_iSystemGamma,                     1.00F,       0.00F,       10.00F,    "Copy for processing (input)"                   },
+  { "OutputSystemGamma",           &ctp->m_oSystemGamma,                     1.00F,       0.00F,       10.00F,    "Copy for processing (output)"                  },
   { "SourceNormalizationScale",    &pParams->m_srcNormalScale,           10000.00F,       0.01F,  1000000.00F,    "Source Normalization Scale for Linear Data"  },
   { "OutputNormalizationScale",    &pParams->m_outNormalScale,           10000.00F,       0.01F,  1000000.00F,    "Output Normalization Scale for Linear Data"  },
-  { "SourceTransferMinBrightness", &pParams->m_srcMinValue,                  0.00F,       0.00F,  1000000.00F,    "Source Transfer Function Minimum Brightness" },
-  { "SourceTransferMaxBrightness", &pParams->m_srcMaxValue,              10000.00F,       0.00F,  1000000.00F,    "Source Transfer Function Maximum Brightness" },
-  { "OutputTransferMinBrightness", &pParams->m_outMinValue,                  0.00F,       0.00F,  1000000.00F,    "Output Transfer Function Minimum Brightness" },
-  { "OutputTransferMaxBrightness", &pParams->m_outMaxValue,              10000.00F,       0.00F,  1000000.00F,    "Output Transfer Function Maximum Brightness" },
-  { "",                            NULL,                                     0.00F,       0.00F,        0.00F,    "Float Termination entry"                     }
+  { "SourceTransferMinBrightness", &pParams->m_srcMinValue,                  0.00F,       0.00F,  1000000.00F,    "Source Transfer Function Minimum Brightness"          },
+  { "SourceTransferMaxBrightness", &pParams->m_srcMaxValue,              10000.00F,       0.00F,  1000000.00F,    "Source Transfer Function Maximum Brightness"          },
+  { "OutputTransferMinBrightness", &pParams->m_outMinValue,                  0.00F,       0.00F,  1000000.00F,    "Output Transfer Function Minimum Brightness"          },
+  { "OutputTransferMaxBrightness", &pParams->m_outMaxValue,              10000.00F,       0.00F,  1000000.00F,    "Output Transfer Function Maximum Brightness"          },
+  { "",                            NULL,                                     0.00F,       0.00F,        0.00F,    "Float Termination entry"                                }
 };
 
 
