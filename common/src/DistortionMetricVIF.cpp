@@ -650,7 +650,6 @@ void  DistortionMetricVIF::convertOneRowVar ( const double** input, double * out
 //This function computes the parameters of the reference image. This is called by vifvec.m in the matlab code.
 void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,  
                                            int* subbands, 
-                                           int M, 
                                            vector<vector<int> > &lenWh, 
                                            int sizeSubBand, 	  
                                            vector<vector<vector<double> > >  &ssArr,  
@@ -658,15 +657,13 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
                                            vector<vector<vector<double> > >  &cuArr
                                            ) 
 {
-  Eigenvalue eg1;
-  int MxM = M * M;
-  
+  Eigenvalue eg1;  
   for (int subi = 0; subi < sizeSubBand; subi++)	{
     int   sub = subbands[subi];
     
     //force subband size to be multiple of M
-    int newSizeYWidth  = (lenWh[sub][0] / M) * M;
-    int newSizeYHeight = (lenWh[sub][1] / M) * M;
+    int newSizeYWidth  = (lenWh[sub][0] / m_blockLength) * m_blockLength;
+    int newSizeYHeight = (lenWh[sub][1] / m_blockLength) * m_blockLength;
     
     vector<vector<double> > yMM(newSizeYWidth);
     for (int w = 0; w < newSizeYWidth; w++) {
@@ -680,17 +677,17 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     //Collect MxM blocks. Rearrange each block into an
     //M^2 dimensional vector and collect all such vectors.
     //Collece ALL possible MXM blocks (even those overlapping) from the subband
-    vector<vector<double> > temp(MxM);
+    vector<vector<double> > temp(m_blockSize);
     int count=0;
     int sizeTempH=0;
     
-    for (int k = 0; k < M; k++)	{
-      for (int j = 0; j < M; j++)	{
-        int totalSize= (newSizeYWidth - (M - 1 - k) - k) * (newSizeYHeight - (M - 1 - j) - j);
+    for (int k = 0; k < m_blockLength; k++)	{
+      for (int j = 0; j < m_blockLength; j++)	{
+        int totalSize= (newSizeYWidth - (m_blockLength - 1 - k) - k) * (newSizeYHeight - (m_blockLength - 1 - j) - j);
         temp[count].resize(totalSize);
         sizeTempH = 0;
-        for (int w0 = k; w0 < newSizeYWidth - (M - 1 - k); w0++) {
-          for (int h0 = j; h0 < newSizeYHeight - (M - 1 - j); h0++) {
+        for (int w0 = k; w0 < newSizeYWidth - (m_blockLength - 1 - k); w0++) {
+          for (int h0 = j; h0 < newSizeYHeight - (m_blockLength - 1 - j); h0++) {
             temp[count][sizeTempH++] = (yMM[w0][h0]);
           }
         }
@@ -698,22 +695,22 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
       }
     }
     
-    int totalSize = (newSizeYWidth - (M - 1)) * (newSizeYHeight - (M - 1));
+    int totalSize = (newSizeYWidth - (m_blockLength - 1)) * (newSizeYHeight - (m_blockLength - 1));
     
     //estimate mean 
-    vector<double> mcu(MxM);
-    mean(temp, MxM, totalSize, &mcu[0]);
+    vector<double> mcu(m_blockSize);
+    mean(temp, m_blockSize, totalSize, &mcu[0]);
     
     //estimate covariance
-    vector<vector<double> > cu1 (MxM);
-    vector<vector<double> > cu2 (MxM);
-    vector<vector<double> > rep1(MxM);
+    vector<vector<double> > cu1 (m_blockSize);
+    vector<vector<double> > cu2 (m_blockSize);
+    vector<vector<double> > rep1(m_blockSize);
     
-    repmat(&mcu[0], MxM, sizeTempH, rep1);
-    differenceVector(temp, rep1, MxM, sizeTempH, cu1);
-    vectorMultiplicationInverse (cu1, MxM, sizeTempH, cu1, cu2);
-    for (int ii = 0; ii < MxM; ii++)	{
-      for (int jj = 0;jj < MxM; jj++) {
+    repmat(&mcu[0], m_blockSize, sizeTempH, rep1);
+    differenceVector(temp, rep1, m_blockSize, sizeTempH, cu1);
+    vectorMultiplicationInverse (cu1, m_blockSize, sizeTempH, cu1, cu2);
+    for (int ii = 0; ii < m_blockSize; ii++)	{
+      for (int jj = 0;jj < m_blockSize; jj++) {
         cuArr[sub] [ii][jj]=(cu2[ii][jj] / sizeTempH); //% covariance matrix for U
       }
     }
@@ -721,16 +718,16 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     //================================
     //Collect MxM blocks as above. Use ONLY non-overlapping blocks to
     //calculate the S field
-    vector<vector<double> > temp1(MxM);
+    vector<vector<double> > temp1(m_blockSize);
     
     count = 0;
     int temp1Size = 0;
-    for (int k = 0; k < M; k++)		{
-      for (int j = 0;j < M; j++)			{
+    for (int k = 0; k < m_blockLength; k++)		{
+      for (int j = 0;j < m_blockLength; j++)			{
         temp1Size = 0;
         temp1[count].resize(newSizeYWidth * newSizeYHeight);
-        for (int w0 = k; w0 < newSizeYWidth; w0 += M) {
-          for (int h0 = j; h0 < newSizeYHeight;h0 += M) {
+        for (int w0 = k; w0 < newSizeYWidth; w0 += m_blockLength) {
+          for (int h0 = j; h0 < newSizeYHeight;h0 += m_blockLength) {
             temp1[count][temp1Size]=(yMM[w0][h0]);
             temp1Size++;
           }
@@ -740,33 +737,33 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
     }
     
     //Calculate the S field
-    vector<vector<double> > inCuCo(MxM);    
+    vector<vector<double> > inCuCo(m_blockSize);    
     
-    for (int i = 0; i < MxM;i++)	{
-      inCuCo[i].resize(MxM); 
+    for (int i = 0; i < m_blockSize;i++)	{
+      inCuCo[i].resize(m_blockSize); 
     }
-    inverseMatrix(cuArr[sub], MxM, inCuCo);
+    inverseMatrix(cuArr[sub], m_blockSize, inCuCo);
     
-    vector<vector<double> > ss1(MxM);
-    vectorMultiplication(inCuCo, MxM, MxM, temp1, MxM, temp1Size, ss1);
+    vector<vector<double> > ss1(m_blockSize);
+    vectorMultiplication(inCuCo, m_blockSize, m_blockSize, temp1, m_blockSize, temp1Size, ss1);
     vector<vector<double> >  ss4(1);
     
-    sumSSTempMM (ss1, MxM, temp1Size, temp1, MxM, ss4);
-    reshape(ss4,(int)(newSizeYWidth / (double) M), (int)(newSizeYHeight / (double) M), ssArr[sub]);
+    sumSSTempMM (ss1, m_blockSize, temp1Size, temp1, m_blockSize, ss4);
+    reshape(ss4,(int)(newSizeYWidth / (double) m_blockLength), (int)(newSizeYHeight / (double) m_blockLength), ssArr[sub]);
     
     //==========================
     //Eigen-decomposition
-    vector<double> a(MxM * MxM);
+    vector<double> a(m_blockSize * m_blockSize);
     
     int k = 0;
-    for (int i = 0; i < MxM; i++)	{
-      for (int j = 0;j < MxM; j++)	{
+    for (int i = 0; i < m_blockSize; i++)	{
+      for (int j = 0;j < m_blockSize; j++)	{
         a[k++] = (cuArr[sub][i][j]);
       }
     }
-    int n = MxM;
+    int n = m_blockSize;
     
-    vector<double> v(MxM * MxM);
+    vector<double> v(m_blockSize * m_blockSize);
     
     int itMax = 100;
     int rotNum;
@@ -778,7 +775,6 @@ void DistortionMetricVIF::refParamsVecGSM (vector<vector<double> > &org,
 void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org, 
                                       vector<vector<double> >  &dist, 
                                       int* subbands, 
-                                      int M, 
                                       vector<vector<int> > &lenWh, 
                                       int sizeSubBand, 
                                       vector<vector<vector<double> > >  &gAll, 
@@ -803,14 +799,16 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     vector<double> win      (winSize * winSize);
     vector<double> winNormal(winSize * winSize);
     
+	// Compute normal value once and then initialize window arrays
+	double normalValue = 1.0 / (double)(winSize * winSize);
     for (int j = 0; j < winSize * winSize; j++) {
       win[j] = 1.0; 
-      winNormal[j] = 1.0 / (double)(winSize * winSize);
+      winNormal[j] = normalValue;
     }
     
     //force subband size to be multiple of M
-    int newSizeYWidth  = (lenWh[sub][0] / M) * M;
-    int newSizeYHeight = (lenWh[sub][1] / M) * M;
+    int newSizeYWidth  = (lenWh[sub][0] / m_blockLength) * m_blockLength;
+    int newSizeYHeight = (lenWh[sub][1] / m_blockLength) * m_blockLength;
     
     vector<double> yMM (newSizeYWidth * newSizeYHeight);
     vector<double> ynMM(newSizeYWidth * newSizeYHeight);
@@ -824,8 +822,8 @@ void DistortionMetricVIF::vifSubEstM (vector<vector<double> >  &org,
     
     //Correlation with downsampling. This is faster than downsampling after
     //computing full correlation.
-    int winStepX       = M; 
-    int winStepY       = M;
+    int winStepX       = m_blockLength; 
+    int winStepY       = m_blockLength;
     int winStartX      = winStepX >> 1; 
     int winStartY      = winStartX;
     int winStopX       = newSizeYWidth  - ((winStepX + 1) >> 1) + 1; 
@@ -1042,7 +1040,7 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   
   int sizeSubBand = sizeof(subbands )/sizeof(*subbands );
   int pYrSize = maxPyrHt(inp0->m_width[Y_COMP], inp0->m_height[Y_COMP],  sizeof(lo0filt) / sizeof(*lo0filt)   )-1;
-
+  
   m_image0.resize(inp0->m_compSize[Y_COMP]); 
   m_image1.resize(inp1->m_compSize[Y_COMP]);
   
@@ -1082,7 +1080,7 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   vector<double>          hi0FiltOneRow(xFDimHi0 * xFDimHi0);
   vector<vector<int> >    lenWh(subbandsNum);
   vector<bool>            subbandUsed(subbandsNum);
-
+  
   for (int i = 0;i < subbandsNum;i++)
     lenWh[i].resize(2);
   
@@ -1189,7 +1187,7 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   }
   
   //calculate the parameters of the distortion channel
-  vifSubEstM (pyrImg0Arr, pyrImg1Arr,  subbands,  m_blockLength,  lenWh, sizeSubBand, gAll,  VvAll, lenWhGAll);
+  vifSubEstM (pyrImg0Arr, pyrImg1Arr,  subbands,  lenWh, sizeSubBand, gAll,  VvAll, lenWhGAll);
   
   vector<vector<vector<double> > >  ssArr(subbandsNum);
   vector<vector<vector<double> > >  cuArr(subbandsNum);
@@ -1214,7 +1212,7 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
   }
   
   //calculate the parameters of the reference image
-  refParamsVecGSM (pyrImg0Arr, subbands, m_blockLength, lenWh,  sizeSubBand,  ssArr,  lArr,  cuArr);
+  refParamsVecGSM (pyrImg0Arr, subbands, lenWh,  sizeSubBand,  ssArr,  lArr,  cuArr);
   
   // compute reference and distorted image information from each subband
   vector<double> num(sizeSubBand);
@@ -1243,10 +1241,10 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
       ss[jj].resize(sizeGHeight);
     }
     
-    int w1=0;
-    for (int w = offset; w < lenWhGAll[sub][0]-offset; w++)  {
+    int w1 = 0;
+    for (int w = offset; w < lenWhGAll[sub][0] - offset; w++)  {
       int h1=0;	
-      for (int h=offset;h<lenWhGAll[sub][1]-offset; h++)  {
+      for (int h = offset; h < lenWhGAll[sub][1] - offset; h++)  {
         // select only valid portion of the output.
         g [w1][h1] = gAll [sub][w][h];
         vv[w1][h1] = VvAll[sub][w][h];
@@ -1265,21 +1263,19 @@ void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1)
     }
     num[i] = temp1;
     den[i] = temp2;
-    
-    //compute IFC and normalize to size of the image
-    double ifc1 = 0;
-    double sumNum = 0;
-    double sumDen = 0;
-    for (int j = 0;j < sizeSubBand; j++) {
-      sumNum += num[j];
-      sumDen += den[j];
-      ifc1   += num[j] / (inp0->m_width[Y_COMP] * inp0->m_height[Y_COMP]);
-    }
-    
-    m_vifFrame = sumNum / sumDen;
-    m_vifFrameStats.updateStats(m_vifFrame);
-    
   }
+  //compute IFC and normalize to size of the image
+  double ifc1 = 0;
+  double sumNum = 0;
+  double sumDen = 0;
+  for (int j = 0;j < sizeSubBand; j++) {
+    sumNum += num[j];
+    sumDen += den[j];
+    ifc1   += num[j] / (inp0->m_width[Y_COMP] * inp0->m_height[Y_COMP]);
+  }
+  
+  m_vifFrame = sumNum / sumDen;
+  m_vifFrameStats.updateStats(m_vifFrame);
 }
 
 void DistortionMetricVIF::computeMetric (Frame* inp0, Frame* inp1, int component)

@@ -193,7 +193,6 @@ static const double bfilts[6][49] =
 };
 
 
-
 #endif
 #endif
 
@@ -228,8 +227,8 @@ private:
 
   
   void convertOneRowVar            (const double** input, double * output); 
-  void refParamsVecGSM             (vector<vector<double> > &org,  int* subbands, int M, vector<vector<int> > &lenWh, int sizeSubBand, vector<vector<vector<double> > >   &ssArr, vector<vector<double> > &lArr, vector<vector<vector<double> > >   &cuArr);
-  void vifSubEstM                  (vector<vector<double> >  &org,  vector<vector<double> >  &dist, int* subbands, int M, vector<vector<int> > &lenWh,int sizeSubBand, vector<vector<vector<double> > >   &gAll, vector<vector<vector<double> > > &VvAll, vector<vector<int> > &lenWhGAll); 
+  void refParamsVecGSM             (vector<vector<double> > &org,  int* subbands, vector<vector<int> > &lenWh, int sizeSubBand, vector<vector<vector<double> > >   &ssArr, vector<vector<double> > &lArr, vector<vector<vector<double> > >   &cuArr);
+  void vifSubEstM                  (vector<vector<double> >  &org,  vector<vector<double> >  &dist, int* subbands, vector<vector<int> > &lenWh,int sizeSubBand, vector<vector<vector<double> > >   &gAll, vector<vector<vector<double> > > &VvAll, vector<vector<int> > &lenWhGAll); 
   void multiply                    (double* input1, double* input2, int size, double num,  double* output );
   void difference                  (double* input1, double* input2, int size,   double* output );
   void mean                        (vector<vector<double> >  &input, int w, int h, double* mcu);
