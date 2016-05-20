@@ -465,29 +465,42 @@ void ColorTransformGeneric::process ( Frame* out, const Frame *inp) {
         YCbCrConstantLuminance2RGB( out, inp );
     }
     else {
+    //printf("Matrix0 %14.10f %14.10f %14.10f\n", m_transform0[0], m_transform0[1], m_transform0[2]);
+    //printf("Matrix1 %14.10f %14.10f %14.10f\n", m_transform1[0], m_transform1[1], m_transform1[2]);
+    //printf("Matrix2 %14.10f %14.10f %14.10f\n", m_transform2[0], m_transform2[1], m_transform2[2]);
       if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE)  {
         if (m_transformPrecision == FALSE) {
           if (m_sClip == 1) {
             for (int i = 0; i < inp->m_compSize[0]; i++) {
+              double comp0 = inp->m_floatComp[0][i];
+              double comp1 = inp->m_floatComp[1][i];
+              double comp2 = inp->m_floatComp[2][i];
               // Note that since the input and output may be either RGB or YUV, it might be "better" not to use Y_COMP/R_COMP here to avoid confusion.
-              out->m_floatComp[0][i] = fClip((float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i]), m_min, m_max);
-              out->m_floatComp[1][i] = fClip((float) (m_transform1[0] * inp->m_floatComp[0][i] + m_transform1[1] * inp->m_floatComp[1][i] + m_transform1[2] * inp->m_floatComp[2][i]), m_min, m_max);
-              out->m_floatComp[2][i] = fClip((float) (m_transform2[0] * inp->m_floatComp[0][i] + m_transform2[1] * inp->m_floatComp[1][i] + m_transform2[2] * inp->m_floatComp[2][i]), m_min, m_max);
+              out->m_floatComp[0][i] = fClip((float) (m_transform0[0] * comp0 + m_transform0[1] * comp1 + m_transform0[2] * comp2), m_min, m_max);
+              out->m_floatComp[1][i] = fClip((float) (m_transform1[0] * comp0 + m_transform1[1] * comp1 + m_transform1[2] * comp2), m_min, m_max);
+              out->m_floatComp[2][i] = fClip((float) (m_transform2[0] * comp0 + m_transform2[1] * comp1 + m_transform2[2] * comp2), m_min, m_max);
             }
           }
           else if (m_sClip == 2) {
             for (int i = 0; i < inp->m_compSize[0]; i++) {
+              double comp0 = inp->m_floatComp[0][i];
+              double comp1 = inp->m_floatComp[1][i];
+              double comp2 = inp->m_floatComp[2][i];
               // Note that since the input and output may be either RGB or YUV, it might be "better" not to use Y_COMP/R_COMP here to avoid confusion.
-              out->m_floatComp[0][i] = fMax((float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i]), 0.0f);
-              out->m_floatComp[1][i] = fMax((float) (m_transform1[0] * inp->m_floatComp[0][i] + m_transform1[1] * inp->m_floatComp[1][i] + m_transform1[2] * inp->m_floatComp[2][i]), 0.0f);
-              out->m_floatComp[2][i] = fMax((float) (m_transform2[0] * inp->m_floatComp[0][i] + m_transform2[1] * inp->m_floatComp[1][i] + m_transform2[2] * inp->m_floatComp[2][i]), 0.0f);
+              out->m_floatComp[0][i] = fMax((float) (m_transform0[0] * comp0 + m_transform0[1] * comp1 + m_transform0[2] * comp2), 0.0f);
+              out->m_floatComp[1][i] = fMax((float) (m_transform1[0] * comp0 + m_transform1[1] * comp1 + m_transform1[2] * comp2), 0.0f);
+              out->m_floatComp[2][i] = fMax((float) (m_transform2[0] * comp0 + m_transform2[1] * comp1 + m_transform2[2] * comp2), 0.0f);
             }
           }
           else {
             for (int i = 0; i < inp->m_compSize[0]; i++) {
-              out->m_floatComp[0][i] = (float) (m_transform0[0] * inp->m_floatComp[0][i] + m_transform0[1] * inp->m_floatComp[1][i] + m_transform0[2] * inp->m_floatComp[2][i]);
-              out->m_floatComp[1][i] = (float) (m_transform1[0] * inp->m_floatComp[0][i] + m_transform1[1] * inp->m_floatComp[1][i] + m_transform1[2] * inp->m_floatComp[2][i]);
-              out->m_floatComp[2][i] = (float) (m_transform2[0] * inp->m_floatComp[0][i] + m_transform2[1] * inp->m_floatComp[1][i] + m_transform2[2] * inp->m_floatComp[2][i]);
+              double comp0 = inp->m_floatComp[0][i];
+              double comp1 = inp->m_floatComp[1][i];
+              double comp2 = inp->m_floatComp[2][i];
+
+              out->m_floatComp[0][i] = (float) (m_transform0[0] * comp0 + m_transform0[1] * comp1 + m_transform0[2] * comp2);
+              out->m_floatComp[1][i] = (float) (m_transform1[0] * comp0 + m_transform1[1] * comp1 + m_transform1[2] * comp2);
+              out->m_floatComp[2][i] = (float) (m_transform2[0] * comp0 + m_transform2[1] * comp1 + m_transform2[2] * comp2);
 
               //printf("(%d) Values (Generic) (%7.3f %7.3f %7.3f) => (%7.3f %7.3f %7.3f)\n", i, inp->m_floatComp[0][i], inp->m_floatComp[1][i], inp->m_floatComp[2][i], out->m_floatComp[0][i], out->m_floatComp[1][i], out->m_floatComp[2][i]);
               //printf("(%d) Values (Generic) (%7.3f %7.3f %7.3f) => (%7.3f %7.3f %7.3f) & (%7.3f %7.3f %7.3f)\n", i, inp->m_floatComp[0][i], inp->m_floatComp[1][i], inp->m_floatComp[2][i], out->m_floatComp[0][i], out->m_floatComp[1][i], out->m_floatComp[2][i], fClip(out->m_floatComp[0][i], 0, 1.0), out->m_floatComp[1][i], out->m_floatComp[2][i]);

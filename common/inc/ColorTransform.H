@@ -89,6 +89,9 @@ public:
   float                   m_iSystemGamma;
   float                   m_oSystemGamma;
   
+  DisplayAdjustment       m_displayAdjustment;
+
+  
   ColorTransformParams() {
     m_iColorSpace = CM_RGB;
     m_iColorPrimaries = CP_709; 
@@ -121,6 +124,8 @@ public:
     m_max = 1.0f;
     m_iSystemGamma = 1.0f;
     m_oSystemGamma = 1.0f;
+    
+    m_displayAdjustment = DA_NULL;
    }
 };
 

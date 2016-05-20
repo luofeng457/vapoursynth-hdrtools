@@ -124,6 +124,8 @@ IntegerParameter intParameterList[] = {
   { "OutputTransferFunction",  (int *) &out->m_transferFunction,           TF_PQ,     TF_NULL,      TF_TOTAL-1,    "Output Transfer Function"                 },
   { "OutputSampleRange",       (int *) &out->m_sampleRange,          SR_STANDARD, SR_STANDARD,      SR_TOTAL-1,    "Output Sample Range"                      },
   { "OutputDisplayAdjustment", (int *) &out->m_displayAdjustment,        DA_NULL,     DA_NULL,      DA_TOTAL-1,    "Output Gamma Display Adjustment"          },
+  { "OutputDisplayAdjustment", (int *) &ctp->m_displayAdjustment,        DA_NULL,     DA_NULL,      DA_TOTAL-1,    "Output Gamma Display Adjustment"          },
+
 
   //! Various Params
   { "NumberOfFrames",          &pParams->m_numberOfFrames,                     1,           1,         INT_INF,    "Number of Frames to process"              },

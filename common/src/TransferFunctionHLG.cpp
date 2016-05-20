@@ -64,9 +64,10 @@
 
 TransferFunctionHLG::TransferFunctionHLG()
 {
-  m_a        = 0.17883277;
-  m_b        = 0.28466892;
-  m_c        = 0.55991073;
+  m_normalFactor = 1.0;
+  m_a            = 0.17883277;
+  m_b            = 0.28466892;
+  m_c            = 0.55991073;
 }
 
 

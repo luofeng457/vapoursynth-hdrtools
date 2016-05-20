@@ -61,7 +61,11 @@ public:
   // Construct/Deconstruct
   virtual ~DisplayGammaAdjust() {};
   static DisplayGammaAdjust *create(int method, float scale, float systemGamma);
-    
+  
+  virtual void setup  (Frame *frame);
+  virtual void forward(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2);
+  virtual void inverse(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2);
+
   virtual void forward(Frame *frame) = 0;
   virtual void inverse(Frame *frame) = 0;  
   virtual void forward(Frame *out,  const Frame *inp) = 0;

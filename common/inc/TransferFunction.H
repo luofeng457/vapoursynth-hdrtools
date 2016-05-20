@@ -101,6 +101,12 @@ protected:
   
 public:
 
+  TransferFunction() {
+    m_normalFactor = 1.0;
+    m_invNormalFactor = 1.0;
+    m_enableLUT = FALSE;
+    m_binsLUT = 1;
+  }
   // Construct/Deconstruct
   virtual ~TransferFunction() {};
   static TransferFunction *create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE);
@@ -117,10 +123,10 @@ public:
    
   virtual double forward    (double value) = 0;
   virtual double inverse    (double value) = 0;
-  virtual void forward      (Frame *out,  const Frame *inp);
-  virtual void forward      (Frame *out,  const Frame *inp, int component);
-  virtual void inverse      (Frame *out,  const Frame *inp);
-  virtual void inverse      (Frame *out,  const Frame *inp, int component);
+  virtual void   forward    (Frame *out,  const Frame *inp);
+  virtual void   forward    (Frame *out,  const Frame *inp, int component);
+  virtual void   inverse    (Frame *out,  const Frame *inp);
+  virtual void   inverse    (Frame *out,  const Frame *inp, int component);
 };
 
 #endif

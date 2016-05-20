@@ -270,6 +270,7 @@ typedef enum {
   CLT_YLIN     = 16,
   CLT_YSUMLIN  = 17,
   CLT_YADJ2ORD = 18,
+  CLT_YADJHLG  = 19,
   CLT_TOTAL
 } ClosedLoopTrans;
 
