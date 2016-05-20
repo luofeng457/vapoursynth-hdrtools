@@ -34,6 +34,11 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>HDRVQM.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>8</integer>
+		</dict>
 		<key>Sim2Convert.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -58,6 +63,11 @@
 			<true/>
 		</dict>
 		<key>C567FCE51A44E149006035B1</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>C580D7491CAF47F500E01A76</key>
 		<dict>
 			<key>primary</key>
 			<true/>

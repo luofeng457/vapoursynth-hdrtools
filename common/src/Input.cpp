@@ -54,10 +54,11 @@
 //-----------------------------------------------------------------------------
 
 #include "Input.H"
-#include "InputY4M.H"
-#include "InputYUV.H"
+#include "InputDPX.H"
 #include "InputEXR.H"
 #include "InputTIFF.H"
+#include "InputY4M.H"
+#include "InputYUV.H"
 #include "Global.H"
 
 #include <stdlib.h>
@@ -492,6 +493,9 @@ Input *Input::create(IOVideo *inputFile, FrameFormat *format, Parameters *inputP
         exit(EXIT_FAILURE);
       }
       break;
+    case VIDEO_DPX:
+      result = new InputDPX(inputFile, format);
+      break;
     case VIDEO_EXR:
       result = new InputEXR(inputFile, format);
       break;
@@ -534,9 +538,6 @@ Input::Input () {
   m_frameRate         = 24.0;
   m_picUnitSizeOnDisk = 8;
   m_picUnitSizeShift3 = m_picUnitSizeOnDisk >> 3;
-  m_data              = NULL;
-  m_ui16Data          = NULL;
-  m_floatData         = NULL;
   m_bufToImg          = NULL;
   m_comp[0]           = m_comp[1]      = m_comp[2]      = m_comp[3]      = NULL;
   m_ui16Comp[0]       = m_ui16Comp[1]  = m_ui16Comp[2]  = m_ui16Comp[3]  = NULL;
@@ -557,19 +558,19 @@ void Input::clear() {
 // copy data from input to frm target
 void Input::copyFrame(Frame *frm) {
   // we currently only copy the first three components and discard alpha
-  int size = m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
+  //int size = m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
   
   if (m_isFloat) {
     // Copying floating point data from the input buffer to the frame buffer
-    memcpy(frm->m_floatData, m_floatData, (int) size * sizeof(float));
+    frm->m_floatData = m_floatData;
   }
   else if (frm->m_bitDepth == m_bitDepthComp[Y_COMP]) {
     if (m_chromaFormat == frm->m_chromaFormat) {
       // if same chroma type, simply copy the frame
       if (frm->m_bitDepth == 8)
-        memcpy(frm->m_data, m_data, (int) size * sizeof(imgpel));
+        frm->m_data = m_data;
       else
-        memcpy(frm->m_ui16Data, m_ui16Data, (int) size * sizeof(uint16));
+        frm->m_ui16Data = m_ui16Data;
     }
     else {
       // This should never happen. To revisit.
@@ -731,10 +732,7 @@ void Input::imageReformatUInt16 (
         m_bufToImg->process(m_ui16Comp[V_COMP], buf + bytesY + bytesUV, source->m_width[V_COMP], source->m_height[V_COMP], source->m_width[V_COMP], source->m_height[V_COMP], symbolSizeInBytes, bit_scale);
       }           
     } 
-    else {
-      uint16 *data_temp = new uint16[source->m_width[U_COMP] * source->m_height[U_COMP]];     
-
-      delete [] data_temp;
+    else { // different chroma format buffers? This should not happen.
     }
   }
 }

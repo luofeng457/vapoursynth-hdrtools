@@ -82,8 +82,6 @@ InputEXR::InputEXR(IOVideo *videoFile, FrameFormat *format) {
   
   m_buf = NULL;
   
-  m_floatData = NULL;
-  
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -257,25 +255,25 @@ void InputEXR::allocateMemory(FrameFormat *format)
 
   
   if (m_channels[Y_COMP].pixelType == HALF)
-    m_buf  = new uint8 [(int) m_size * 2];
+    m_buffer.resize((unsigned int) m_size * 2);
   else
-    m_buf  = new uint8 [(int) m_size * 4];
+    m_buffer.resize((unsigned int) m_size * 4);
 
+  m_buf = &m_buffer[0];
+  
   format->m_pixelType[Y_COMP] = m_pixelType[Y_COMP] = m_channels[Y_COMP].pixelType;
   format->m_pixelType[U_COMP] = m_pixelType[U_COMP] = m_channels[U_COMP].pixelType;
   format->m_pixelType[V_COMP] = m_pixelType[V_COMP] = m_channels[V_COMP].pixelType;
   format->m_pixelType[A_COMP] = m_pixelType[A_COMP] = m_channels[A_COMP].pixelType;
   
-  m_data              = NULL;
   m_comp[Y_COMP]      = NULL;
   m_comp[U_COMP]      = NULL;
   m_comp[V_COMP]      = NULL;
-  m_ui16Data          = NULL;
   m_ui16Comp[Y_COMP]  = NULL;
   m_ui16Comp[U_COMP]  = NULL;
   m_ui16Comp[V_COMP]  = NULL;
-  m_floatData         = new float[(int) m_size];
-  m_floatComp[Y_COMP] = m_floatData;
+  m_floatData.resize((unsigned int) m_size);
+  m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[V_COMP];
   m_floatComp[A_COMP] = m_floatComp[V_COMP] + m_compSize[A_COMP];
@@ -283,20 +281,12 @@ void InputEXR::allocateMemory(FrameFormat *format)
 
 void InputEXR::freeMemory()
 { 
-  if (m_buf != NULL) {
-    delete[] m_buf;
-    m_buf = NULL;
-  }
+  m_buf = NULL;
   
-  if (m_floatData != NULL) {
-    m_floatComp[Y_COMP] = NULL;
-    m_floatComp[U_COMP] = NULL;
-    m_floatComp[V_COMP] = NULL;
-    m_floatComp[A_COMP] = NULL;
-    
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
+  m_floatComp[Y_COMP] = NULL;
+  m_floatComp[U_COMP] = NULL;
+  m_floatComp[V_COMP] = NULL;
+  m_floatComp[A_COMP] = NULL;
 }
 
 int InputEXR::readAttributeInfo( int vfile, FrameFormat *source)
@@ -612,8 +602,6 @@ int InputEXR::reformatData (uint8 *buf,  float  *floatComp[4]) {
         for (i = 0; i < m_width[component[j]]; i++) {
           // Convert data from half precision to float.
           *comp++ = halfToFloat(*curBuf++);
-          //if (k > 982 && i == 0)
-          //printf("Value %d %d %7.3f\n", *(comp - 1), *(curBuf - 1), *((float *) (comp - 1)));
         }
       }
     }

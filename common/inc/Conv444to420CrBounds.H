@@ -5,9 +5,9 @@
  *
  * <OWNER> = Apple Inc.
  * <ORGANIZATION> = Apple Inc.
- * <YEAR> = 2014
+ * <YEAR> = 2016
  *
- * Copyright (c) 2014, Apple Inc.
+ * Copyright (c) 2016, Apple Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -61,12 +61,12 @@
 class Conv444to420CrBounds : public ConvertColorFormat {
 
 private:
-  int32  *m_i32Data;
-  float  *m_floatData;
-  ScaleFilter *m_horFilterDown[5];
-  ScaleFilter *m_verFilterDown[5];
+  vector<int32> m_i32Data;
+  vector<float> m_floatData;
+  ScaleFilter  *m_horFilterDown[5];
+  ScaleFilter  *m_verFilterDown[5];
   
-  double  m_edgeClassifier;
+  double        m_edgeClassifier;
 
   void    setupFilter(int index, DownSamplingFilters filter, int hPhase, int vPhase);
   

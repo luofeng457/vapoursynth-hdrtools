@@ -87,7 +87,7 @@ private:
   MetricStatistics  m_maxPSNRStats[T_COMP];
   MetricStatistics  m_minPSNRStats[T_COMP];
   
-  std::vector<double> m_diffData;
+  vector<double> m_diffData;
 
   
   double compute(const float *iComp0, const float *iComp1, int width, int height, int component, double maxValue);
@@ -95,7 +95,7 @@ private:
   uint64 compute(const uint8 *iComp0, const uint8 *iComp1, int size);
 public:
   // Construct/Deconstruct
-  DistortionMetricRegionPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, double maxSampleValue);
+  DistortionMetricRegionPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue);
   virtual ~DistortionMetricRegionPSNR();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

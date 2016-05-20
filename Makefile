@@ -7,7 +7,7 @@
 ###             Created: July 17, 2014
 ###
 
-SUBDIRS := common projects/HDRConvert projects/HDRConvScaler projects/HDRMetrics projects/ChromaConvert projects/HDRMontage
+SUBDIRS := common projects/HDRConvert projects/HDRVQM projects/HDRConvScaler projects/HDRMetrics projects/ChromaConvert projects/HDRMontage
 
 ### include debug information: 1=yes, 0=no
 DBG?= 0
@@ -37,7 +37,7 @@ export MMX
 
 default: all
 
-all: $(SUBDIRS)
+all: | $(SUBDIRS) 
 
 $(SUBDIRS):
 	$(MAKE) -C $@

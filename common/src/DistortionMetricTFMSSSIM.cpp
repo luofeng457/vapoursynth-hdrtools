@@ -80,19 +80,19 @@ static const double kMsSSIMBeta4 = 0.1333;
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, int blockSizeX, int blockSizeY, int blockDistance, bool useLogSSIM, double K1, double K2, double maxSampleValue, DistortionFunction distortionMethod)
+DistortionMetricTFMSSSIM::DistortionMetricTFMSSSIM(const FrameFormat *format, SSIMParams *params, double maxSampleValue)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion, params->m_tfLUTEnable);
 
   // Metric parameters
-  m_K1 = K1;
-  m_K2 = K2;
+  m_K1 = params->m_K1;
+  m_K2 = params->m_K2;
   
-  m_blockDistance = blockDistance;
-  m_blockSizeX    = blockSizeX;
-  m_blockSizeY    = blockSizeY;
-  m_useLogSSIM    = useLogSSIM;
+  m_blockDistance = params->m_blockDistance;
+  m_blockSizeX    = params->m_blockSizeX;
+  m_blockSizeY    = params->m_blockSizeY;
+  m_useLogSSIM    = params->m_useLog;
   
 #ifdef UNBIASED_VARIANCE
   m_bias = 1;
@@ -392,8 +392,8 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
   int ii, jj;
   float *tmpDst, *tmpSrc;
   
-  float *itemp = new float [(iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD)];
-  float *dest  = new float [(iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD)];
+  vector<float> itemp((iHeight + MS_SSIM_PAD) *( iWidth + MS_SSIM_PAD));
+  vector<float> dest ((iHeight + MS_SSIM_PAD) *( oWidth + MS_SSIM_PAD));
 
 /*
   if (iWidth + MS_SSIM_PAD > m_tempWidth || iHeight + MS_SSIM_PAD > m_tempHeight ) {
@@ -413,12 +413,12 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
   float *p_out;
   static const float downSampleFilter[3] = { 1.0f/64.0f, 3.0f/64.0f, 28.0f/64.0f};
   
-  padImage(src, itemp, iWidth, iHeight);
-  horizontalSymmetricExtension(itemp, iWidth, iHeight);
+  padImage(src, &itemp[0], iWidth, iHeight);
+  horizontalSymmetricExtension(&itemp[0], iWidth, iHeight);
   
   for (j = MS_SSIM_PAD2; j < iHeight + MS_SSIM_PAD2; j++) {
-    tmpDst = dest  + j * oWidth + MS_SSIM_PAD2;
-    tmpSrc = itemp + j * iWidth + MS_SSIM_PAD2;
+    tmpDst = &dest [j * oWidth + MS_SSIM_PAD2];
+    tmpSrc = &itemp[j * iWidth + MS_SSIM_PAD2];
     for (i = 0; i < oWidth; i++) {
       ii = (i << 1);
       tmpDst[i]  =
@@ -429,11 +429,11 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
   }
   
   //Periodic extension
-  verticalSymmetricExtension(dest, oWidth, iHeight);
+  verticalSymmetricExtension(&dest[0], oWidth, iHeight);
   
   for (j = 0; j < oHeight; j++)  {
     jj = (j << 1) + 1;
-    p_destM2 = dest + jj * oWidth + MS_SSIM_PAD2;
+    p_destM2 = &dest[jj * oWidth + MS_SSIM_PAD2];
     p_destM1 = p_destM2 + oWidth;
     p_destM0 = p_destM1 + oWidth;
     p_destP1 = p_destM0 + oWidth;
@@ -447,8 +447,6 @@ void DistortionMetricTFMSSSIM::downsample(const float* src, float* out, int iWid
       downSampleFilter[2] * (p_destM0[i] + p_destP1[i]);
     }
   }
-  delete[] itemp;
-  delete[] dest;
 }
 
 
@@ -484,23 +482,14 @@ float DistortionMetricTFMSSSIM::computePlane(float *inp0Data, float *inp1Data, i
   float luminance;
   int   dsWidth  = width >> 1;
   int   dsHeight = height >> 1;
-  float* dsRef = new float [dsHeight * dsWidth];
-  float* dsEnc = new float [dsHeight * dsWidth];
-  /*
-  if (dsWidth > m_dsWidth || dsHeight > m_dsHeight ) {
-    m_dsWidth  = dsWidth;
-    m_dsHeight = dsHeight;
-    
-    m_dsRef.resize ( m_dsWidth * m_dsHeight );
-    m_dsEnc.resize ( m_dsWidth * m_dsHeight );
-  }
-  */
+  vector<float>  dsRef(dsHeight * dsWidth);
+  vector<float>  dsEnc(dsHeight * dsWidth);
   
   structural[0] = computeStructuralComponents(inp0Data, inp1Data, height, width, m_blockSizeY, m_blockSizeX, maxPixelValue);
   float distortion = (float)pow(structural[0], m_exponent[0]);
   
-  downsample(inp0Data, dsRef, width, height, dsWidth, dsHeight);
-  downsample(inp1Data, dsEnc, width, height, dsWidth, dsHeight);
+  downsample(inp0Data, &dsRef[0], width, height, dsWidth, dsHeight);
+  downsample(inp1Data, &dsEnc[0], width, height, dsWidth, dsHeight);
   
   for (int m = 1; m < MAX_SSIM_LEVELS; m++)  {
     width  = dsWidth;
@@ -508,21 +497,18 @@ float DistortionMetricTFMSSSIM::computePlane(float *inp0Data, float *inp1Data, i
     dsWidth  = width >> 1;
     dsHeight = height >> 1;
     
-    structural[m] = computeStructuralComponents(dsRef, dsEnc, height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
+    structural[m] = computeStructuralComponents(&dsRef[0], &dsEnc[0], height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
     distortion *= (float) pow(structural[m], m_exponent[m]);
     
     if (m < m_maxSSIMLevelsMinusOne)  {
-      downsample(dsRef, dsRef, width, height, dsWidth, dsHeight);
-      downsample(dsEnc, dsEnc, width, height, dsWidth, dsHeight);
+      downsample(&dsRef[0], &dsRef[0], width, height, dsWidth, dsHeight);
+      downsample(&dsEnc[0], &dsEnc[0], width, height, dsWidth, dsHeight);
     }
     else  {
-      luminance = computeLuminanceComponent(dsRef, dsEnc, height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
+      luminance = computeLuminanceComponent(&dsRef[0], &dsEnc[0], height, width, iMin(m_blockSizeY,height), iMin(m_blockSizeX,width), maxPixelValue);
       distortion *= (float)pow(luminance, m_exponent[m]);
     }
   }
-  
-  delete [] dsRef;
-  delete [] dsEnc;
   
   if (m_useLogSSIM)
     return (float) ssimSNR(distortion);
@@ -570,9 +556,9 @@ void DistortionMetricTFMSSSIM::compute(Frame* inp0, Frame* inp1)
     convertToXYZ(rgb1Normal, xyz1Normal, transform10, transform11, transform12);
     // Y Component
     // TF inp0
-    m_dataY0[i] = (float) m_transferFunction->compute( xyz0Normal[1] );
+    m_dataY0[i] = (float) m_transferFunction->performCompute( xyz0Normal[1] );
     // TF inp1
-    m_dataY1[i] = (float) m_transferFunction->compute( xyz1Normal[1] );
+    m_dataY1[i] = (float) m_transferFunction->performCompute( xyz1Normal[1] );
   }  
   
   m_metric[0] = (double) computePlane(&m_dataY0[0], &m_dataY1[0], inp0->m_height[0], inp0->m_width[0], 1.0);

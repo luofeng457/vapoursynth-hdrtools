@@ -65,7 +65,7 @@
 DistortionMetricBlockAct::DistortionMetricBlockAct(double maxSampleValue, DistortionFunction distortionMethod)
 : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(distortionMethod, FALSE);
 
   m_memWidth = 0;
   m_memHeight = 0;
@@ -234,49 +234,49 @@ void DistortionMetricBlockAct::compareActivity(int size)
     }
 }
 
-void DistortionMetricBlockAct::accumulateHArray(double *array, double *vector, int width, int height, int arraywidth, int posY, int posX)
+void DistortionMetricBlockAct::accumulateHArray(double *array, double *out, int width, int height, int arraywidth, int posY, int posX)
 {
   for (int i = 0; i < width; i++) { 
-    vector[ i ] = array[ posY * arraywidth + posX +i];
+    out[ i ] = array[ posY * arraywidth + posX +i];
   }
   
   for (int j = posY + 1; j < posY + height; j++) { 
     for (int i = 0; i < width; i++) { 
-      vector[ i ] += array[ j * arraywidth + posX + i];
+      out[ i ] += array[ j * arraywidth + posX + i];
     }
   }
 
   for (int i = 0; i < width; i++) { 
-    vector[ i ] /= arraywidth;
+    out[ i ] /= arraywidth;
   }
 }
 
-void DistortionMetricBlockAct::accumulateVArray(double *array, double *vector, int width, int height, int arraywidth, int posY, int posX)
+void DistortionMetricBlockAct::accumulateVArray(double *array, double *out, int width, int height, int arraywidth, int posY, int posX)
 {
   for (int j = 0; j < height; j++) { 
-    vector[j] = array[ (j + posY) * arraywidth + posX];
+    out[j] = array[ (j + posY) * arraywidth + posX];
     for (int i = 0; i < width; i++) { 
-      vector[ j ] += array[ (j + posY) * arraywidth + posX + i];
+      out[ j ] += array[ (j + posY) * arraywidth + posX + i];
     }
-    vector[ j ] /= arraywidth;
+    out[ j ] /= arraywidth;
   }
 }
 
-double DistortionMetricBlockAct::shiftAccumulateVector(double *vector, int width)
+double DistortionMetricBlockAct::shiftAccumulateVector(double *inVector, int width)
 {
   double sum = 0.0;
   for (int i = 0; i < width - 1; i++) { 
-    sum += dAbs(vector[ i ] - vector[ i + 1]);
+    sum += dAbs(inVector[ i ] - inVector[ i + 1]);
   }
   return (sum / (double) (width - 1));
 }
 
-double DistortionMetricBlockAct::accumulateVector(double *vector, int width)
+double DistortionMetricBlockAct::accumulateVector(double *inVector, int width)
 {
   double sum = 0.0;
   for (int i = 0; i < width; i++) { 
-    //sum += dAbs(vector[ i ]);
-    sum += dAbs2(vector[ i ]);
+    //sum += dAbs(inVector[ i ]);
+    sum += dAbs2(inVector[ i ]);
   }
   return (sum / (double) width);
 }

@@ -63,24 +63,23 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod)
+DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue)
  : DistortionMetric()
 {
-  m_transferFunction   = DistortionTransferFunction::create(distortionMethod);
+  m_transferFunction   = DistortionTransferFunction::create(params->m_tfDistortion, params->m_tfLUTEnable);
   m_totalComponents    = TOTAL_COMPONENTS; // 3 for YCbCr, 3 for RGB, 3 for XYZ and three aggregators = 12
   
-  m_blockWidth    = blockWidth;
-  m_blockHeight   = blockWidth;
-  m_overlapWidth  = overlapWidth;
-  m_overlapHeight = overlapHeight;
+  m_blockWidth    = params->m_rPSNRBlockSizeX;
+  m_blockHeight   = params->m_rPSNRBlockSizeY;
+  m_overlapWidth  = params->m_rPSNROverlapX;
+  m_overlapHeight = params->m_rPSNROverlapY;
   m_width         = format->m_width[Y_COMP];
   m_height        = format->m_height[Y_COMP];
   
-  m_computePsnrInRgb   = computePsnrInRgb;
-  m_computePsnrInXYZ   = computePsnrInXYZ;
-  m_computePsnrInYCbCr = computePsnrInYCbCr;
-  m_computePsnrInYUpVp = computePsnrInYUpVp;
-
+  m_computePsnrInRgb   = params->m_computePsnrInRgb;
+  m_computePsnrInXYZ   = params->m_computePsnrInXYZ;
+  m_computePsnrInYCbCr = params->m_computePsnrInYCbCr;
+  m_computePsnrInYUpVp = params->m_computePsnrInYUpVp;
   
   m_diffData.resize  ( m_width * m_height );
    
@@ -103,7 +102,7 @@ DistortionMetricRegionTFPSNR::DistortionMetricRegionTFPSNR(const FrameFormat *fo
   }
 
   m_colorSpace    = format->m_colorSpace;
-  m_enableShowMSE = enableShowMSE;
+  m_enableShowMSE = params->m_enableShowMSE;
   
   for (int c = 0; c < m_totalComponents; c++) {
     m_mse[c]  = 0.0;
@@ -366,9 +365,9 @@ void DistortionMetricRegionTFPSNR::convert (Frame* inp, double *rgbNormalData,
     rgbNormalData[planeSize * 2 + i] = rgbNormal[B_COMP] = inp->m_floatComp[B_COMP][i] / m_maxValue[B_COMP];
     
     if (m_computePsnrInRgb == TRUE || m_computePsnrInYCbCr == TRUE) {
-      rgbTFData[planeSize * 0 + i] = rgbDouble[R_COMP] = m_transferFunction->compute( rgbNormal[R_COMP] );
-      rgbTFData[planeSize * 1 + i] = rgbDouble[G_COMP] = m_transferFunction->compute( rgbNormal[G_COMP] );
-      rgbTFData[planeSize * 2 + i] = rgbDouble[B_COMP] = m_transferFunction->compute( rgbNormal[B_COMP] );
+      rgbTFData[planeSize * 0 + i] = rgbDouble[R_COMP] = m_transferFunction->performCompute( rgbNormal[R_COMP] );
+      rgbTFData[planeSize * 1 + i] = rgbDouble[G_COMP] = m_transferFunction->performCompute( rgbNormal[G_COMP] );
+      rgbTFData[planeSize * 2 + i] = rgbDouble[B_COMP] = m_transferFunction->performCompute( rgbNormal[B_COMP] );
     }
     
     if (m_computePsnrInYCbCr == TRUE) {
@@ -384,11 +383,11 @@ void DistortionMetricRegionTFPSNR::convert (Frame* inp, double *rgbNormalData,
     {
       convertToXYZ(rgbNormal, xyzNormal, transform0, transform1, transform2);
       // Y Component
-      xyzDouble[1] = m_transferFunction->compute( xyzNormal[1] );
+      xyzDouble[1] = m_transferFunction->performCompute( xyzNormal[1] );
       
       if ( m_computePsnrInXYZ == TRUE ) {
-        xyzDouble[0] = m_transferFunction->compute( xyzNormal[0] );
-        xyzDouble[2] = m_transferFunction->compute( xyzNormal[2] );
+        xyzDouble[0] = m_transferFunction->performCompute( xyzNormal[0] );
+        xyzDouble[2] = m_transferFunction->performCompute( xyzNormal[2] );
         xyzTFData[planeSize * 0 + i] = xyzDouble[0];
         xyzTFData[planeSize * 1 + i] = xyzDouble[1];
         xyzTFData[planeSize * 2 + i] = xyzDouble[2];

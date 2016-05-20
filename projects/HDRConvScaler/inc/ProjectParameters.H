@@ -54,6 +54,7 @@
 #include "Global.H"
 #include "Parameters.H"
 #include "AddNoise.H"
+#include "ColorTransform.H"
 
 #define DEFAULTCONFIGFILENAME "HDRConvScaler.cfg"
 
@@ -96,12 +97,17 @@ public:
   bool            m_bUseWienerFiltering;
   bool            m_bUse2DSepFiltering;
   bool            m_b2DSepMode;
+  bool            m_enableTFLUTs;
+
 
   // Cropping parameters
   int             m_cropOffsetLeft;
   int             m_cropOffsetTop;
   int             m_cropOffsetRight;
   int             m_cropOffsetBottom;
+  
+  // Color Transform function parameters
+  ColorTransformParams   m_ctParams;
 
   virtual void update();
   virtual void refresh();

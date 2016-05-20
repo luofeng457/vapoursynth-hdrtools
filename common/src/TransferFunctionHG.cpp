@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file TransferFunctionHGold.cpp
+ * \file TransferFunctionHG.cpp
  *
  * \brief
- *    TransferFunctionHGold class implementation for the BBC Hybrid Gamma (HG) Transfer Function
+ *    TransferFunctionHG class implementation for the BBC Hybrid Gamma (HG) Transfer Function
  *
  * \author
  *     - Matteo Naccari         <matteo.naccari@bbc.co.uk>
@@ -81,88 +81,16 @@ TransferFunctionHG::~TransferFunctionHG()
 {
 }
 
+//-----------------------------------------------------------------------------
+// PUBLIC
+//-----------------------------------------------------------------------------
+
 double TransferFunctionHG::forward(double value) {
   return (value <= m_xi ? pow(value, 2.0 * m_gamma) : exp(m_gamma * (value - m_rho) / m_eta));
 }
 
 double TransferFunctionHG::inverse(double value) {
   return (value <= m_mu ? pow(value, 0.5) : m_eta * log(value) + m_rho);
-}
-
-void TransferFunctionHG::forward(Frame *out, const Frame *inp)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size)  {
-    if (m_normalFactor == 1.0) {
-      for (int index = 0; index < inp->m_size; index++) {
-        out->m_floatData[index] = (float) forward((double) inp->m_floatData[index]);
-      }
-    }
-    else {
-      for (int index = 0; index < inp->m_size; index++) {
-        out->m_floatData[index] = (float) forward((double) inp->m_floatData[index] * m_normalFactor);
-      }
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp);
-  }
-}
-
-void TransferFunctionHG::forward(Frame *out, const Frame *inp, int component)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    if (m_normalFactor == 1.0) {
-      for (int index = 0; index < inp->m_compSize[component]; index++) {
-        out->m_floatComp[component][index] = (float) forward((double) inp->m_floatComp[component][index]);
-      }
-    }
-    else {
-      for (int index = 0; index < inp->m_compSize[component]; index++) {
-        out->m_floatComp[component][index] = (float) forward((double) inp->m_floatComp[component][index] * m_normalFactor);
-      }      
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp, component);
-  }
-}
-
-void TransferFunctionHG::inverse(Frame *out, const Frame *inp)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size)  {
-    if (m_normalFactor == 1.0) {
-      for (int index = 0; index < inp->m_size; index++) {
-        out->m_floatData[index] = (float) inverse((double) inp->m_floatData[index]);
-      }
-    }
-    else {
-      for (int index = 0; index < inp->m_size; index++) {
-        out->m_floatData[index] = (float) inverse((double) inp->m_floatData[index] / m_normalFactor);
-      }      
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp);
-  }
-}
-
-void TransferFunctionHG::inverse(Frame *out, const Frame *inp, int component)
-{
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    if (m_normalFactor == 1.0) {
-      for (int index = 0; index < inp->m_compSize[component]; index++) {
-        out->m_floatComp[component][index] = (float) inverse((double) inp->m_floatComp[component][index]);
-      }
-    }
-    else {
-      for (int index = 0; index < inp->m_compSize[component]; index++) {
-        out->m_floatComp[component][index] = (float) inverse((double) inp->m_floatComp[component][index] / m_normalFactor);
-      }      
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp, component);
-  }
 }
 
 //-----------------------------------------------------------------------------

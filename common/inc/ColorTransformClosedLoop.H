@@ -64,12 +64,11 @@ private:
   const double   *m_transform0;
   const double   *m_transform1;
   const double   *m_transform2;
-  bool            m_transformPrecision;
   bool            m_clip;
   double          m_crDivider;
   double          m_cbDivider;
   
-  float          *m_floatData;
+  vector<float>   m_floatData;
   float          *m_floatComp[4];
   int64           m_size;              // number of samples
   int             m_compSize[4];       // number of samples in each color component
@@ -80,12 +79,10 @@ private:
   int             m_mode;
   bool            m_isForward;
   ClosedLoopTrans m_closedLoopTransform;
-  SampleRange     m_range;
-  int             m_bitDepth;
    
 public:
   // Construct/Deconstruct
-  ColorTransformClosedLoop(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, bool transformPrecision, int useHighPrecision, ClosedLoopTrans closedLoopTransform = CLT_BASE, int bitDepth = 10, SampleRange range = SR_FULL);
+  ColorTransformClosedLoop( ColorTransformParams *params );
   virtual ~ColorTransformClosedLoop();
   
   virtual void process(Frame *out,  const Frame *inp);

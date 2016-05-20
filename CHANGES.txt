@@ -1,23 +1,40 @@
-Changes in Version HDRTools 0.10 (since 0.9)
--------------------------------------------
-- Additional (adaptive) Transfer Functions
-- Additional downsampling and upsampling filters
-- Post deblocking
-- Denoising (Wiener and separable)
-- I/O improvements
-- Various bug fixes relating to dynamic range and other issues
-- Closed loop conversion
-- MinMax filtering
-- Chroma limit aware clipping
-- Constant Luminance Support
+Changes in HDRTools Version 0.11 (since 0.10)
+---------------------------------------------
+- Additional luma adjustment methods - JCTVC-W0052 (AT)
+- Addition of Canon's JCTVC-W0056 luma adjustment method (VK, AT)
+- Addition of Netflix's JCTVC-W0107 luma adjustment method (AN, AT)
+- LUT support for Transfer Functions (both for conversions and metrics) (AT)
+- Implementation of Adaptive downsampling - JCTVC-W0051 (AT)
+- Implementation of Adaptive upsampling - JCTVC-W0051 (AT)
+- VIF support (HRZ, MA, MTP, PN, AT)
+- VQM support (SS, KP, AT)
+- limited DPX file input support (AT)
+- extended AVI support (AT)
+- Support of HLG (MN, MP, AT)
+- ICtCp support (AT)
+- Various bug fixes, optimizations, and code improvements (AT)
+- Memory restructuring (AT)
+
+Changes in HDRTools Version 0.10 (since 0.9)
+---------------------------------------------
+- Additional (adaptive) Transfer Functions (AT)
+- Additional downsampling and upsampling filters (AT)
+- Post deblocking (AT)
+- Denoising (Wiener and separable) (AT)
+- I/O improvements (AT)
+- Various bug fixes relating to dynamic range and other issues (AT)
+- Closed loop conversion (AT)n
+- MinMax filtering (AT)
+- Chroma limit aware clipping (AT)
+- Constant Luminance Support (AT)
 - Distortion Computation improvements
 - Integration of Ericsson's Luma "micrograding" (iterative closed loop conversion)
   process. Two different versions were implemented that utilize two different 
   initial positions. Both result in similar performance but have different complexity.
   Scheme could be vastly improved in terms of speed, especially using LUTs for TF
-  computation.
+  computation. (JS, JSS, AT)
  
-Changes in Version HDRTools 0.9 (since 0.8)
+Changes in HDRTools Version 0.9 (since 0.8)
 -------------------------------------------
 - First version of HDRMontage tool; Support  for both “copy” and “butterfly” modes (AT)
 - tPSNR computation buf fixes and enhancements
@@ -38,7 +55,7 @@ Changes in Version HDRTools 0.9 (since 0.8)
 - Max DeltaE support; Optional selection of White Point in DeltaE computation (AT)
 - Various bug fixes/cleanups (AT)
 
-Changes in Version HDRTools 0.8 (since 0.7)
+Changes in HDRTools Version 0.8 (since 0.7)
 -------------------------------------------
 - TIFF support fixes; Support for TIFF output (AT)
 - Initial implementation of MS-SSIM (AT)
@@ -62,7 +79,7 @@ Changes in Version HDRTools 0.8 (since 0.7)
 - Frame rate bug fixes (AT)
 
 
-Changes in Version HDRTools 0.7 (since 0.6)
+Changes in HDRTools Version 0.7 (since 0.6)
 -------------------------------------------
 - first version of sigma compare (CF/AT)
 - revised implementation of mPSNR (both normal and fast versions) (JS/AT))
@@ -74,7 +91,7 @@ Changes in Version HDRTools 0.7 (since 0.6)
 - TM5 interpolation filters (CF)
 - Various code improvements and extensions (AT)
 
-Changes in Version HDRTools 0.6 (since 0.5)
+Changes in HDRTools Version 0.6 (since 0.5)
 -------------------------------------------
 - Creation of a window based data copy function in the Frame class. (AT)
 - Addition of optional rectangular window based distortion computation. (AT)
@@ -83,7 +100,7 @@ Changes in Version HDRTools 0.6 (since 0.5)
 - Other "cosmetic" enhancements (AT)
 - Cleanups and enhancements to deltaE2K (CC)
 
-Changes in Version HDRTools 0.5 (since 0.4)
+Changes in HDRTools Version 0.5 (since 0.4)
 -------------------------------------------
 - Addition of deltaE2K computation (CC/EF)
 - Addition of first version of mPSNR (JS/AT))
@@ -92,7 +109,7 @@ Changes in Version HDRTools 0.5 (since 0.4)
 - Full cleanup of the code for Visual Studio (zero warning target) (AT)
 - Other cosmetic enhancements and bug fixes (AT)
 
-Changes in Version HDRTools 0.4 (since 0.2)
+Changes in HDRTools Version 0.4 (since 0.2)
 -------------------------------------------
 - Resolves 32bit compilation issue (AT/CR)
 - Addition of HDRMetrics with support for PSNR/MSE (AT)
@@ -103,7 +120,7 @@ Changes in Version HDRTools 0.4 (since 0.2)
 - Support for both half and single precision floats in OpenEXR (AT)
 - Output OpenEXR support (AT)
 
-Changes in Version HDRTools 0.2 (since 0.1)
+Changes in HDRTools Version 0.2 (since 0.1)
 -------------------------------------------
 - Alpha plane support (AT)
 - Support for single precision floating data OpenEXR files (uncompressed) (AT)
@@ -115,18 +132,29 @@ Changes in Version HDRTools 0.2 (since 0.1)
 People:
 AT      Alexis Michael Tourapis 	(alexismt@ieee.org)
 
+AN      Andrey Norkin
 CA      Cheung Auyeung
 CC      Christophe Chevance
 CF      Chad Fogg
 CR      Chris Rosewarne
 DL      Daisy Liu
 EF      Edouard Francois
+HRZ     Hamid Reza Tohidypour 
 JRS     Joel Royals Sole
 JS      Jacob Ström	
+JSS     Jonatan Samuelsson
+KP      Kulbhushan Pachauri
+MA      Maryam Azimi
 MK      Madhu Krishnan
 MN      Matteo Naccari
+MP      Manish Pindoria
+MTP     Mahsa T. Pourazad 
+PN      Panos Nasiopoulos
 PY      Peng Yin
 RB      Robert Brondijk
+SS      Sarvesh Sahota
 TL      Taoran Lu
+VK      Vladimir Kolesnikov
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

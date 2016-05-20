@@ -57,11 +57,12 @@
 
 TransferFunctionHGold::TransferFunctionHGold(double gamma)
 {
-  m_mu    = 0.139401137752;
-  m_eta   = sqrt(m_mu)/2.0;
-  m_rho   = sqrt(m_mu)*(1.0-log(sqrt(m_mu)));
-  m_xi    = sqrt(m_mu);
-  m_gamma = gamma;
+  m_mu           = 0.139401137752;
+  m_eta          = sqrt(m_mu)/2.0;
+  m_rho          = sqrt(m_mu)*(1.0-log(sqrt(m_mu)));
+  m_xi           = sqrt(m_mu);
+  m_gamma        = gamma;
+  m_normalFactor = 1.0;
 }
 
 TransferFunctionHGold::~TransferFunctionHGold()

@@ -63,18 +63,18 @@ class DistortionMetricBlockAct : public DistortionMetric {
 private:
   DistortionTransferFunction *m_transferFunction;
 
-  std::vector<double> m_verAct[2];
-  std::vector<double> m_horAct[2];
-  std::vector<double> m_verActDiff;
-  std::vector<double> m_horActDiff;
+  vector<double> m_verAct[2];
+  vector<double> m_horAct[2];
+  vector<double> m_verActDiff;
+  vector<double> m_horActDiff;
 
-  std::vector<double> m_sumW;
-  std::vector<double> m_sumH;
+  vector<double> m_sumW;
+  vector<double> m_sumH;
   
-  std::vector<double> m_dSum;
-  std::vector<double> m_dSumDev;
-  std::vector<double> m_dDistance;
-  std::vector<double> m_dOutput;
+  vector<double> m_dSum;
+  vector<double> m_dSumDev;
+  vector<double> m_dDistance;
+  vector<double> m_dOutput;
   
   int     m_width;
   int     m_height;
@@ -103,10 +103,10 @@ private:
   double avgSubsample(double *data, int step, int offset, int length);
   void computeActivity(float *inpData, int height, int width, int index, double maxValue);
   void compareActivity(int size);
-  void accumulateHArray(double *array, double *vector, int width, int height, int arraywidth, int posY, int posX);
-  void accumulateVArray(double *array, double *vector, int width, int height, int arraywidth, int posY, int posX);
-  double accumulateVector(double *vector, int width);
-  double shiftAccumulateVector(double *vector, int width);
+  void accumulateHArray(double *array, double *out, int width, int height, int arraywidth, int posY, int posX);
+  void accumulateVArray(double *array, double *out, int width, int height, int arraywidth, int posY, int posX);
+  double accumulateVector(double *inVector, int width);
+  double shiftAccumulateVector(double *inVector, int width);
   
   float compute                     (uint8  *inp0Data, uint8  *inp1Data, int height, int width, int windowHeight, int windowWidth, int comp, int   maxPixelValue);
   float compute                     (uint16 *inp0Data, uint16 *inp1Data, int height, int width, int windowHeight, int windowWidth, int comp, int   maxPixelValue);

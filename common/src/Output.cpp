@@ -471,11 +471,8 @@ Output::Output () {
   m_frameRate = 24.0;
   m_picUnitSizeOnDisk = 8;
   m_picUnitSizeShift3 = m_picUnitSizeOnDisk >> 3;
-  m_data = NULL;
   m_comp[0] = m_comp[1] = m_comp[2] = m_comp[3] = NULL;
-  m_ui16Data = NULL;
   m_ui16Comp[0] = m_ui16Comp[1] = m_ui16Comp[2] = m_ui16Comp[3] = NULL;
-  m_floatData = NULL;
   m_floatComp[0] = m_floatComp[1] = m_floatComp[2] = m_floatComp[3] = NULL;
   m_imgToBuf  = NULL;
   m_cositedSampling = FALSE;
@@ -498,13 +495,13 @@ void Output::copyFrame(Frame *frm) {
 
   if (m_isFloat) {
     // Copying floating point data from the frame buffer to the output buffer
-    memcpy(m_floatData, frm->m_floatData, (int) m_size * sizeof(float));
+    m_floatData = frm->m_floatData;
   }
   else {
     if (frm->m_bitDepth == 8)
-      memcpy(m_data, frm->m_data, (int) m_size * sizeof(imgpel));
+      m_data = m_data;
     else
-      memcpy(m_ui16Data, frm->m_ui16Data, (int) m_size * sizeof(uint16));
+      m_ui16Data = frm->m_ui16Data;
   }
 }
 

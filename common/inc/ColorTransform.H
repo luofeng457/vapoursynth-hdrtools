@@ -56,8 +56,119 @@
 #include "Parameters.H"
 #include "Frame.H"
 
+class ColorTransformParams {
+public:
+  ColorSpace              m_iColorSpace;
+  ColorPrimaries          m_iColorPrimaries; 
+  ChromaFormat            m_iChromaFormat;
+
+  ColorSpace              m_oColorSpace;
+  ColorPrimaries          m_oColorPrimaries; 
+  ChromaFormat            m_oChromaFormat;
+
+  bool                    m_transformPrecision; 
+  int                     m_useHighPrecision;
+  ClosedLoopTrans         m_closedLoopTransform; 
+  int                     m_iConstantLuminance;
+  int                     m_oConstantLuminance; 
+  TransferFunctions       m_transferFunction;
+  int                     m_bitDepth;
+  SampleRange             m_range;
+  int                     m_downMethod;
+  int                     m_upMethod;
+  int                     m_useAdaptiveDownsampler;
+  int                     m_useAdaptiveUpsampler;
+  int                     m_useMinMax;
+  int                     m_maxIterations;
+  vector <ChromaLocation> m_oChromaLocationType;
+  bool                    m_useFloatPrecision;
+  bool                    m_enableLUTs;
+  char                    m_yAdjustModelFile[MAX_LINE_LEN];
+  float                   m_min;
+  float                   m_max;
+  float                   m_iSystemGamma;
+  float                   m_oSystemGamma;
+  
+  DisplayAdjustment       m_displayAdjustment;
+
+  
+  ColorTransformParams() {
+    m_iColorSpace = CM_RGB;
+    m_iColorPrimaries = CP_709; 
+    m_iChromaFormat = CF_444;
+
+    m_oColorSpace = CM_RGB;
+    m_oColorPrimaries = CP_709; 
+    m_oChromaFormat = CF_444;
+    m_transformPrecision = FALSE; 
+    m_useHighPrecision = 0;
+    m_closedLoopTransform = CLT_NULL; 
+    m_iConstantLuminance = 0;
+    m_oConstantLuminance = 0; 
+    m_transferFunction = TF_NULL;
+    m_bitDepth = 10;
+    m_range = SR_FULL;
+    m_downMethod = 0;
+    m_upMethod = 0;
+    m_useAdaptiveDownsampler = 0;
+    m_useAdaptiveUpsampler = 0;
+    m_useMinMax = 0;
+    m_maxIterations = 0;
+    m_oChromaFormat = CF_444;
+    m_oChromaLocationType.resize(FP_TOTAL);
+    m_oChromaLocationType[FP_TOP   ] = CL_TWO;
+    m_oChromaLocationType[FP_BOTTOM] = CL_TWO;
+    m_useFloatPrecision = TRUE;
+    m_enableLUTs = TRUE;
+    m_min = 0.0f;
+    m_max = 1.0f;
+    m_iSystemGamma = 1.0f;
+    m_oSystemGamma = 1.0f;
+    
+    m_displayAdjustment = DA_NULL;
+   }
+};
 
 class ColorTransform {
+// shared parameters across all functions
+// maybe using "protected" variables might not be 
+// the best way to go, but somehow this saves us some code.
+protected: 
+
+  SampleRange         m_range;
+  int                 m_bitDepth;
+  bool                m_transformPrecision;
+
+  ChromaFormat        m_iChromaFormat;
+  ColorSpace          m_iColorSpace;
+  ColorPrimaries      m_iColorPrimaries;
+  
+  ChromaFormat        m_oChromaFormat;  
+  ColorSpace          m_oColorSpace;
+  ColorPrimaries      m_oColorPrimaries;
+  ChromaLocation      m_oChromaLocation[FP_TOTAL];
+
+  int                 m_useAdaptiveDownsampler;
+  int                 m_useAdaptiveUpsampler;
+
+  int                 m_downMethod;
+  int                 m_upMethod;
+  bool                m_useFloatPrecision;
+  TransferFunctions   m_transferFunctions;
+  int                 m_maxIterations;
+  int                 m_useMinMax;
+  
+  float               m_iSystemGamma;
+  float               m_oSystemGamma;
+  int                 m_useHighPrecision;
+
+
+
+  void setupParams( ColorTransformParams *params );
+
+private:
+  ColorTransformParams m_params;
+  
 public:
   // Construct/Deconstruct
   virtual ~ColorTransform() {};
@@ -82,7 +193,9 @@ public:
                                 int               maxIterations = 20,
                                 ChromaFormat      oChromaFormat = CF_420,
                                 ChromaLocation    *oChromaLocationType = NULL,
-                                bool              useFloatPrecision = TRUE
+                                bool              useFloatPrecision = TRUE,
+                                bool              enableTFLuts = FALSE,
+                                ColorTransformParams *iParams = NULL
                                 );
   
   virtual void process(Frame *out,  const Frame *inp) = 0;

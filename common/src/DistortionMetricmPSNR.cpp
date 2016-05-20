@@ -80,20 +80,12 @@ DistortionMetricmPSNR::DistortionMetricmPSNR(const FrameFormat *format, bool ena
   // memory buffers for the virtual images
   m_compSize = format->m_compSize[R_COMP];
   
-  m_ldrSrc = new imgpel[3 * m_compSize];
-  m_ldrRef = new imgpel[3 * m_compSize];
+  m_ldrSrc.resize(3 * m_compSize);
+  m_ldrRef.resize(3 * m_compSize);
 }
 
 DistortionMetricmPSNR::~DistortionMetricmPSNR()
 {
-  if (m_ldrSrc != NULL) {
-    delete[] m_ldrSrc;
-    m_ldrSrc = NULL;
-  }
-  if (m_ldrSrc != NULL) {
-    delete[] m_ldrSrc;
-    m_ldrSrc = NULL;
-  }
 }
 
 //-----------------------------------------------------------------------------
@@ -275,18 +267,11 @@ double DistortionMetricmPSNR::calculateError(Frame* inp0, Frame* inp1)
   
   // re-allocate memory for low dynamic range images (virtual photographs)
   // if size has changed for some odd reason
-  if (m_compSize != size) {
-    if (m_ldrSrc != NULL) {
-      delete[] m_ldrSrc;
-    }
-    if (m_ldrRef != NULL) {
-      delete[] m_ldrRef;
-    }
-    m_compSize = size;
+  m_compSize = size;
     
-    m_ldrSrc = new imgpel[3 * m_compSize];
-    m_ldrRef = new imgpel[3 * m_compSize];
-  }
+  m_ldrSrc.resize(3 * m_compSize);
+  m_ldrRef.resize(3 * m_compSize);
+  
   
   float *inp0Comp0 = inp0->m_floatComp[0];
   float *inp0Comp1 = inp0->m_floatComp[1];
@@ -329,7 +314,7 @@ double DistortionMetricmPSNR::calculateError(Frame* inp0, Frame* inp1)
     
     int numpixels;
     double sse, sseR, sseG, sseB;
-    calculateSSEnoSaturationRGB(m_ldrRef, m_ldrSrc, size, numpixels, sse, sseR, sseG, sseB);
+    calculateSSEnoSaturationRGB(&m_ldrRef[0], &m_ldrSrc[0], size, numpixels, sse, sseR, sseG, sseB);
     totpixels += numpixels;
     totsse += sse;
     m_sse[R_COMP] += sseR;
@@ -445,18 +430,11 @@ double DistortionMetricmPSNR::calculateErrorYUV(Frame* inp0, Frame* inp1)
   
   // re-allocate memory for low dynamic range images (virtual photographs)
   // if size changed for some odd reason
-  if (m_compSize != size) {
-    if (m_ldrSrc != NULL) {
-      delete[] m_ldrSrc;
-    }
-    if (m_ldrRef != NULL) {
-      delete[] m_ldrRef;
-    }
-    m_compSize = size;
-    
-    m_ldrSrc = new imgpel[3 * m_compSize];
-    m_ldrRef = new imgpel[3 * m_compSize];
-  }
+
+  m_compSize = size;
+  
+  m_ldrSrc.resize(3 * m_compSize);
+  m_ldrRef.resize(3 * m_compSize);
   
   float *inp0Comp0 = inp0->m_floatComp[0];
   float *inp0Comp1 = inp0->m_floatComp[1];
@@ -499,7 +477,7 @@ double DistortionMetricmPSNR::calculateErrorYUV(Frame* inp0, Frame* inp1)
     
     int numpixels;
     double sse, sseY, sseU, sseV;
-    calculateSSEnoSaturationYUV(m_ldrRef, m_ldrSrc, size, numpixels, sse, sseY, sseU, sseV);
+    calculateSSEnoSaturationYUV(&m_ldrRef[0], &m_ldrSrc[0], size, numpixels, sse, sseY, sseU, sseV);
     totpixels += numpixels;
     totsse += sse;
     m_sse[Y_COMP] += sseY;

@@ -71,8 +71,8 @@ Conv420to444Generic::Conv420to444Generic(int width, int height, int method, Chro
   int vPhase[2];
   // here we allocate the entire image buffers. To save on memory we could just allocate
   // these based on filter length, but this is test code so we don't care for now.
-  m_i32Data   = new int32[ width * height * 2];
-  m_floatData = new float[ width * height * 2];
+  m_i32Data.resize  (width * height * 2);
+  m_floatData.resize(width * height * 2);
   // Currently we only support progressive formats, and thus ignore the bottom chroma location type
   switch (chromaLocationType[FP_FRAME]) {
     case CL_FIVE:
@@ -121,14 +121,6 @@ Conv420to444Generic::Conv420to444Generic(int width, int height, int method, Chro
 }
 
 Conv420to444Generic::~Conv420to444Generic() {
-  if ( m_i32Data != NULL ) {
-    delete [] m_i32Data;
-    m_i32Data = NULL;
-  }
-  if ( m_floatData != NULL ) {
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
   delete m_horFilter[0];
   delete m_horFilter[1];
   delete m_verFilter[0];

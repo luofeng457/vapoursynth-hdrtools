@@ -55,6 +55,8 @@
 #include "Parameters.H"
 #include "AddNoise.H"
 #include "ToneMapping.H"
+#include "TransferFunction.H"
+#include "ColorTransform.H"
 
 #define DEFAULTCONFIGFILENAME "HDRConvert.cfg"
 
@@ -80,6 +82,8 @@ public:
   bool              m_transformPrecision;
   bool              m_useSingleTransferStep;     //!< Use single or multiple steps (for normalization) when applying PQ
   bool              m_filterInFloat;             //!< Use floating precision for filtering
+  bool              m_enableTFunctionLUT;        //!< Use Transfer function LUT for some operations
+  bool              m_enableTFLUTs;
   int               m_chromaDownsampleFilter;    //!< Chroma downsampling filter
   int               m_chromaUpsampleFilter;      //!< Chroma upsampling filter
   bool              m_outputSinglePrecision;     //!< Set output, for OpenEXR files, to single instead of half precision
@@ -109,7 +113,11 @@ public:
 
   int               m_toneMapping;
   // Tone mapping parameters
-  ToneMappingParams m_tmParams;
+  ToneMappingParams      m_tmParams;
+  // Transfer function parameters
+  TransferFunctionParams m_tfParams;
+  // Color Transform function parameters
+  ColorTransformParams   m_ctParams;
 
   virtual void update();
   virtual void refresh();

@@ -65,45 +65,47 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, int useHighPrecision, int transferFunctionLuma, int transferFunctionChroma, bool forceRange, float scale, float minValue, float maxValue) {
+ColorTransformCL::ColorTransformCL(ColorTransformParams *iParams, int forceRange) {
   
   m_mode = CTF_IDENTITY;
   m_closedLoop = FALSE;
   
-  if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  setupParams(iParams);
+
+  if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr && m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
     m_mode = CTF_RGB709_2_YUV709;
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-    if (useHighPrecision == 1)
+  else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr && m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
+    if (m_useHighPrecision == 1)
       m_mode = CTF_RGB2020_2_YUV2020_HP;
     else
     m_mode = CTF_RGB2020_2_YUV2020;
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+  else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr && m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_P3D65) {
     m_mode = CTF_RGBP3D65_2_YUVP3D65;
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+  else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr && m_iColorPrimaries == CP_P3D60 && m_oColorPrimaries == CP_P3D60) {
     m_mode = CTF_RGBP3D60_2_YUVP3D60;
   }
-  else if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr && iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+  else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr && m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_EXT) {
     m_mode = CTF_RGBEXT_2_YUVEXT;
   }
-  else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  else if (m_iColorSpace == CM_YCbCr && m_oColorSpace == CM_RGB && m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
     m_mode = CTF_RGB709_2_YUV709;
   }
-  else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-    if (useHighPrecision == 2)
+  else if (m_iColorSpace == CM_YCbCr && m_oColorSpace == CM_RGB && m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
+    if (m_useHighPrecision == 2)
       m_mode = CTF_RGB2020_2_YUV2020_HP;
     else
     m_mode = CTF_RGB2020_2_YUV2020;
   }
-  else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+  else if (m_iColorSpace == CM_YCbCr && m_oColorSpace == CM_RGB && m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_P3D65) {
     m_mode = CTF_RGBP3D65_2_YUVP3D65;
   }
-  else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+  else if (m_iColorSpace == CM_YCbCr && m_oColorSpace == CM_RGB && m_iColorPrimaries == CP_P3D60 && m_oColorPrimaries == CP_P3D60) {
     m_mode = CTF_RGBP3D60_2_YUVP3D60;
   }
-  else if (iColorSpace == CM_YCbCr && oColorSpace == CM_RGB && iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+  else if (m_iColorSpace == CM_YCbCr && m_oColorSpace == CM_RGB && m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_EXT) {
     m_mode = CTF_RGBEXT_2_YUVEXT;
   }
   else {
@@ -112,14 +114,14 @@ ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColor
   
   m_transformY = FWD_TRANSFORM[m_mode][Y_COMP];
     
-  m_lumaTF   = TransferFunction::create(transferFunctionLuma,   1, scale, 2.6f, minValue, maxValue);
-  m_chromaTF = TransferFunction::create(transferFunctionChroma, 1, scale, 2.6f, minValue, maxValue);
+  m_lumaTF   = TransferFunction::create(m_transferFunctions, TRUE, 1.0f, m_oSystemGamma, 0.0f, 1.0f);
+  m_chromaTF = TransferFunction::create(m_transferFunctions, TRUE, 1.0f, m_oSystemGamma, 0.0f, 1.0f);
 
-  if (forceRange == TRUE) {
+  if (forceRange == 1) {
     m_nB = m_pB = 0.9407f;
     m_nR = m_pR = 0.7373f;
   }
-  else {
+  else if (forceRange == 0) {
     //NB = ( 1 − KB )′	(52) 
     //PB = 1 − ( KB )′ 	(53)
     //NR = ( 1 − KR )′	(54)
@@ -129,6 +131,20 @@ ColorTransformCL::ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColor
     m_pB = 1.0 - m_chromaTF->inverse( m_transformY[B_COMP] );
     m_nR = m_chromaTF->inverse( 1.0 - m_transformY[R_COMP] );
     m_pR = 1.0 - m_chromaTF->inverse( m_transformY[R_COMP] );
+  }
+  else { // forceRange == 2
+  // This is a special mode where basically everything is scaled (max of the two weights)
+  // by the same value. This avoids the extra non linearity introduced
+  // in the existing CL mode.
+  
+    m_nB = m_chromaTF->inverse( 1.0 - m_transformY[B_COMP] );
+    m_pB = 1.0 - m_chromaTF->inverse( m_transformY[B_COMP] );
+        
+    m_nR = m_chromaTF->inverse( 1.0 - m_transformY[R_COMP] );
+    m_pR = 1.0 - m_chromaTF->inverse( m_transformY[R_COMP] );
+    
+    m_nB = m_pB = dMax(m_nB, m_pB);
+    m_nR = m_pR = dMax(m_nR, m_pR);
   }
 }
 
@@ -168,11 +184,15 @@ void ColorTransformCL::forward ( Frame* out, const Frame *inp) {
       compC = (compC / (2.0 * m_pR) );
     
     out->m_floatComp[Cr_COMP][i] = (float) compC;
+    
+    //printf("values %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f \n", inp->m_floatComp[R_COMP][i] , inp->m_floatComp[G_COMP][i] , inp->m_floatComp[B_COMP][i] , out->m_floatComp[Y_COMP][i], out->m_floatComp[Cb_COMP][i], out->m_floatComp[Cr_COMP][i]);
+
   }
 }
 
 void ColorTransformCL::inverse ( Frame* out, const Frame *inp) {
   double compY, compC, compB, compR, compG;
+  
   for (int i = 0; i < inp->m_compSize[Y_COMP]; i++) {
     compY = m_lumaTF->forward( (double) inp->m_floatComp[Y_COMP][i] );
     /* 
@@ -228,6 +248,8 @@ void ColorTransformCL::inverse ( Frame* out, const Frame *inp) {
     out->m_floatComp[R_COMP][i] = (float) compR;
     out->m_floatComp[G_COMP][i] = (float) compG;
     out->m_floatComp[B_COMP][i] = (float) compB;
+    
+    //printf("values %10.7f %10.7f %10.7f %10.7f %10.7f %10.7f \n", compR, compG, compB, inp->m_floatComp[Y_COMP][i], inp->m_floatComp[Cb_COMP][i], inp->m_floatComp[Cr_COMP][i]);
     
   }
 }

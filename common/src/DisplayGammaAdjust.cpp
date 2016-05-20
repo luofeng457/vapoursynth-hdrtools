@@ -83,6 +83,28 @@ DisplayGammaAdjust *DisplayGammaAdjust::create(int method, float scale, float sy
   return result;
 }
 
+
+void DisplayGammaAdjust::setup(Frame *frame) {
+};
+
+void DisplayGammaAdjust::inverse(double &comp0, double &comp1, double &comp2) {
+}
+
+void DisplayGammaAdjust::forward(double &comp0, double &comp1, double &comp2) {
+}
+
+void DisplayGammaAdjust::forward(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2) {
+  *oComp0 = iComp0;
+  *oComp1 = iComp1;
+  *oComp2 = iComp2;
+};
+void DisplayGammaAdjust::inverse(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2) {
+  *oComp0 = iComp0;
+  *oComp1 = iComp1;
+  *oComp2 = iComp2;
+};
+
+
 //-----------------------------------------------------------------------------
 // End of file
 //-----------------------------------------------------------------------------

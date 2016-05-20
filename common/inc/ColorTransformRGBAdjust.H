@@ -69,25 +69,18 @@ private:
   const double       *m_invTransform0;
   const double       *m_invTransform1;
   const double       *m_invTransform2;
-  float              *m_floatData;
+  vector<float>       m_floatData;
   float              *m_floatComp[4];
   int64               m_size;              // number of samples
   int                 m_compSize[4];       // number of samples in each color component
   int                 m_height[4];         // height of each color component
   int                 m_width[4];          // width of each color component
-  int                 m_useMinMax;
   bool                m_memoryAllocated;
   bool                m_tfDistance;
   
   int                 m_mode;
-  SampleRange         m_range;
-  int                 m_bitDepth;
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;
-  int                 m_downMethod;
-  int                 m_upMethod;
-  int                 m_maxIterations;
-  ChromaFormat        m_oChromaFormat;
   
   Frame              *m_fwdFrameStore;
   Frame              *m_invFrameStore;
@@ -104,26 +97,12 @@ private:
 
 public:
   // Construct/Deconstruct
-  ColorTransformRGBAdjust( ColorSpace        iColorSpace, 
-                         ColorPrimaries    iColorPrimaries, 
-                         ColorSpace        oColorSpace, 
-                         ColorPrimaries    oColorPrimaries, 
-                         TransferFunctions transferFunction = TF_PQ,
-                         int               downMethod = 2,
-                         int               upMethod = 4,
-                         int               useMinMax = 3,
-                         int               bitDepth = 10, 
-                         SampleRange       range = SR_FULL, 
-                         int               maxIterations = 20,
-                         ChromaFormat      oChromaFormat = CF_420
-                         );
+  ColorTransformRGBAdjust( ColorTransformParams *params );
                         
   virtual ~ColorTransformRGBAdjust();
   
   virtual void process(Frame *out,  const Frame *inp);
   
-  //virtual void RGB2YCbCrConstantLuminance(Frame *out,  const Frame *inp);
-  //virtual void YCbCrConstantLuminance2RGB(Frame *out,  const Frame *inp);
 };
 
 #endif

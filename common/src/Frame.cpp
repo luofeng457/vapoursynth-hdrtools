@@ -118,23 +118,22 @@ Frame::Frame(int width, int height,  bool isFloat, ColorSpace colorSpace, ColorP
     }
  
   if (m_isFloat) {
-    if (NULL == (m_floatData = new float[(int) m_size])) {
+    m_floatData.resize((unsigned int) m_size);
+    if (m_floatData.size() != (unsigned int) m_size) {
       fprintf(stderr, "Frame.cpp: Frame(...) Not enough memory to create array m_floatData, of size %d", (int) m_size);
       exit(-1);
     }
     
-    m_floatComp[Y_COMP] = m_floatData;
+    m_floatComp[Y_COMP] = &m_floatData[0];
     m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
     m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[U_COMP];
     
     // Set ui8 pointers
-    m_data = NULL;
     m_comp[Y_COMP] = NULL;
     m_comp[U_COMP] = NULL;
     m_comp[V_COMP] = NULL;
 
     // Set ui16 pointers
-    m_ui16Data = NULL;
     m_ui16Comp[Y_COMP] = NULL;
     m_ui16Comp[U_COMP] = NULL;
     m_ui16Comp[V_COMP] = NULL;
@@ -142,45 +141,43 @@ Frame::Frame(int width, int height,  bool isFloat, ColorSpace colorSpace, ColorP
   }
   else {
     if (m_bitDepth == 8) {
-      if (NULL == (m_data = new imgpel[(int) m_size])) {
+      m_data.resize((unsigned int) m_size);
+      if (m_data.size() != (unsigned int) m_size) {
         fprintf(stderr, "Frame.cpp: Frame(...) Not enough memory to create array m_data, of size %d", (int) m_size);
         exit(-1);
       }
       
-      m_comp[Y_COMP] = m_data;
+      m_comp[Y_COMP] = &m_data[0];
       m_comp[U_COMP] = m_comp[Y_COMP] + m_compSize[Y_COMP];
       m_comp[V_COMP] = m_comp[U_COMP] + m_compSize[U_COMP];
       
       // Set ui16 pointers
-      m_ui16Data         = NULL;
       m_ui16Comp[Y_COMP] = NULL;
       m_ui16Comp[U_COMP] = NULL;
       m_ui16Comp[V_COMP] = NULL;
       
       // Set float pointers
-      m_floatData         = NULL;
       m_floatComp[Y_COMP] = NULL;
       m_floatComp[U_COMP] = NULL;
       m_floatComp[V_COMP] = NULL;
     }
     else {
-      if (NULL == (m_ui16Data = new uint16[(int) m_size])) {
+      m_ui16Data.resize((unsigned int) m_size);
+      if (m_ui16Data.size() != (unsigned int) m_size) {
         fprintf(stderr, "Frame.cpp: Frame(...) Not enough memory to create array m_ui16Data, of size %d", (int) m_size);
         exit(-1);
       }
       
-      m_ui16Comp[Y_COMP] = m_ui16Data;
+      m_ui16Comp[Y_COMP] = &m_ui16Data[0];
       m_ui16Comp[U_COMP] = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
       m_ui16Comp[V_COMP] = m_ui16Comp[U_COMP] + m_compSize[U_COMP];
       
       // Set ui8 pointers
-      m_data = NULL;
       m_comp[Y_COMP] = NULL;
       m_comp[U_COMP] = NULL;
       m_comp[V_COMP] = NULL;
       
       // Set float pointers
-      m_floatData         = NULL;
       m_floatComp[Y_COMP] = NULL;
       m_floatComp[U_COMP] = NULL;
       m_floatComp[V_COMP] = NULL;
@@ -211,26 +208,14 @@ Frame::Frame(int width, int height,  bool isFloat, ColorSpace colorSpace, ColorP
 
 Frame::~Frame()
 {
-  if (m_floatData != NULL) {
-    delete[] m_floatData;
-    m_floatData = NULL;
-  }
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
   
-  if (m_data != NULL) {
-    delete[] m_data;
-    m_data = NULL;
-  }
   m_comp[Y_COMP] = NULL;
   m_comp[U_COMP] = NULL;
   m_comp[V_COMP] = NULL;
   
-  if (m_ui16Data  != NULL) {
-    delete[] m_ui16Data;
-    m_ui16Data = NULL;
-  }
   m_ui16Comp[Y_COMP] = NULL;
   m_ui16Comp[U_COMP] = NULL;
   m_ui16Comp[V_COMP] = NULL;
@@ -248,13 +233,13 @@ void Frame::clear()
 {
   if (m_isFloat) {
     // For floating point data, lets just set everything to 0 for now.
-    memset(m_floatData, ZERO, (int)m_size * sizeof(float));
+    memset(&m_floatData[0], ZERO, (int)m_size * sizeof(float));
   }
   else {
     // If RGB or XYZ, set all components to 0. Otherwise, we set to 0 luma info, and midvalue for chroma.
     if (m_bitDepth == 8) {
       if ( m_colorSpace == CM_RGB || m_colorSpace == CM_XYZ ) {
-        memset(m_data, ZERO, (int)m_size * sizeof(imgpel));
+        memset(&m_data[0], ZERO, (int)m_size * sizeof(imgpel));
       }
       else{
         memset(m_comp[Y_COMP], ZERO, m_compSize[ZERO] * sizeof(imgpel));
@@ -275,7 +260,7 @@ void Frame::clear()
     }
     else {
       if ( m_colorSpace == CM_RGB || m_colorSpace == CM_XYZ ) {
-        memset(m_ui16Data, ZERO, (int)m_size * sizeof(uint16));
+        memset(&m_ui16Data[0], ZERO, (int)m_size * sizeof(uint16));
       }
       else{
         int i, j;
@@ -577,13 +562,13 @@ void Frame::copy(Frame *f)
   m_isAvailable  = TRUE;
 
   if (m_isFloat) {
-    memcpy(m_floatData, f->m_floatData, (int) m_size * sizeof(float));
+    m_floatData = f->m_floatData;
   }
-  else if (m_bitDepth == 8) {
-    memcpy(m_data, f->m_data, (int) m_size * sizeof(imgpel));
+  else if (m_bitDepth == 8) { 
+    m_data = f->m_data;
   }
   else {
-    memcpy(m_ui16Data, f->m_ui16Data, (int) m_size * sizeof(uint16));
+    m_ui16Data = f->m_ui16Data;
   }
 }
 

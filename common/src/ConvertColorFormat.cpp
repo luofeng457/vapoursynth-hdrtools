@@ -59,6 +59,7 @@
 #include "Conv420to422Generic.H"
 #include "Conv420to444NN.H"
 #include "Conv420to444Adaptive.H"
+#include "Conv420to444CrBounds.H"
 #include "Conv420to444Generic.H"
 #include "Conv444to420NN.H"
 #include "Conv444to422NN.H"
@@ -217,10 +218,12 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
       case UF_LS5:
       case UF_LS6:
       case UF_TM:
-        if (useAdaptiveFilter == 1)
-          result = new Conv420to444Adaptive(width, height, method, iChromaLocationType);
-        else 
+        if (useAdaptiveFilter == (int) ADF_NULL)
           result = new Conv420to444Generic(width, height, method, iChromaLocationType);
+        else if (useAdaptiveFilter == (int) ADF_MULTI)
+          result = new Conv420to444Adaptive(width, height, method, iChromaLocationType);
+        else //if (useAdaptiveFilter == (int) ADF_CRBOUNDS) {
+          result = new Conv420to444CrBounds(width, height, method, iChromaLocationType);
         break;
       default:
         fprintf(stderr, "Not supported chroma upsampling method %d\n", method);

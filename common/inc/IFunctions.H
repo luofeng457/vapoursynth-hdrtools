@@ -131,6 +131,17 @@ static inline double dClip(double x, double low, double high) {
   return x;
 }
 
+template <typename Type>
+static inline Type setClosest(Type x, Type a, Type b) {
+  if (abs(x - a) > abs(x - b)) {
+    return b;
+  }
+  else {
+    return a;
+  }
+}
+
+
 static inline short sAbs(short x) {
   static const short SHORT_BITS = (sizeof(short) * CHAR_BIT) - 1;
   short y = (short) (x >> SHORT_BITS);
@@ -239,6 +250,81 @@ static inline int signPower2(int x) {
   return ( x < 0 ) ? 0 : (ONE << x);
 }
 
+// rounding down the the next power of 2
+static inline int flp2(int y) {
+  uint32 x = (uint32) y;
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  x |= ( x >> 16 );
+  return (int) (x - (x >> 1));
+}
+
+static inline uint32 flp2(uint32 x) {
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  x |= ( x >> 16 );
+  return (x - (x >> 1));
+}
+
+static inline uint16 flp2(uint16 x) {
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  return (x - (x >> 1));
+}
+
+static inline short flp2(short x) {
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  return (x - (x >> 1));
+}
+
+// rounding up the the next power of 2
+static inline int clp2(int y) {
+  uint32 x = ((uint32) y) - 1;
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  x |= ( x >> 16 );
+  return (int) (x + 1);
+}
+
+static inline uint32 clp2(uint32 x) {
+  x -= 1;
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  x |= ( x >> 16 );
+  return (x + 1);
+}
+
+static inline uint16 clp2(uint16 x) {
+  x -= 1;
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  return (x + 1);
+}
+
+static inline short clp2(short x) {
+  x -= 1;
+  x |= ( x >> 1 );
+  x |= ( x >> 2 );
+  x |= ( x >> 4 );
+  x |= ( x >> 8 );
+  return (x + 1);
+}
+
 static inline int median(int a, int b, int c) {
   //return a + b + c - iMin(iMin(a, b), c) - iMax(iMax(a, b), c);
   return iMax(iMin(iMax(a, b), c), iMin(a, b));
@@ -290,12 +376,28 @@ static inline int double2IntFloor(double x) {
   return (((x) < 0.0 ) ? (((int)(x))-1) : (((int)(x))));
 }
 
+static inline uint16 ceilDivide(uint16 x, uint16 y) {
+  return (x / y + (x % y != 0));
+}
 
+static inline uint32 ceilDivide(uint32 x, uint32 y) {
+  return (x / y + (x % y != 0));
+}
+
+static inline int ceilDivide(int x, int y) {
+  return (x / y + (x % y != 0));
+}
 
 static inline double psnr(double maxSampleValue, int samples, double sseDistortion, double minLimit) {
   return (double) (10.0 * log10(maxSampleValue * maxSampleValue * (double) ((double) samples / (sseDistortion < minLimit ? minLimit : sseDistortion))));
 }
 
+template <typename Type>
+static inline void swap(Type *x, Type *y) {
+  Type temp = *x;
+  *x = *y;
+  *y = temp;
+}
 
 
 #ifdef JM_PSNR

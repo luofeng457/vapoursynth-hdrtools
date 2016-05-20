@@ -59,6 +59,8 @@
 class Output {
 protected:  
   unsigned char *m_buf, *m_iBuf;
+  vector<unsigned char>  m_buffer;
+  vector<unsigned char>  m_iBuffer;
   void imageReformat       ( unsigned char* inp,  unsigned char* out,   FrameFormat *source, int symbolSizeInBytes);
   void imageReformatUInt16 ( unsigned char* buf, FrameFormat *source, int symbolSizeInBytes);
  
@@ -103,13 +105,14 @@ public:
   int               m_picUnitSizeOnDisk;            //!< picture sample unit size on storage medium
   int               m_picUnitSizeShift3;            //!< m_picUnitSizeOnDisk >> 3
 
-  imgpel           *m_data;                         //!< data array for 8 bit data
+
+  vector<imgpel>    m_data;                         //!< data array for 8 bit data
   imgpel           *m_comp[4];                      //!< pointers to the different components of the data array
   
-  uint16           *m_ui16Data;                     //!< data array for 16 bit data
+  vector<uint16>    m_ui16Data;                     //!< data array for 16 bit data
   uint16           *m_ui16Comp[4];                  //!< pointers to the different components of the data array
   
-  float            *m_floatData;                    //!< data array for floating point data
+  vector<float>     m_floatData;                    //!< data array for floating point data
   float            *m_floatComp[4];                 //!< pointers to the different components of the data array
 
   ImgToBuf         *m_imgToBuf;

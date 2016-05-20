@@ -79,7 +79,7 @@ private:
   
 public:
   // Construct/Deconstruct
-  ColorTransformCL(ColorSpace iColorSpace, ColorPrimaries iColorPrimaries, ColorSpace oColorSpace, ColorPrimaries oColorPrimaries, int useHighPrecision, int transferFunctionLuma = TF_PQ, int transferFunctionChroma = TF_PQ, bool forceRange = FALSE,  float scale = 1.0f, float minValue = 0.0f, float maxValue = 1.0f);
+  ColorTransformCL(ColorTransformParams *iParams, int forceRange = 0);
   virtual ~ColorTransformCL();
   
   virtual void process(Frame *out,  const Frame *inp);

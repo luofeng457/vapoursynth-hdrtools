@@ -64,26 +64,11 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformRGBAdjust::ColorTransformRGBAdjust( ColorSpace        iColorSpace, 
-                                              ColorPrimaries    iColorPrimaries, 
-                                              ColorSpace        oColorSpace, 
-                                              ColorPrimaries    oColorPrimaries, 
-                                              TransferFunctions transferFunction,
-                                              int               downMethod,
-                                              int               upMethod,
-                                              int               useMinMax,
-                                              int               bitDepth, 
-                                              SampleRange       range, 
-                                              int               maxIterations,
-                                              ChromaFormat      oChromaFormat) {
+ColorTransformRGBAdjust::ColorTransformRGBAdjust( ColorTransformParams *params ) {
   
   m_mode = CTF_IDENTITY; 
-  m_range = range;
-  m_bitDepth = bitDepth;
   
-  m_floatData = NULL;
   m_size = 0;
-  m_maxIterations = maxIterations;
   m_tfDistance = TRUE;
   
   for (int index = 0; index < 4; index++) {
@@ -94,30 +79,28 @@ ColorTransformRGBAdjust::ColorTransformRGBAdjust( ColorSpace        iColorSpace,
     m_width[index] = 0;          // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_oChromaFormat = oChromaFormat;
-  m_useMinMax     = useMinMax;
   
   // Method is only allowed for RGB to YCbCr conversion
-  if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
-    if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr) {
+    if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
+    else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB2020_2_YUV2020;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+    else if (m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+    else if (m_iColorPrimaries == CP_P3D60 && m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_YUVP3D60;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+    else if (m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_YUVEXT;
     }
-    else if (oColorPrimaries == CP_AMT) {
+    else if (m_oColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
     }
-    else if ( oColorPrimaries == CP_YCOCG) {
+    else if ( m_oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
     }
   }
@@ -139,9 +122,6 @@ ColorTransformRGBAdjust::ColorTransformRGBAdjust( ColorSpace        iColorSpace,
   m_invColorFormat = NULL;
   m_fwdFrameStore  = NULL;
   m_invFrameStore  = NULL;
-  
-  m_downMethod = downMethod;
-  m_upMethod   = upMethod;
 
   if (m_range == SR_STANDARD) {
     m_lumaWeight   = (double) (1 << (m_bitDepth - 8)) * 219.0;
@@ -162,14 +142,10 @@ ColorTransformRGBAdjust::ColorTransformRGBAdjust( ColorSpace        iColorSpace,
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
 
-  m_transferFunction = TransferFunction::create(transferFunction, TRUE, 1.0, 1.0, 0.0, 1.0);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformRGBAdjust::~ColorTransformRGBAdjust() {
-  if (m_floatData != NULL) {
-    delete[] m_floatData;
-    m_floatData = NULL;
-  }
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -217,12 +193,13 @@ void ColorTransformRGBAdjust::allocateMemory(Frame* out, const Frame *inp) {
   }
   
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
-  if (NULL == (m_floatData = new float[(int) m_size])) {
+  m_floatData.resize((unsigned int) m_size);
+  if (m_floatData.size() != (unsigned int) m_size) {
     fprintf(stderr, "ColorTransformRGBAdjust: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }
   
-  m_floatComp[Y_COMP] = m_floatData;
+  m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[U_COMP];
   

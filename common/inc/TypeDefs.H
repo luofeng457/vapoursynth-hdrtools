@@ -62,6 +62,7 @@ typedef enum {
   VIDEO_AVI     =  4,
   VIDEO_EXR     =  5,
   VIDEO_Y4M     =  6,
+  VIDEO_DPX     =  7,
   VIDEO_TOTAL
 } VideoFileType;
 
@@ -265,6 +266,11 @@ typedef enum {
   CLT_YADJLFST = 12,
   CLT_YADJTELE = 13,
   CLT_FRGB     = 14,
+  CLT_YADJFULL = 15,
+  CLT_YLIN     = 16,
+  CLT_YSUMLIN  = 17,
+  CLT_YADJ2ORD = 18,
+  CLT_YADJHLG  = 19,
   CLT_TOTAL
 } ClosedLoopTrans;
 

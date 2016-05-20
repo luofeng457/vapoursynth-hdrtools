@@ -90,66 +90,6 @@ double TransferFunctionPower::forward(double value) {
 double TransferFunctionPower::inverse(double value) {
   return (pow(value / m_alpha, m_inverseGamma) - m_beta);
 }
-
-void TransferFunctionPower::forward( Frame* out, const Frame *inp, int component ) {
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    double v;
-    for (int index = 0; index < inp->m_compSize[component]; index++) {
-      v = (double) inp->m_floatComp[component][index];
-      out->m_floatComp[component][index] = (float) (m_alpha * pow(dMax(v + m_beta, 0.0), m_gamma));
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp, component);
-  }
-}
-
-void TransferFunctionPower::forward( Frame* out, const Frame *inp ) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-    double v;
-    for (int index = 0; index < inp->m_size; index++) {
-      v = (double) inp->m_floatData[index];
-      out->m_floatData[index] = (float) (m_alpha * pow(dMax(v + m_beta, 0.0), m_gamma));
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp);
-  }
-}
-
-void TransferFunctionPower::inverse( Frame* out, const Frame *inp, int component ) {
-  
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    double v;
-    for (int index = 0; index < inp->m_compSize[component]; index++) {
-      v = (double) inp->m_floatComp[component][index] / m_alpha;
-      out->m_floatComp[component][index] = (float) (pow(v, m_inverseGamma) - m_beta);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp, component);
-  }
-}
-
-void TransferFunctionPower::inverse( Frame* out, const Frame *inp ) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-    double v;
-    for (int index = 0; index < inp->m_size; index++) {
-      v = (double) inp->m_floatData[index]/ m_alpha;
-      out->m_floatData[index] = (float) (pow(v, m_inverseGamma) - m_beta);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    out->copy((Frame *) inp);
-  }
-}
-
 //-----------------------------------------------------------------------------
 // End of file
 //-----------------------------------------------------------------------------

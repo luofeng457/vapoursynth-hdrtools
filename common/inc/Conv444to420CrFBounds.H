@@ -61,14 +61,14 @@
 class Conv444to420CrFBounds : public ConvertColorFormat {
 
 private:
-  int32  *m_i32Data;
-  float  *m_floatData;
-  ScaleFilter *m_horFilterDown[5];
-  ScaleFilter *m_verFilterDown[5];
-  int          m_maxVerTaps;
-  int          m_maxHorTaps;
-  int          m_verFilterMap[10]; // currently we can support up to 18 tap filters
-  int          m_horFilterMap[10]; // currently we can support up to 18 tap filters
+  vector<int32> m_i32Data;
+  vector<float> m_floatData;
+  ScaleFilter  *m_horFilterDown[5];
+  ScaleFilter  *m_verFilterDown[5];
+  int           m_maxVerTaps;
+  int           m_maxHorTaps;
+  int           m_verFilterMap[10]; // currently we can support up to 18 tap filters
+  int           m_horFilterMap[10]; // currently we can support up to 18 tap filters
 
   
   double  m_edgeClassifier;

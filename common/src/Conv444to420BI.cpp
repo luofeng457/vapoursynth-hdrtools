@@ -67,19 +67,11 @@
 Conv444to420BI::Conv444to420BI(int width, int height) {
   // here we allocate the entire image buffers. To save on memory we could just allocate
   // these based on filter length, but this is test code so we don't care for now.
-  m_i16Data   = new int16[ (width >> 1) * height ];
-  m_floatData = new float[ (width >> 1) * height ];
+  m_i16Data.resize  ( (width >> 1) * height );
+  m_floatData.resize( (width >> 1) * height );
 }
 
 Conv444to420BI::~Conv444to420BI() {
-  if (m_i16Data != NULL) {
-    delete [] m_i16Data;
-    m_i16Data = NULL;
-  }
-  if (m_floatData != NULL) {
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
 }
 
 //-----------------------------------------------------------------------------

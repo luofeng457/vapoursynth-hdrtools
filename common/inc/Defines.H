@@ -58,6 +58,7 @@
 #define INT_INF 0x7fffffff
 #define FLT_INF 1e30F
 
+#define ENABLE_SSE_OPT      0
 
 #if (defined(WIN32) || defined(WIN64)) && !defined(__GNUC__)
 typedef unsigned char       imgpel;                 //!<  Pixel type definition (8 bit)

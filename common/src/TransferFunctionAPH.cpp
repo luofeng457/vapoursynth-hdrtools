@@ -102,6 +102,7 @@ double TransferFunctionAPH::forwardPH(double value) {
 }
 
 double TransferFunctionAPH::inversePH(double value) {
+  value = dClip(value, 0, 1.0);
   return ((log(1.0 + (m_rho - 1.0) * pow( value, (1.0 / m_gamma))) / log(m_rho)));
 }
 
@@ -116,97 +117,7 @@ double TransferFunctionAPH::inverse(double value) {
   return (float) dMax(0.0, dMin(1.0, (inversePH(value) - m_minValueInv) / m_denomInv));
 }
 
-void TransferFunctionAPH::forward( Frame* out, const Frame *inp, int component ) {
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) forward((double) inp->m_floatComp[component][i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) (m_normalFactor * forward((double) inp->m_floatComp[component][i]));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-}
 
-void TransferFunctionAPH::forward( Frame* out, const Frame *inp ) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) forward((double) inp->m_floatData[i]);
-      }
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) (m_normalFactor * forward((double) inp->m_floatData[i]));
-      }    
-    }
-  }
-}
-
-void TransferFunctionAPH::inverse( Frame* out, const Frame *inp, int component ) {
-  // In this scenario, we should likely copy the frame number externally
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) inverse((double) inp->m_floatComp[component][i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-      for (int i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_floatComp[component][i] = (float) inverse(dMax(0.0, dMin((double) inp->m_floatComp[component][i] / m_normalFactor, 1.0)));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp, component);
-    }
-  }
-}
-
-void TransferFunctionAPH::inverse( Frame* out, const Frame *inp ) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-  
-  if (m_normalFactor == 1.0) {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) inverse((double) inp->m_floatData[i]);
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp);
-    }
-  }
-  else {
-    if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-      for (int i = 0; i < inp->m_size; i++) {
-        out->m_floatData[i] = (float) inverse(dMax(0.0, dMin((double) inp->m_floatData[i] / m_normalFactor, 1.0)));
-      }
-    }
-    else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-      out->copy((Frame *) inp);
-    }
-  }
-}
 
 //-----------------------------------------------------------------------------
 // End of file

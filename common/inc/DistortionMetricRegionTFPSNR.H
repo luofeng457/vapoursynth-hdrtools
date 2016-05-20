@@ -100,19 +100,19 @@ private:
   MetricStatistics  m_maxPSNRStats[TOTAL_COMPONENTS];
   MetricStatistics  m_minPSNRStats[TOTAL_COMPONENTS];
   
-  std::vector<double> m_diffData;
+  vector<double> m_diffData;
   
-  std::vector<double> m_rgb0NormalData;
-  std::vector<double> m_rgb0TFData;
-  std::vector<double> m_xyz0TFData;
-  std::vector<double> m_ycbcr0TFData;
-  std::vector<double> m_yupvp0Data;
+  vector<double> m_rgb0NormalData;
+  vector<double> m_rgb0TFData;
+  vector<double> m_xyz0TFData;
+  vector<double> m_ycbcr0TFData;
+  vector<double> m_yupvp0Data;
 
-  std::vector<double> m_rgb1NormalData;
-  std::vector<double> m_rgb1TFData;
-  std::vector<double> m_xyz1TFData;
-  std::vector<double> m_ycbcr1TFData;
-  std::vector<double> m_yupvp1Data;
+  vector<double> m_rgb1NormalData;
+  vector<double> m_rgb1TFData;
+  vector<double> m_xyz1TFData;
+  vector<double> m_ycbcr1TFData;
+  vector<double> m_yupvp1Data;
 
   void   convert (Frame* inp, double *rgbNormalData,
                   double *rgbTFData,
@@ -139,7 +139,7 @@ private:
   uint64 compute(const uint8  *iComp0, const uint8  *iComp1, int size);
 public:
   // Construct/Deconstruct
-  DistortionMetricRegionTFPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, bool computePsnrInYCbCr, bool computePsnrInRgb, bool computePsnrInXYZ, bool computePsnrInYUpVp, double maxSampleValue, DistortionFunction distortionMethod);
+  DistortionMetricRegionTFPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue);
   virtual ~DistortionMetricRegionTFPSNR();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

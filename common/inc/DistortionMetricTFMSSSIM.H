@@ -66,18 +66,18 @@
 
 class DistortionMetricTFMSSSIM : public DistortionMetric {
 private:
-  std::vector<float> m_dataY0;
-  std::vector<float> m_dataY1;
+  vector<float> m_dataY0;
+  vector<float> m_dataY1;
   int m_memWidth;
   int m_memHeight;
 
-  std::vector<double> m_dsRef;
-  std::vector<double> m_dsEnc;
+  vector<double> m_dsRef;
+  vector<double> m_dsEnc;
   int m_dsWidth;
   int m_dsHeight;
 
-  std::vector<double> m_temp;
-  std::vector<double> m_dest;
+  vector<double> m_temp;
+  vector<double> m_dest;
   int m_tempWidth;
   int m_tempHeight;
   int m_destWidth;
@@ -121,7 +121,7 @@ private:
   void padImage                      (const float*  src, float *buffer, int width, int height);
 public:
   // Construct/Deconstruct
-  DistortionMetricTFMSSSIM(const FrameFormat *format, int blockSizeX, int blockSizeY, int blockDistance, bool useLogSSIM, double K1, double K2, double maxSampleValue, DistortionFunction distortionMethod);
+  DistortionMetricTFMSSSIM(const FrameFormat *format, SSIMParams *params, double maxSampleValue);
   virtual ~DistortionMetricTFMSSSIM();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components

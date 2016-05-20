@@ -61,8 +61,9 @@
 class Conv444to420Generic : public ConvertColorFormat {
 
 private:
-  int32  *m_i32Data;
-  float  *m_floatData;
+  vector<int32> m_i32Data;
+  vector<float> m_floatData;
+  
   int     m_useMinMax;
   ScaleFilter *m_horFilter;
   ScaleFilter *m_verFilter;

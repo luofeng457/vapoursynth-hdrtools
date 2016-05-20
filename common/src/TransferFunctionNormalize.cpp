@@ -65,6 +65,7 @@
 
 TransferFunctionNormalize::TransferFunctionNormalize(float scale) {
   m_scale = scale;
+  m_normalFactor = 1.0;
 }
 
 TransferFunctionNormalize::~TransferFunctionNormalize() {
@@ -86,107 +87,7 @@ double TransferFunctionNormalize::inverse(double value) {
 }
 
 
-void TransferFunctionNormalize::forward ( Frame* out, const Frame *inp, int component) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    int i;
-    for (i = 0; i < inp->m_compSize[component]; i++) {
-      out->m_floatComp[component][i] = inp->m_floatComp[component][i] * m_scale;
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_compSize[component] == out->m_compSize[component] && inp->m_bitDepth == out->m_bitDepth) {
-    if (inp->m_bitDepth == 8) {
-      int i;
-      for (i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_comp[component][i] = inp->m_comp[component][i];
-      }
-    }
-    else{
-      int i;
-      for (i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_ui16Comp[component][i] = inp->m_ui16Comp[component][i];
-      }
-    }
-  }
-}
 
-void TransferFunctionNormalize::forward ( Frame* out, const Frame *inp) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-    int i;
-    for (i = 0; i < inp->m_size; i++) {
-      out->m_floatData[i] = inp->m_floatData[i] * m_scale;
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    if (inp->m_bitDepth == 8) {
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_data[i] = inp->m_data[i];
-      }
-    }
-    else{
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_ui16Data[i] = inp->m_ui16Data[i];
-      }
-    }
-  }
-}
-
-void TransferFunctionNormalize::inverse ( Frame* out, const Frame *inp, int component) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_compSize[component] == out->m_compSize[component]) {
-    int i;
-    for (i = 0; i < inp->m_compSize[component]; i++) {
-      out->m_floatComp[component][i] = fClip(inp->m_floatComp[component][i] / m_scale, 0.0, 1.0);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_compSize[component] == out->m_compSize[component] && inp->m_bitDepth == out->m_bitDepth) {
-    if (inp->m_bitDepth == 8) {
-      int i;
-      for (i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_comp[component][i] = inp->m_comp[component][i];
-      }
-    }
-    else{
-      int i;
-      for (i = 0; i < inp->m_compSize[component]; i++) {
-        out->m_ui16Comp[component][i] = inp->m_ui16Comp[component][i];
-      }
-    }
-  }
-}
-
-void TransferFunctionNormalize::inverse ( Frame* out, const Frame *inp) {
-  out->m_frameNo = inp->m_frameNo;
-  out->m_isAvailable = TRUE;
-
-  if (inp->m_isFloat == TRUE && out->m_isFloat == TRUE && inp->m_size == out->m_size) {
-    int i;
-    for (i = 0; i < inp->m_size; i++) {
-      out->m_floatData[i] = fClip(inp->m_floatData[i] / m_scale, 0.0, 1.0);
-    }
-  }
-  else if (inp->m_isFloat == FALSE && out->m_isFloat == FALSE && inp->m_size == out->m_size && inp->m_bitDepth == out->m_bitDepth) {
-    if (inp->m_bitDepth == 8) {
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_data[i] = inp->m_data[i];
-      }
-    }
-    else{
-      int i;
-      for (i = 0; i < inp->m_size; i++) {
-        out->m_ui16Data[i] = inp->m_ui16Data[i];
-      }
-    }
-  }
-}
 
 //-----------------------------------------------------------------------------
 // End of file

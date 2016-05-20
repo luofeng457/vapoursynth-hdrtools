@@ -66,10 +66,11 @@
 Conv444to420Generic::Conv444to420Generic(int width, int height, int method, ChromaLocation chromaLocationType[2], int useMinMax) {
   int offset, scale;
   int hPhase, vPhase;
+
   // here we allocate the entire image buffers. To save on memory we could just allocate
   // these based on filter length, but this is test code so we don't care for now.
-  m_i32Data   = new int32[ (width >> 1) * height ];
-  m_floatData = new float[ (width >> 1) * height ];
+  m_i32Data.resize  ( (width >> 1) * height );
+  m_floatData.resize( (width >> 1) * height );
   
   // Currently we only support progressive formats, and thus ignore the bottom chroma location type
   switch (chromaLocationType[FP_FRAME]) {
@@ -116,14 +117,6 @@ Conv444to420Generic::Conv444to420Generic(int width, int height, int method, Chro
 }
 
 Conv444to420Generic::~Conv444to420Generic() {
-  if ( m_i32Data != NULL ) {
-    delete [] m_i32Data;
-    m_i32Data = NULL;
-  }
-  if ( m_floatData != NULL ) {
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
   delete m_horFilter;
   delete m_verFilter;
   m_horFilter = NULL;
@@ -588,7 +581,6 @@ void Conv444to420Generic::process ( Frame* out, const Frame *inp)
     memcpy(out->m_floatComp[Y_COMP], inp->m_floatComp[Y_COMP], (int) out->m_compSize[Y_COMP] * sizeof(float));
     for (c = U_COMP; c <= V_COMP; c++) {
       filter(out->m_floatComp[c], inp->m_floatComp[c], out->m_width[c], out->m_height[c], (float) out->m_minPelValue[c], (float) out->m_maxPelValue[c] );
-      //filter(out->m_floatComp[c], inp->m_floatComp[c], out->m_width[c], out->m_height[c], -0.5f, 0.5f );
     }
   }
   else if (out->m_bitDepth == 8) {   // 8 bit data

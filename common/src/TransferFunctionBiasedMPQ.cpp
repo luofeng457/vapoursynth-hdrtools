@@ -113,6 +113,10 @@ double TransferFunctionBiasedMPQ::inversePQ(double value) {
   return (float) (pow(((c2 *(tempValue) + c1)/(1.0 + c3 *(tempValue))), m2));
 }
 
+//-----------------------------------------------------------------------------
+// Public methods
+//-----------------------------------------------------------------------------
+
 
 double TransferFunctionBiasedMPQ::forward(double value) {
   if (value <= m_invInflectionPointDiv2) {
@@ -136,9 +140,6 @@ double TransferFunctionBiasedMPQ::inverse(double value) {
   }
 }
 
-//-----------------------------------------------------------------------------
-// Public methods
-//-----------------------------------------------------------------------------
 
 
 void TransferFunctionBiasedMPQ::forward( Frame* out, const Frame *inp, int component ) {

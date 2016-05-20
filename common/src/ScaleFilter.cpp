@@ -70,6 +70,7 @@ ScaleFilter::ScaleFilter(int filter, int mode, int paramsMode, int inOffset, int
     // subtract two here to account for the NN and bilinear filters
     filter = filter - 2;
     m_numberOfTaps = (int) DCF_Filters[filter][phase][index];
+
     m_floatFilter  = new float[m_numberOfTaps];
     for (index = 1; index <= m_numberOfTaps; index++) {
       m_floatFilter[index - 1] = (float) DCF_Filters[filter][phase][index];
@@ -83,6 +84,7 @@ ScaleFilter::ScaleFilter(int filter, int mode, int paramsMode, int inOffset, int
     // subtract one here to account for the NN filter
     filter = filter - 1;
     m_numberOfTaps = (int) UCF_Filters[filter][phase][index];
+    
     m_floatFilter  = new float[m_numberOfTaps];
     for (index = 1; index <= m_numberOfTaps; index++) {
       m_floatFilter[index - 1] = (float) UCF_Filters[filter][phase][index];
@@ -138,7 +140,6 @@ ScaleFilter::ScaleFilter(int filter, int mode, int paramsMode, int inOffset, int
   //printf("%d ", m_i32Filter[i]);
   //}
   //printf("} %d %d %d %d\n", *outOffset, *outShift, m_i32Offset, m_i32Shift);
-  
 }
 
 ScaleFilter::~ScaleFilter() {

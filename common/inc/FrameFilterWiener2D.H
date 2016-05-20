@@ -61,10 +61,10 @@
 //template <class ImgData>
 class FrameFilterWiener2D : public FrameFilter {
 private:
-  std::vector<double> m_dImgSum;
-  std::vector<double> m_dImgSumDev;
-  std::vector<double> m_dImgDistance;
-  std::vector<double> m_dImgOutput;
+  vector<double> m_dImgSum;
+  vector<double> m_dImgSumDev;
+  vector<double> m_dImgDistance;
+  vector<double> m_dImgOutput;
   
   int     m_width;
   int     m_height;

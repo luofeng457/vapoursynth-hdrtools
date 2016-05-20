@@ -66,47 +66,21 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ( 
-                                              ColorSpace        iColorSpace, 
-                                              ColorPrimaries    iColorPrimaries, 
-                                              ColorSpace        oColorSpace, 
-                                              ColorPrimaries    oColorPrimaries, 
-                                              int               useHighPrecision,
-                                              TransferFunctions transferFunctions,
-                                              int               downMethod,
-                                              int               upMethod,
-                                              int               useAdaptiveDownsampler,
-                                              int               useAdaptiveUpsampler,
-                                              int               useMinMax,
-                                              int               bitDepth, 
-                                              SampleRange       range, 
-                                              int               maxIterations,
-                                              ChromaFormat      oChromaFormat, 
-                                              ChromaLocation    *oChromaLocationType,
-                                              bool              useFloatPrecision) {
+ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ( ColorTransformParams *params ) {
   
   m_mode = CTF_IDENTITY; 
   m_invMode = m_mode;
-  m_range = range;
-  m_bitDepth = bitDepth;
-  m_transferFunctions = transferFunctions;
+  setupParams(params);
 
-  m_floatData = NULL;
   m_size = 0;
   m_tfDistance = TRUE;
-  m_useFloatPrecision = useFloatPrecision;
-  m_oColorSpace = oColorSpace;
-  m_oColorPrimaries = oColorPrimaries;
-  m_oChromaLocation[0] = oChromaLocationType[0];
-  m_oChromaLocation[1] = oChromaLocationType[1];
-  
-  m_useAdaptiveDownsampler = useAdaptiveDownsampler;
-  m_useAdaptiveUpsampler   = useAdaptiveUpsampler;
 
   // These are the weights for the distortion computation
-  m_xWeight = 1.0;
+  m_xWeight = 0.0;
   m_yWeight = 1.0;
-  m_zWeight = 1.0;
+  m_zWeight = 0.0;
+  
+  m_isICtCp = FALSE;
 
   for (int index = 0; index < 4; index++) {
     m_floatComp[index] = NULL;
@@ -116,22 +90,22 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
     m_width[index] = 0;          // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_oChromaFormat = oChromaFormat;
-  m_useMinMax     = useMinMax;
   
-  // Method is only allowed for RGB to YCbCr conversion
-  if (iColorSpace == CM_RGB && oColorSpace == CM_YCbCr) {
-    if (iColorPrimaries == CP_709 && oColorPrimaries == CP_709) {
+  // Method is only allowed for RGB to YCbCr conversion.
+  // This is not properly supported for ICtCp given the different behavior of the 
+  // transform. Please do not use.
+  if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_YCbCr) {
+    if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_YUV709;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGB709_2_XYZ;
     }
-    else if (iColorPrimaries == CP_2020 && oColorPrimaries == CP_2020) {
-      if (useHighPrecision == 0) {
+    else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_2020) {
+      if (params->m_useHighPrecision == 0) {
         m_mode = CTF_RGB2020_2_YUV2020;
         m_invMode = m_mode;
       }
-      else if (useHighPrecision == 1) {
+      else if (params->m_useHighPrecision == 1) {
         m_mode = CTF_RGB2020_2_YUV2020;
         m_invMode = CTF_RGB2020_2_YUV2020_HP;
       }
@@ -141,57 +115,72 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
       }
       m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;
     }
-    else if (iColorPrimaries == CP_P3D65 && oColorPrimaries == CP_P3D65) {
+    else if (m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_YUVP3D65;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;
     }
-    else if (iColorPrimaries == CP_P3D60 && oColorPrimaries == CP_P3D60) {
+    else if (m_iColorPrimaries == CP_P3D60 && m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_YUVP3D60;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;
     }
-    else if (iColorPrimaries == CP_EXT && oColorPrimaries == CP_EXT) {
+    else if (m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBEXT_2_YUVEXT;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_RGBEXT_2_XYZ;
     }
-    else if (oColorPrimaries == CP_AMT) {
+    else if (m_oColorPrimaries == CP_AMT) {
       m_mode = CTF_RGB_2_AMT;
       m_invMode = m_mode;
-      if (iColorPrimaries == CP_709) {
+      if (m_iColorPrimaries == CP_709) {
         m_modeRGB2XYZ = CTF_RGB709_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_2020) {
+      else if (m_iColorPrimaries == CP_2020) {
         m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D65) {
+      else if (m_iColorPrimaries == CP_P3D65) {
         m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D60) {
+      else if (m_iColorPrimaries == CP_P3D60) {
         m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;        
       }
     }
-    else if ( oColorPrimaries == CP_YCOCG) {
+    else if (m_oColorPrimaries == CP_YCOCG) {
       m_mode = CTF_RGB_2_YCOCG;
       m_invMode = m_mode;
-      if (iColorPrimaries == CP_709) {
+      if (m_iColorPrimaries == CP_709) {
         m_modeRGB2XYZ = CTF_RGB709_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_2020) {
+      else if (m_iColorPrimaries == CP_2020) {
         m_modeRGB2XYZ = CTF_RGB2020_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D65) {
+      else if (m_iColorPrimaries == CP_P3D65) {
         m_modeRGB2XYZ = CTF_RGBP3D65_2_XYZ;        
       }
-      else if (iColorPrimaries == CP_P3D60) {
+      else if (m_iColorPrimaries == CP_P3D60) {
         m_modeRGB2XYZ = CTF_RGBP3D60_2_XYZ;        
       }
+    }
+  }
+  else if (m_iColorSpace == CM_RGB && m_oColorSpace == CM_ICtCp) {
+    if (m_iColorPrimaries == CP_LMSD && m_oColorPrimaries == CP_LMSD) {
+      printf("Conversion not supported for ICtCp space\n");
+      m_mode = CTF_LMSD_2_ICtCp;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
+      m_isICtCp     = TRUE;
+    }
+    else {
+      m_mode = CTF_IDENTITY;
+      m_invMode = m_mode;
+      m_modeRGB2XYZ = CTF_IDENTITY;
     }
   }
   else {
     m_mode = CTF_IDENTITY;
     m_invMode = m_mode;
+    m_modeRGB2XYZ = CTF_IDENTITY;
   }
   
   // Forward Transform coefficients 
@@ -219,9 +208,6 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
   m_fwdFrameStore2  = NULL; 
   m_invFrameStore2  = NULL;
 
-  m_downMethod = downMethod;
-  m_upMethod   = upMethod;
-
   if (m_range == SR_STANDARD) {
     m_lumaWeight   = (double) (1 << (m_bitDepth - 8)) * 219.0;
     m_lumaOffset   = (double) (1 << (m_bitDepth - 8)) * 16.0;
@@ -242,16 +228,15 @@ ColorTransformYAdjustXYZ::ColorTransformYAdjustXYZ(
   }
 
   m_iLumaWeight = (int) m_lumaWeight;
-  m_interval    = iMax(4, (int) dRound(m_lumaWeight / 16));
+  if (m_transferFunctions != TF_HLG)
+    m_useAlternate = TRUE;
+  else
+    m_useAlternate = FALSE;
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, 1.0, 0.0, 1.0);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
 }
 
 ColorTransformYAdjustXYZ::~ColorTransformYAdjustXYZ() {
-  if (m_floatData != NULL) {
-    delete[] m_floatData;
-    m_floatData = NULL;
-  }
   m_floatComp[Y_COMP] = NULL;
   m_floatComp[U_COMP] = NULL;
   m_floatComp[V_COMP] = NULL;
@@ -317,12 +302,13 @@ void ColorTransformYAdjustXYZ::allocateMemory(Frame* out, const Frame *inp) {
   }
   
   m_size =  m_compSize[ZERO] + m_compSize[ONE] + m_compSize[TWO];
-  if (NULL == (m_floatData = new float[(int) m_size])) {
+  m_floatData.resize((unsigned int) m_size);
+  if (m_floatData.size() != (unsigned int) m_size) {
     fprintf(stderr, "ColorTransformYAdjustXYZ: Not enough memory to create array m_floatData, of size %d", (int) m_size);
     exit(-1);
   }
   
-  m_floatComp[Y_COMP] = m_floatData;
+  m_floatComp[Y_COMP] = &m_floatData[0];
   m_floatComp[U_COMP] = m_floatComp[Y_COMP] + m_compSize[Y_COMP];
   m_floatComp[V_COMP] = m_floatComp[U_COMP] + m_compSize[U_COMP];
   
@@ -466,12 +452,12 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
       float *green = inp->m_floatComp[1];
       float *blue  = inp->m_floatComp[2];
 
-      if (inp->m_hasAlternate == TRUE) {
+      if (m_useAlternate && inp->m_hasAlternate == TRUE) {
         floatComp[0] = inp->m_altFrame->m_floatComp[0];
         floatComp[1] = inp->m_altFrame->m_floatComp[1];
         floatComp[2] = inp->m_altFrame->m_floatComp[2];
-        scale       = 1.0 / inp->m_altFrameNorm;
-        pt2Convert  = &ColorTransformYAdjustXYZ::convertToXYZ;
+        scale        = 1.0 / inp->m_altFrameNorm;
+        pt2Convert   = &ColorTransformYAdjustXYZ::convertToXYZ;
       }
       else {
         floatComp[0] = inp->m_floatComp[0];
@@ -560,11 +546,17 @@ void ColorTransformYAdjustXYZ::process ( Frame* out, const Frame *inp) {
           int yValueMax = iMax(yValueRQ, iMax(yValueBQ, yValueGQ));
           
           computeColorImpact(uComp, vComp, &rColor, &gColor, &bColor);          
+          if (m_isICtCp == FALSE) {
+            calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
+            
+            iYCompMin = iMax(iYCompMin, yValueMin);
+            iYCompMax = iMin(iYCompMax, yValueMax);
+          }
+          else {
+            iYCompMin = 0;
+            iYCompMax = (int) m_lumaWeight;
+          }
           
-          calcBoundsFast(iYCompMin, iYCompMax, yLinear, rColor, gColor, bColor);
-
-          iYCompMin = iMax(iYCompMin, yValueMin);
-          iYCompMax = iMin(iYCompMax, yValueMax);
           if (iYCompMin == iYCompMax) {
             //convertToXYZLinear((double) iYCompMin / m_lumaWeight, rColor, gColor, bColor, &xConvMin, &yConvMin, &zConvMin);
             out->m_floatComp[0][i] = (float) ((double) iYCompMin / m_lumaWeight);            

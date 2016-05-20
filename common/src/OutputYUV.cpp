@@ -124,35 +124,33 @@ OutputYUV::OutputYUV(IOVideo *outputFile, FrameFormat *format) {
   m_size = m_compSize[Y_COMP] + m_compSize[U_COMP] + m_compSize[V_COMP];
 
   if (m_isInterleaved) {
-    m_iBuf  = new uint8 [(int) m_size * m_picUnitSizeShift3];
+    m_iBuffer.resize((unsigned int) m_size * m_picUnitSizeShift3);
+    m_iBuf  = &m_iBuffer[0];
   }
 
-  m_buf  = new uint8 [(int) m_size * m_picUnitSizeShift3];
+  m_buffer.resize((unsigned int) m_size * m_picUnitSizeShift3);
+  m_buf = &m_buffer[0];
 
   if (m_picUnitSizeShift3 > 1) {
-    m_ui16Data = new uint16[(int) m_size];
-    m_ui16Comp[Y_COMP] = m_ui16Data;
+    m_ui16Data.resize((unsigned int) m_size);
+    m_ui16Comp[Y_COMP] = &m_ui16Data[0];
     m_ui16Comp[U_COMP] = m_ui16Comp[Y_COMP] + m_compSize[Y_COMP];
     m_ui16Comp[V_COMP] = m_ui16Comp[U_COMP] + m_compSize[U_COMP];
-    m_data = NULL;
     m_comp[Y_COMP] = NULL;
     m_comp[U_COMP] = NULL;
     m_comp[V_COMP] = NULL;
-    m_floatData = NULL;
     m_floatComp[Y_COMP] = NULL;
     m_floatComp[U_COMP] = NULL;
     m_floatComp[V_COMP] = NULL;
   }
   else {
-    m_ui16Data = NULL;
     m_ui16Comp[Y_COMP] = NULL;
     m_ui16Comp[U_COMP] = NULL;
     m_ui16Comp[V_COMP] = NULL;
-    m_data = new imgpel[(int) m_size];
-    m_comp[Y_COMP] = m_data;
+    m_data.resize((unsigned int) m_size);
+    m_comp[Y_COMP] = &m_data[0];
     m_comp[U_COMP] = m_comp[Y_COMP] + m_compSize[Y_COMP];
     m_comp[V_COMP] = m_comp[U_COMP] + m_compSize[U_COMP];
-    m_floatData = NULL;
     m_floatComp[Y_COMP] = NULL;
     m_floatComp[U_COMP] = NULL;
     m_floatComp[V_COMP] = NULL;
@@ -161,43 +159,20 @@ OutputYUV::OutputYUV(IOVideo *outputFile, FrameFormat *format) {
 }
 
 OutputYUV::~OutputYUV() {
-  if (m_isInterleaved) {
-    if (m_iBuf != NULL) {
-      delete[] m_iBuf;
-      m_iBuf = NULL;
-    }
-  }
-
-  if (m_buf != NULL) {
-    delete[] m_buf;
-    m_buf = NULL;
-  }
-  if (m_data != NULL) {
-    m_comp[Y_COMP] = NULL;
-    m_comp[U_COMP] = NULL;
-    m_comp[V_COMP] = NULL;
-    
-    delete [] m_data;
-    m_data = NULL;
-  }
+  m_iBuf = NULL;
+  m_buf = NULL;
+  m_comp[Y_COMP] = NULL;
+  m_comp[U_COMP] = NULL;
+  m_comp[V_COMP] = NULL;
   
-  if (m_ui16Data != NULL) {
-    m_ui16Comp[Y_COMP] = NULL;
-    m_ui16Comp[U_COMP] = NULL;
-    m_ui16Comp[V_COMP] = NULL;
-
-    delete [] m_ui16Data;
-    m_ui16Data = NULL;
-  }
+  m_ui16Comp[Y_COMP] = NULL;
+  m_ui16Comp[U_COMP] = NULL;
+  m_ui16Comp[V_COMP] = NULL;
   
-  if (m_floatData != NULL) {
-    m_floatComp[Y_COMP] = NULL;
-    m_floatComp[U_COMP] = NULL;
-    m_floatComp[V_COMP] = NULL;
-    
-    delete [] m_floatData;
-    m_floatData = NULL;
-  }
+  m_floatComp[Y_COMP] = NULL;
+  m_floatComp[U_COMP] = NULL;
+  m_floatComp[V_COMP] = NULL;
+  
   clear();
 }
 
@@ -349,7 +324,7 @@ int OutputYUV::writeOneFrame (IOVideo *outputFile, int frameNumber, int fileHead
   // Now write it.
   if ((format->m_picUnitSizeOnDisk & 0x07) == 0)  {
     if (this->m_bitDepthComp[Y_COMP] == 8)
-      imageReformat ( m_buf, m_data, format, m_picUnitSizeShift3 );
+      imageReformat ( m_buf, &m_data[0], format, m_picUnitSizeShift3 );
     else
       imageReformatUInt16 ( m_buf, format, m_picUnitSizeShift3 );
 

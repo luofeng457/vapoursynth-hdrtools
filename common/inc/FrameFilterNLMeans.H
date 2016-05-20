@@ -87,11 +87,11 @@ class PixelSum {
 //template <class ImgData>
 class FrameFilterNLMeans : public FrameFilter {
 private:
-  std::vector<double> m_dImgOutput;
-  std::vector<double> m_weightSum;
-  std::vector<double> m_pixelSum;
-  //std::vector<PixelSum> m_tempData;
-  std::vector<INTEGRAL_TYPE> m_integralMem;
+  vector<double> m_dImgOutput;
+  vector<double> m_weightSum;
+  vector<double> m_pixelSum;
+  //vector<PixelSum> m_tempData;
+  vector<INTEGRAL_TYPE> m_integralMem;
   
   int     m_width;
   int     m_height;

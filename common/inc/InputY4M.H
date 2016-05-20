@@ -65,7 +65,7 @@
 class InputY4M : public Input {
 private:
 
-  std::vector<char> m_streamHeader;
+  vector<char> m_streamHeader;
   int m_streamHeaderSize;
   int readData (int vfile, FrameFormat *source,    uint8 *buf);
   int readData (int vfile, int framesizeInBytes, uint8 *buf);

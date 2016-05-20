@@ -58,8 +58,8 @@
 
 class Conv444to420BI : public ConvertColorFormat {
 private:
-  int16  *m_i16Data;
-  float  *m_floatData;
+  vector<int16>  m_i16Data;
+  vector<float>  m_floatData;
   
   void filter(float  *out, const float  *inp, int width, int height, float minValue, float maxValue);
   void filter(uint16 *out, const uint16 *inp, int width, int height, int   minValue, int   maxValue);

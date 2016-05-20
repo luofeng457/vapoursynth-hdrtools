@@ -40,7 +40,7 @@
  * \file ProjectParameters.cpp
  *
  * \brief
- *    ProjectParameters class functions for HDRConvert project
+ *    ProjectParameters class functions for HDRConvScaler project
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -71,17 +71,19 @@
 ProjectParameters ccParams;
 ProjectParameters *pParams = &ccParams;
 
-FrameFormat *src  = &pParams->m_source;
-FrameFormat *out  = &pParams->m_output;
+FrameFormat          *src  = &pParams->m_source;
+FrameFormat          *out  = &pParams->m_output;
+ColorTransformParams *ctp  = &pParams->m_ctParams;
 
 static char def_logfile[]  = "log.txt";
 static char def_out_file[] = "output_conv.yuv";
 
 StringParameter stringParameterList[] = {
-  { "SourceFile",          pParams->m_inputFile.m_fName,              NULL, "Source file name"           },
-  { "OutputFile",          pParams->m_outputFile.m_fName,     def_out_file, "Output file name"           },
-  { "LogFile",             pParams->m_logFile,                 def_logfile, "Output Log file name"       },
-  { "",                    NULL,                                      NULL, "String Termination entry"   }
+  { "SourceFile",          pParams->m_inputFile.m_fName,              NULL, "Source file name"                            },
+  { "OutputFile",          pParams->m_outputFile.m_fName,     def_out_file, "Output file name"                            },
+  { "LogFile",             pParams->m_logFile,                 def_logfile, "Output Log file name"                        },
+  { "YAdjustModelFile",    ctp->m_yAdjustModelFile,                   NULL, "Luma adjustment (2nd order) model file name" },
+  { "",                    NULL,                                      NULL, "String Termination entry"                    }
 };
 
 IntegerParameter intParameterList[] = {
@@ -131,11 +133,11 @@ IntegerParameter intParameterList[] = {
   { "AddNoise",                &pParams->m_addNoise,                  NOISE_NULL,  NOISE_NULL,   NOISE_NORMAL,    "Add noise to the input signal"            },
   { "ClosedLoopConversion",    (int *) &pParams->m_closedLoopConversion,CLT_NULL,    CLT_NULL,  CLT_TOTAL - 1,    "Enable Closed Loop Conversion"            },
   { "ClosedLoopIterations",    &pParams->m_closedLoopIterations,              10,           1,             50,    "Number of Closed Loop Iterations"            },
-  { "SourceConstantLuminance", &src->m_iConstantLuminance,                     0,           0,              2,    "Constant Luminance Source"                },
-  { "OutputConstantLuminance", &out->m_iConstantLuminance,                     0,           0,              2,    "Constant Luminance Output"                },
+  { "SourceConstantLuminance", &src->m_iConstantLuminance,                     0,           0,              3,    "Constant Luminance Source"                },
+  { "OutputConstantLuminance", &out->m_iConstantLuminance,                     0,           0,              3,    "Constant Luminance Output"                },
   { "UseMinMaxFiltering",      &pParams->m_useMinMax,                          0,           0,              3,    "Use Min/Max Filtering"                    },
   { "HighPrecisionColor",      &pParams->m_useHighPrecisionTransform,          0,           0,              2,    "High Precision Color Mode "               },
-  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,              0,           0,              1,    "Use Adaptive Upsampler"                   },
+  { "UseAdaptiveUpsampling",   &pParams->m_useAdaptiveUpsampling,       ADF_NULL,    ADF_NULL,  ADF_TOTAL - 1,    "Use Adaptive Upsampler"                   },
   { "UseAdaptiveDownsampling", &pParams->m_useAdaptiveDownsampling,     ADF_NULL,    ADF_NULL,  ADF_TOTAL - 1,    "Use Adaptive Downsampler"                   },
 
   
@@ -143,25 +145,23 @@ IntegerParameter intParameterList[] = {
 };
 
 BoolParameter boolParameterList[] = {
-  { "SourceInterleaved",          &pParams->m_inputFile.m_isInterleaved,      FALSE,       FALSE,         TRUE,    "Interleaved Source"                       },
-  { "SourceInterlaced",           &src->m_isInterlaced,                       FALSE,       FALSE,         TRUE,    "Interlaced Source"                        },
-  { "OutputInterleaved",          &pParams->m_outputFile.m_isInterleaved,     FALSE,       FALSE,         TRUE,    "Interleaved Output"                       },
-  { "SilentMode",                 &pParams->m_silentMode,                     FALSE,       FALSE,         TRUE,    "Silent mode"                              },
-  { "USeSingleTransferStep",      &pParams->m_useSingleTransferStep,          FALSE,       FALSE,         TRUE,    "Use a single transfer step"               },
-  { "TransformPrecision",         &pParams->m_transformPrecision,              TRUE,       FALSE,         TRUE,    "Color transform precision"                },
-  { "SetOutputSinglePrec",        &pParams->m_outputSinglePrecision,          FALSE,       FALSE,         TRUE,    "OpenEXR Output data precision"            },
-  { "SetOutputEXRRounding",       &out->m_useFloatRound,                      FALSE,       FALSE,         TRUE,    "OpenEXR Output with Rounding Enabled"     },
-  { "FilterUsingFloats",          &pParams->m_filterInFloat,                  FALSE,       FALSE,         TRUE,    "Perform Filtering using Floats "          },
-  { "LinearDownConversion",       &pParams->m_linearDownConversion,           FALSE,       FALSE,         TRUE,    "Perform linear downconversion to 420"     },
-  { "RGBDownConversion",          &pParams->m_rgbDownConversion,              FALSE,       FALSE,         TRUE,    "Perform downconversion in RGB"            },
-  { "UseChromaDeblocking",        &pParams->m_bUseChromaDeblocking,           FALSE,       FALSE,         TRUE,    "Deblock Chroma before Upconversion"       },
-  { "UseWienerFiltering",         &pParams->m_bUseWienerFiltering,            FALSE,       FALSE,         TRUE,    "Wiener Filtering before conversion"       },
+  { "SourceInterleaved",          &pParams->m_inputFile.m_isInterleaved,      FALSE,       FALSE,         TRUE,    "Interleaved Source"                          },
+  { "SourceInterlaced",           &src->m_isInterlaced,                       FALSE,       FALSE,         TRUE,    "Interlaced Source"                           },
+  { "OutputInterleaved",          &pParams->m_outputFile.m_isInterleaved,     FALSE,       FALSE,         TRUE,    "Interleaved Output"                          },
+  { "SilentMode",                 &pParams->m_silentMode,                     FALSE,       FALSE,         TRUE,    "Silent mode"                                 },
+  { "USeSingleTransferStep",      &pParams->m_useSingleTransferStep,          FALSE,       FALSE,         TRUE,    "Use a single transfer step"                  },
+  { "TransformPrecision",         &pParams->m_transformPrecision,              TRUE,       FALSE,         TRUE,    "Color transform precision"                   },
+  { "SetOutputSinglePrec",        &pParams->m_outputSinglePrecision,          FALSE,       FALSE,         TRUE,    "OpenEXR Output data precision"               },
+  { "SetOutputEXRRounding",       &out->m_useFloatRound,                      FALSE,       FALSE,         TRUE,    "OpenEXR Output with Rounding Enabled"        },
+  { "FilterUsingFloats",          &pParams->m_filterInFloat,                  FALSE,       FALSE,         TRUE,    "Perform Filtering using Floats "             },
+  { "LinearDownConversion",       &pParams->m_linearDownConversion,           FALSE,       FALSE,         TRUE,    "Perform linear downconversion to 420"        },
+  { "RGBDownConversion",          &pParams->m_rgbDownConversion,              FALSE,       FALSE,         TRUE,    "Perform downconversion in RGB"               },
+  { "UseChromaDeblocking",        &pParams->m_bUseChromaDeblocking,           FALSE,       FALSE,         TRUE,    "Deblock Chroma before Upconversion"          },
+  { "UseWienerFiltering",         &pParams->m_bUseWienerFiltering,            FALSE,       FALSE,         TRUE,    "Wiener Filtering before conversion"          },
   { "Use2DSepFiltering",          &pParams->m_bUse2DSepFiltering,             FALSE,       FALSE,         TRUE,    "Separable Filtering before conversion"       },
-  { "2DSepFilteringMode",         &pParams->m_b2DSepMode,                     FALSE,       FALSE,         TRUE,    "Edge Adaptation On or OFF"               },
-  
-  
-  
-  { "",                           NULL,                                           0,           0,            0,    "Boolean Termination entry"                }
+  { "2DSepFilteringMode",         &pParams->m_b2DSepMode,                     FALSE,       FALSE,         TRUE,    "Edge Adaptation On or OFF"                   },
+  { "EnableTFunctionLUT",         &pParams->m_enableTFLUTs,                   FALSE,       FALSE,         TRUE,    "Enable TF LUTs for closed loop conversions"  }, 
+  { "",                           NULL,                                       FALSE,       FALSE,        FALSE,    "Boolean Termination entry"                   }
 };
 
 DoubleParameter doubleParameterList[] = {

@@ -62,21 +62,20 @@
 // Constructor/destructor
 //-----------------------------------------------------------------------------
 
-DistortionMetricRegionPSNR::DistortionMetricRegionPSNR(const FrameFormat *format, int blockWidth, int blockHeight, int overlapWidth, int overlapHeight, bool enableShowMSE, double maxSampleValue)
+DistortionMetricRegionPSNR::DistortionMetricRegionPSNR(const FrameFormat *format, PSNRParams *params, double maxSampleValue)
  : DistortionMetric()
 {
-
-  m_blockWidth    = blockWidth;
-  m_blockHeight   = blockWidth;
-  m_overlapWidth  = overlapWidth;
-  m_overlapHeight = overlapHeight;
+  m_blockWidth    = params->m_rPSNRBlockSizeX;
+  m_blockHeight   = params->m_rPSNRBlockSizeY;
+  m_overlapWidth  = params->m_rPSNROverlapX;
+  m_overlapHeight = params->m_rPSNROverlapY;
   m_width         = format->m_width[Y_COMP];
   m_height        = format->m_height[Y_COMP];
   
   m_diffData.resize  ( m_width * m_height );
 
   m_colorSpace    = format->m_colorSpace;
-  m_enableShowMSE = enableShowMSE;
+  m_enableShowMSE = params->m_enableShowMSE;
   for (int c = 0; c < T_COMP; c++) {
     m_mse[c] = 0.0;
     m_sse[c] = 0.0;

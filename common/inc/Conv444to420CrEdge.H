@@ -61,12 +61,12 @@
 class Conv444to420CrEdge : public ConvertColorFormat {
 
 private:
-  int32  *m_i32Data;
-  float  *m_floatData;
-  ScaleFilter *m_horFilterDown[5];
-  ScaleFilter *m_verFilterDown[5];
+  vector<int32> m_i32Data;
+  vector<float> m_floatData;
+  ScaleFilter  *m_horFilterDown[5];
+  ScaleFilter  *m_verFilterDown[5];
   
-  double  m_edgeClassifier;
+  double        m_edgeClassifier;
 
   
   void  filter(float  *out, const float  *inp, int width, int height, float minValue, float maxValue);

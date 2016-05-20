@@ -38,7 +38,6 @@
 		C5133DF219CCF59C00D64D48 /* DistortionMetricDeltaE.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26BF19CCAC10003F1B51 /* DistortionMetricDeltaE.H */; };
 		C5133DF319CCF59C00D64D48 /* DistortionMetricPSNR.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26C019CCAC10003F1B51 /* DistortionMetricPSNR.H */; };
 		C5133DF419CCF59C00D64D48 /* DistortionMetricmPSNR.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26C119CCAC10003F1B51 /* DistortionMetricmPSNR.H */; };
-		C5133DF519CCF59C00D64D48 /* FastMemory.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26C219CCAC10003F1B51 /* FastMemory.H */; };
 		C5133DF619CCF59C00D64D48 /* Frame.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26C319CCAC10003F1B51 /* Frame.H */; };
 		C5133DF719CCF59C00D64D48 /* Global.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26C419CCAC10003F1B51 /* Global.H */; };
 		C5133DF819CCF59C00D64D48 /* IFunctions.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BD26C519CCAC10003F1B51 /* IFunctions.H */; };
@@ -145,6 +144,8 @@
 		C53E9BCD1C1261A100448F69 /* Conv444to420CrFBounds.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */; };
 		C53E9BCF1C175C2100448F69 /* FrameFilterNLMeans.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */; };
 		C53E9BD11C175C3800448F69 /* FrameFilterNLMeans.H in Headers */ = {isa = PBXBuildFile; fileRef = C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */; };
+		C5496AB21CEE97D50052AB6D /* ColorTransformYAdjustHLG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5496AB11CEE97D50052AB6D /* ColorTransformYAdjustHLG.cpp */; };
+		C5496AB41CEE97F00052AB6D /* ColorTransformYAdjustHLG.H in Headers */ = {isa = PBXBuildFile; fileRef = C5496AB31CEE97F00052AB6D /* ColorTransformYAdjustHLG.H */; };
 		C54BDE0A1ACB236A000A34BE /* ColorTransformClosedLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */; };
 		C54BDE0C1ACB2384000A34BE /* ColorTransformClosedLoop.H in Headers */ = {isa = PBXBuildFile; fileRef = C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */; };
 		C5528B301BE3045300CCADA5 /* TransferFunctionHPQ2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */; };
@@ -163,8 +164,39 @@
 		C567FCF61A44E18F006035B1 /* HDRMontage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C567FCF31A44E18F006035B1 /* HDRMontage.cpp */; };
 		C567FCF71A44E18F006035B1 /* HDRMontageFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C567FCF41A44E18F006035B1 /* HDRMontageFrame.cpp */; };
 		C567FCF81A44E18F006035B1 /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C567FCF51A44E18F006035B1 /* ProjectParameters.cpp */; };
+		C56A3F5A1CDBDBAD0045291B /* ColorTransformYLin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C56A3F591CDBDBAD0045291B /* ColorTransformYLin.cpp */; };
+		C56A3F5C1CDBDBC70045291B /* ColorTransformYSumLin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C56A3F5B1CDBDBC70045291B /* ColorTransformYSumLin.cpp */; };
+		C56A3F5E1CDBDBE10045291B /* ColorTransformYLin.H in Headers */ = {isa = PBXBuildFile; fileRef = C56A3F5D1CDBDBE10045291B /* ColorTransformYLin.H */; };
+		C56A3F601CDBDBF10045291B /* ColorTransformYSumLin.H in Headers */ = {isa = PBXBuildFile; fileRef = C56A3F5F1CDBDBF10045291B /* ColorTransformYSumLin.H */; };
+		C56A3F621CDD26C60045291B /* ColorTransformYAdjust2ndOrder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C56A3F611CDD26C50045291B /* ColorTransformYAdjust2ndOrder.cpp */; };
+		C56A3F641CDD26DB0045291B /* ColorTransformYAdjust2ndOrder.H in Headers */ = {isa = PBXBuildFile; fileRef = C56A3F631CDD26DB0045291B /* ColorTransformYAdjust2ndOrder.H */; };
+		C56CC7671CA0BCE500235480 /* InputDPX.H in Headers */ = {isa = PBXBuildFile; fileRef = C56CC7661CA0BCE500235480 /* InputDPX.H */; };
+		C56CC7691CA0BCFA00235480 /* InputDPX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C56CC7681CA0BCFA00235480 /* InputDPX.cpp */; };
+		C56CC76B1CA0CF0400235480 /* IODPX.H in Headers */ = {isa = PBXBuildFile; fileRef = C56CC76A1CA0CF0400235480 /* IODPX.H */; };
 		C57D22181B4F58C900DA1E4C /* ColorTransformYAdjust.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C57D22171B4F58C900DA1E4C /* ColorTransformYAdjust.cpp */; };
 		C57D221A1B4F5C7200DA1E4C /* ColorTransformYAdjust.H in Headers */ = {isa = PBXBuildFile; fileRef = C57D22191B4F5C7200DA1E4C /* ColorTransformYAdjust.H */; };
+		C580D7271CAF469300E01A76 /* ColorTransformRGBAdjust.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7201CAF469300E01A76 /* ColorTransformRGBAdjust.H */; };
+		C580D7281CAF469300E01A76 /* DistortionMetricVQM.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7211CAF469300E01A76 /* DistortionMetricVQM.H */; };
+		C580D72A1CAF469300E01A76 /* FFT.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7231CAF469300E01A76 /* FFT.H */; };
+		C580D72B1CAF469300E01A76 /* PUEncode.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7241CAF469300E01A76 /* PUEncode.H */; };
+		C580D72C1CAF469300E01A76 /* ResizeBiCubic.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7251CAF469300E01A76 /* ResizeBiCubic.H */; };
+		C580D72D1CAF469300E01A76 /* TransferFunctionHGold.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7261CAF469300E01A76 /* TransferFunctionHGold.H */; };
+		C580D7331CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D72E1CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp */; };
+		C580D7341CAF46D500E01A76 /* DistortionMetricVQM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D72F1CAF46D500E01A76 /* DistortionMetricVQM.cpp */; };
+		C580D7351CAF46D500E01A76 /* FFT.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7301CAF46D500E01A76 /* FFT.cpp */; };
+		C580D7361CAF46D500E01A76 /* ResizeBiCubic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7311CAF46D500E01A76 /* ResizeBiCubic.cpp */; };
+		C580D7371CAF46D500E01A76 /* TransferFunctionHGold.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7321CAF46D500E01A76 /* TransferFunctionHGold.cpp */; };
+		C580D7401CAF47C900E01A76 /* HDRVQM.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D73D1CAF47C900E01A76 /* HDRVQM.H */; };
+		C580D7411CAF47C900E01A76 /* HDRVQMFrame.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D73E1CAF47C900E01A76 /* HDRVQMFrame.H */; };
+		C580D7421CAF47C900E01A76 /* ProjectParameters.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D73F1CAF47C900E01A76 /* ProjectParameters.H */; };
+		C580D7511CAF47F500E01A76 /* libHDRToolsHDRTools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5133DD619CCF31100D64D48 /* libHDRToolsHDRTools.a */; };
+		C580D7571CAF485000E01A76 /* HDRVQM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7431CAF47DD00E01A76 /* HDRVQM.cpp */; };
+		C580D7581CAF485000E01A76 /* HDRVQMFrame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7441CAF47DD00E01A76 /* HDRVQMFrame.cpp */; };
+		C580D7591CAF485000E01A76 /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7451CAF47DD00E01A76 /* ProjectParameters.cpp */; };
+		C580D78D1CB490E900E01A76 /* Eigenvalue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */; };
+		C580D78F1CB4937500E01A76 /* Eigenvalue.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D78E1CB4937500E01A76 /* Eigenvalue.H */; };
+		C580D7951CB4973200E01A76 /* DistortionMetricVIF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */; };
+		C580D7971CB4979500E01A76 /* DistortionMetricVIF.H in Headers */ = {isa = PBXBuildFile; fileRef = C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */; };
 		C585BD051B041F9000235FE6 /* TransferFunctionAMPQ.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C585BD041B041F9000235FE6 /* TransferFunctionAMPQ.cpp */; };
 		C585BD071B041FA000235FE6 /* TransferFunctionAMPQ.H in Headers */ = {isa = PBXBuildFile; fileRef = C585BD061B041FA000235FE6 /* TransferFunctionAMPQ.H */; };
 		C585BD091B05190500235FE6 /* TransferFunctionAPH.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C585BD081B05190500235FE6 /* TransferFunctionAPH.cpp */; };
@@ -192,11 +224,6 @@
 		C5BE379F1B752C8A00350F6D /* HDRConvScalerTIFF.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BE379A1B752C8A00350F6D /* HDRConvScalerTIFF.H */; };
 		C5BE37A01B752C8A00350F6D /* HDRConvScalerYUV.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BE379B1B752C8A00350F6D /* HDRConvScalerYUV.H */; };
 		C5BE37A11B752C8A00350F6D /* ProjectParameters.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BE379C1B752C8A00350F6D /* ProjectParameters.H */; };
-		C5BE37A71B752CA000350F6D /* HDRConvScaler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A21B752CA000350F6D /* HDRConvScaler.cpp */; };
-		C5BE37A81B752CA000350F6D /* HDRConvScalerEXR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A31B752CA000350F6D /* HDRConvScalerEXR.cpp */; };
-		C5BE37A91B752CA000350F6D /* HDRConvScalerTIFF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A41B752CA000350F6D /* HDRConvScalerTIFF.cpp */; };
-		C5BE37AA1B752CA000350F6D /* HDRConvScalerYUV.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A51B752CA000350F6D /* HDRConvScalerYUV.cpp */; };
-		C5BE37AB1B752CA000350F6D /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A61B752CA000350F6D /* ProjectParameters.cpp */; };
 		C5BE37B91B752F2F00350F6D /* HDRConvScaler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A21B752CA000350F6D /* HDRConvScaler.cpp */; };
 		C5BE37BA1B752F2F00350F6D /* HDRConvScalerEXR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A31B752CA000350F6D /* HDRConvScalerEXR.cpp */; };
 		C5BE37BB1B752F2F00350F6D /* HDRConvScalerTIFF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37A41B752CA000350F6D /* HDRConvScalerTIFF.cpp */; };
@@ -211,6 +238,8 @@
 		C5BE37CF1B7BEA5500350F6D /* DisplayGammaAdjustNull.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BE37CE1B7BEA5500350F6D /* DisplayGammaAdjustNull.H */; };
 		C5BE37D11B7BEACF00350F6D /* DisplayGammaAdjustHLG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5BE37D01B7BEACF00350F6D /* DisplayGammaAdjustHLG.cpp */; };
 		C5BE37D31B7BEAE400350F6D /* DisplayGammaAdjustHLG.H in Headers */ = {isa = PBXBuildFile; fileRef = C5BE37D21B7BEAE400350F6D /* DisplayGammaAdjustHLG.H */; };
+		C5C22C721CA5D81A00A539F3 /* ColorTransformYAdjustFull.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C22C711CA5D81A00A539F3 /* ColorTransformYAdjustFull.cpp */; };
+		C5C22C741CA5D82D00A539F3 /* ColorTransformYAdjustFull.H in Headers */ = {isa = PBXBuildFile; fileRef = C5C22C731CA5D82D00A539F3 /* ColorTransformYAdjustFull.H */; };
 		C5C2CC381B1906D600AD96EA /* FrameFilter2DSep.H in Headers */ = {isa = PBXBuildFile; fileRef = C5C2CC371B1906D600AD96EA /* FrameFilter2DSep.H */; };
 		C5C2CC3A1B19070600AD96EA /* FrameFilter2DSep.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C2CC391B19070600AD96EA /* FrameFilter2DSep.cpp */; };
 		C5C2CC3C1B19164E00AD96EA /* Filter1D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5C2CC3B1B19164E00AD96EA /* Filter1D.cpp */; };
@@ -229,6 +258,8 @@
 		C5CC7E371BB3677200EBE780 /* DistortionMetricBlockAct.H in Headers */ = {isa = PBXBuildFile; fileRef = C5CC7E361BB3677200EBE780 /* DistortionMetricBlockAct.H */; };
 		C5CC7E391BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5CC7E381BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp */; };
 		C5CC7E3B1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H in Headers */ = {isa = PBXBuildFile; fileRef = C5CC7E3A1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H */; };
+		C5D169301CC6EEF900A4A487 /* Conv420to444CrBounds.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */; };
+		C5D169321CC6EF2300A4A487 /* Conv420to444CrBounds.H in Headers */ = {isa = PBXBuildFile; fileRef = C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */; };
 		C5DA4E3A1A5B17ED00DA2F2E /* Conv420to422Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */; };
 		C5DA4E3E1A5B674600DA2F2E /* Conv420to422Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */; };
 		C5DA4E401A5CB5B500DA2F2E /* OutputAVI.H in Headers */ = {isa = PBXBuildFile; fileRef = C5DA4E3F1A5CB5B500DA2F2E /* OutputAVI.H */; };
@@ -299,6 +330,13 @@
 			remoteGlobalIDString = C5133DD519CCF31100D64D48;
 			remoteInfo = HDRToolsCommon;
 		};
+		C580D74B1CAF47F500E01A76 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C5BD26A219CCABF3003F1B51 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C5133DD519CCF31100D64D48;
+			remoteInfo = HDRToolsCommon;
+		};
 		C5BE37B71B752F1900350F6D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = C5BD26A219CCABF3003F1B51 /* Project object */;
@@ -335,6 +373,15 @@
 			runOnlyForDeploymentPostprocessing = 1;
 		};
 		C567FCEE1A44E149006035B1 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		C580D7521CAF47F500E01A76 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = /usr/share/man/man1/;
@@ -419,6 +466,8 @@
 		C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv444to420CrFBounds.H; path = ../common/inc/Conv444to420CrFBounds.H; sourceTree = "<group>"; };
 		C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameFilterNLMeans.cpp; path = ../common/src/FrameFilterNLMeans.cpp; sourceTree = "<group>"; };
 		C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameFilterNLMeans.H; path = ../common/inc/FrameFilterNLMeans.H; sourceTree = "<group>"; };
+		C5496AB11CEE97D50052AB6D /* ColorTransformYAdjustHLG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYAdjustHLG.cpp; path = ../common/src/ColorTransformYAdjustHLG.cpp; sourceTree = "<group>"; };
+		C5496AB31CEE97F00052AB6D /* ColorTransformYAdjustHLG.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYAdjustHLG.H; path = ../common/inc/ColorTransformYAdjustHLG.H; sourceTree = "<group>"; };
 		C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformClosedLoop.cpp; path = ../common/src/ColorTransformClosedLoop.cpp; sourceTree = "<group>"; };
 		C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformClosedLoop.H; path = ../common/inc/ColorTransformClosedLoop.H; sourceTree = "<group>"; };
 		C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionHPQ2.cpp; path = ../common/src/TransferFunctionHPQ2.cpp; sourceTree = "<group>"; };
@@ -443,8 +492,40 @@
 		C567FCFA1A44E1A0006035B1 /* HDRMontageFrame.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = HDRMontageFrame.H; path = ../../projects/HDRMontage/inc/HDRMontageFrame.H; sourceTree = "<group>"; };
 		C567FCFB1A44E1A0006035B1 /* ProjectParameters.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ProjectParameters.H; path = ../../projects/HDRMontage/inc/ProjectParameters.H; sourceTree = "<group>"; };
 		C567FCFC1A44E463006035B1 /* HDRMontage.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HDRMontage.cfg; path = ../../bin/HDRMontage.cfg; sourceTree = "<group>"; };
+		C56A3F591CDBDBAD0045291B /* ColorTransformYLin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYLin.cpp; path = ../common/src/ColorTransformYLin.cpp; sourceTree = "<group>"; };
+		C56A3F5B1CDBDBC70045291B /* ColorTransformYSumLin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYSumLin.cpp; path = ../common/src/ColorTransformYSumLin.cpp; sourceTree = "<group>"; };
+		C56A3F5D1CDBDBE10045291B /* ColorTransformYLin.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYLin.H; path = ../common/inc/ColorTransformYLin.H; sourceTree = "<group>"; };
+		C56A3F5F1CDBDBF10045291B /* ColorTransformYSumLin.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYSumLin.H; path = ../common/inc/ColorTransformYSumLin.H; sourceTree = "<group>"; };
+		C56A3F611CDD26C50045291B /* ColorTransformYAdjust2ndOrder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYAdjust2ndOrder.cpp; path = ../common/src/ColorTransformYAdjust2ndOrder.cpp; sourceTree = "<group>"; };
+		C56A3F631CDD26DB0045291B /* ColorTransformYAdjust2ndOrder.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYAdjust2ndOrder.H; path = ../common/inc/ColorTransformYAdjust2ndOrder.H; sourceTree = "<group>"; };
+		C56CC7661CA0BCE500235480 /* InputDPX.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = InputDPX.H; path = ../common/inc/InputDPX.H; sourceTree = "<group>"; };
+		C56CC7681CA0BCFA00235480 /* InputDPX.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = InputDPX.cpp; path = ../common/src/InputDPX.cpp; sourceTree = "<group>"; };
+		C56CC76A1CA0CF0400235480 /* IODPX.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = IODPX.H; path = ../common/inc/IODPX.H; sourceTree = "<group>"; };
 		C57D22171B4F58C900DA1E4C /* ColorTransformYAdjust.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYAdjust.cpp; path = ../common/src/ColorTransformYAdjust.cpp; sourceTree = "<group>"; };
 		C57D22191B4F5C7200DA1E4C /* ColorTransformYAdjust.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYAdjust.H; path = ../common/inc/ColorTransformYAdjust.H; sourceTree = "<group>"; };
+		C580D7201CAF469300E01A76 /* ColorTransformRGBAdjust.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformRGBAdjust.H; path = ../common/inc/ColorTransformRGBAdjust.H; sourceTree = "<group>"; };
+		C580D7211CAF469300E01A76 /* DistortionMetricVQM.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricVQM.H; path = ../common/inc/DistortionMetricVQM.H; sourceTree = "<group>"; };
+		C580D7231CAF469300E01A76 /* FFT.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FFT.H; path = ../common/inc/FFT.H; sourceTree = "<group>"; };
+		C580D7241CAF469300E01A76 /* PUEncode.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = PUEncode.H; path = ../common/inc/PUEncode.H; sourceTree = "<group>"; };
+		C580D7251CAF469300E01A76 /* ResizeBiCubic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ResizeBiCubic.H; path = ../common/inc/ResizeBiCubic.H; sourceTree = "<group>"; };
+		C580D7261CAF469300E01A76 /* TransferFunctionHGold.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransferFunctionHGold.H; path = ../common/inc/TransferFunctionHGold.H; sourceTree = "<group>"; };
+		C580D72E1CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformRGBAdjust.cpp; path = ../common/src/ColorTransformRGBAdjust.cpp; sourceTree = "<group>"; };
+		C580D72F1CAF46D500E01A76 /* DistortionMetricVQM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricVQM.cpp; path = ../common/src/DistortionMetricVQM.cpp; sourceTree = "<group>"; };
+		C580D7301CAF46D500E01A76 /* FFT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FFT.cpp; path = ../common/src/FFT.cpp; sourceTree = "<group>"; };
+		C580D7311CAF46D500E01A76 /* ResizeBiCubic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ResizeBiCubic.cpp; path = ../common/src/ResizeBiCubic.cpp; sourceTree = "<group>"; };
+		C580D7321CAF46D500E01A76 /* TransferFunctionHGold.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionHGold.cpp; path = ../common/src/TransferFunctionHGold.cpp; sourceTree = "<group>"; };
+		C580D73C1CAF47AE00E01A76 /* HDRVQM.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = HDRVQM.cfg; path = ../../bin/HDRVQM.cfg; sourceTree = "<group>"; };
+		C580D73D1CAF47C900E01A76 /* HDRVQM.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = HDRVQM.H; path = ../../projects/HDRVQM/inc/HDRVQM.H; sourceTree = "<group>"; };
+		C580D73E1CAF47C900E01A76 /* HDRVQMFrame.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = HDRVQMFrame.H; path = ../../projects/HDRVQM/inc/HDRVQMFrame.H; sourceTree = "<group>"; };
+		C580D73F1CAF47C900E01A76 /* ProjectParameters.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ProjectParameters.H; path = ../../projects/HDRVQM/inc/ProjectParameters.H; sourceTree = "<group>"; };
+		C580D7431CAF47DD00E01A76 /* HDRVQM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HDRVQM.cpp; path = ../../projects/HDRVQM/src/HDRVQM.cpp; sourceTree = "<group>"; };
+		C580D7441CAF47DD00E01A76 /* HDRVQMFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HDRVQMFrame.cpp; path = ../../projects/HDRVQM/src/HDRVQMFrame.cpp; sourceTree = "<group>"; };
+		C580D7451CAF47DD00E01A76 /* ProjectParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ProjectParameters.cpp; path = ../../projects/HDRVQM/src/ProjectParameters.cpp; sourceTree = "<group>"; };
+		C580D7561CAF47F500E01A76 /* HDRVQM */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = HDRVQM; sourceTree = BUILT_PRODUCTS_DIR; };
+		C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Eigenvalue.cpp; path = ../common/src/Eigenvalue.cpp; sourceTree = "<group>"; };
+		C580D78E1CB4937500E01A76 /* Eigenvalue.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Eigenvalue.H; path = ../common/inc/Eigenvalue.H; sourceTree = "<group>"; };
+		C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricVIF.cpp; path = ../common/src/DistortionMetricVIF.cpp; sourceTree = "<group>"; };
+		C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricVIF.H; path = ../common/inc/DistortionMetricVIF.H; sourceTree = "<group>"; };
 		C585BD041B041F9000235FE6 /* TransferFunctionAMPQ.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionAMPQ.cpp; path = ../common/src/TransferFunctionAMPQ.cpp; sourceTree = "<group>"; };
 		C585BD061B041FA000235FE6 /* TransferFunctionAMPQ.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransferFunctionAMPQ.H; path = ../common/inc/TransferFunctionAMPQ.H; sourceTree = "<group>"; };
 		C585BD081B05190500235FE6 /* TransferFunctionAPH.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TransferFunctionAPH.cpp; path = ../common/src/TransferFunctionAPH.cpp; sourceTree = "<group>"; };
@@ -489,7 +570,6 @@
 		C5BD26BF19CCAC10003F1B51 /* DistortionMetricDeltaE.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricDeltaE.H; path = ../common/inc/DistortionMetricDeltaE.H; sourceTree = "<group>"; };
 		C5BD26C019CCAC10003F1B51 /* DistortionMetricPSNR.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricPSNR.H; path = ../common/inc/DistortionMetricPSNR.H; sourceTree = "<group>"; };
 		C5BD26C119CCAC10003F1B51 /* DistortionMetricmPSNR.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricmPSNR.H; path = ../common/inc/DistortionMetricmPSNR.H; sourceTree = "<group>"; };
-		C5BD26C219CCAC10003F1B51 /* FastMemory.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FastMemory.H; path = ../common/inc/FastMemory.H; sourceTree = "<group>"; };
 		C5BD26C319CCAC10003F1B51 /* Frame.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Frame.H; path = ../common/inc/Frame.H; sourceTree = "<group>"; };
 		C5BD26C419CCAC10003F1B51 /* Global.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Global.H; path = ../common/inc/Global.H; sourceTree = "<group>"; };
 		C5BD26C519CCAC10003F1B51 /* IFunctions.H */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = IFunctions.H; path = ../common/inc/IFunctions.H; sourceTree = "<group>"; };
@@ -581,6 +661,8 @@
 		C5BE37CE1B7BEA5500350F6D /* DisplayGammaAdjustNull.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DisplayGammaAdjustNull.H; path = ../common/inc/DisplayGammaAdjustNull.H; sourceTree = "<group>"; };
 		C5BE37D01B7BEACF00350F6D /* DisplayGammaAdjustHLG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DisplayGammaAdjustHLG.cpp; path = ../common/src/DisplayGammaAdjustHLG.cpp; sourceTree = "<group>"; };
 		C5BE37D21B7BEAE400350F6D /* DisplayGammaAdjustHLG.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DisplayGammaAdjustHLG.H; path = ../common/inc/DisplayGammaAdjustHLG.H; sourceTree = "<group>"; };
+		C5C22C711CA5D81A00A539F3 /* ColorTransformYAdjustFull.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformYAdjustFull.cpp; path = ../common/src/ColorTransformYAdjustFull.cpp; sourceTree = "<group>"; };
+		C5C22C731CA5D82D00A539F3 /* ColorTransformYAdjustFull.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformYAdjustFull.H; path = ../common/inc/ColorTransformYAdjustFull.H; sourceTree = "<group>"; };
 		C5C2CC371B1906D600AD96EA /* FrameFilter2DSep.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameFilter2DSep.H; path = ../common/inc/FrameFilter2DSep.H; sourceTree = "<group>"; };
 		C5C2CC391B19070600AD96EA /* FrameFilter2DSep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameFilter2DSep.cpp; path = ../common/src/FrameFilter2DSep.cpp; sourceTree = "<group>"; };
 		C5C2CC3B1B19164E00AD96EA /* Filter1D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Filter1D.cpp; path = ../common/src/Filter1D.cpp; sourceTree = "<group>"; };
@@ -599,6 +681,8 @@
 		C5CC7E361BB3677200EBE780 /* DistortionMetricBlockAct.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricBlockAct.H; path = ../common/inc/DistortionMetricBlockAct.H; sourceTree = "<group>"; };
 		C5CC7E381BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameFilterWiener2DDark.cpp; path = ../common/src/FrameFilterWiener2DDark.cpp; sourceTree = "<group>"; };
 		C5CC7E3A1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameFilterWiener2DDark.H; path = ../common/inc/FrameFilterWiener2DDark.H; sourceTree = "<group>"; };
+		C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv420to444CrBounds.cpp; path = ../common/src/Conv420to444CrBounds.cpp; sourceTree = "<group>"; };
+		C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv420to444CrBounds.H; path = ../common/inc/Conv420to444CrBounds.H; sourceTree = "<group>"; };
 		C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv420to422Generic.cpp; path = ../common/src/Conv420to422Generic.cpp; sourceTree = "<group>"; };
 		C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv420to422Generic.H; path = ../common/inc/Conv420to422Generic.H; sourceTree = "<group>"; };
 		C5DA4E3F1A5CB5B500DA2F2E /* OutputAVI.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = OutputAVI.H; path = ../common/inc/OutputAVI.H; sourceTree = "<group>"; };
@@ -702,6 +786,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C580D7501CAF47F500E01A76 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C580D7511CAF47F500E01A76 /* libHDRToolsHDRTools.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5BE37AD1B752D2D00350F6D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -730,6 +822,7 @@
 				C5F1E39D19D23C7E00327932 /* ChromaConvert */,
 				C567FCF21A44E149006035B1 /* HDRMontage */,
 				C5BE37B01B752D2D00350F6D /* HDRConvScaler */,
+				C580D7561CAF47F500E01A76 /* HDRVQM */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -878,6 +971,44 @@
 			name = src;
 			sourceTree = "<group>";
 		};
+		C580D7381CAF477D00E01A76 /* HDRVQM */ = {
+			isa = PBXGroup;
+			children = (
+				C580D7391CAF478800E01A76 /* config */,
+				C580D73A1CAF479200E01A76 /* inc */,
+				C580D73B1CAF479700E01A76 /* src */,
+			);
+			name = HDRVQM;
+			sourceTree = "<group>";
+		};
+		C580D7391CAF478800E01A76 /* config */ = {
+			isa = PBXGroup;
+			children = (
+				C580D73C1CAF47AE00E01A76 /* HDRVQM.cfg */,
+			);
+			name = config;
+			sourceTree = "<group>";
+		};
+		C580D73A1CAF479200E01A76 /* inc */ = {
+			isa = PBXGroup;
+			children = (
+				C580D73D1CAF47C900E01A76 /* HDRVQM.H */,
+				C580D73E1CAF47C900E01A76 /* HDRVQMFrame.H */,
+				C580D73F1CAF47C900E01A76 /* ProjectParameters.H */,
+			);
+			name = inc;
+			sourceTree = "<group>";
+		};
+		C580D73B1CAF479700E01A76 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				C580D7431CAF47DD00E01A76 /* HDRVQM.cpp */,
+				C580D7441CAF47DD00E01A76 /* HDRVQMFrame.cpp */,
+				C580D7451CAF47DD00E01A76 /* ProjectParameters.cpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
 		C5BD26A119CCABF3003F1B51 = {
 			isa = PBXGroup;
 			children = (
@@ -902,34 +1033,41 @@
 				C5E3830B1AEAE68300FE5693 /* ColorTransformCL.H */,
 				C54BDE0B1ACB2384000A34BE /* ColorTransformClosedLoop.H */,
 				C5528B351BE4535500CCADA5 /* ColorTransformClosedLoopCr.H */,
-				C5528B3D1BEAC27700CCADA5 /* ColorTransformClosedLoopRGB.H */,
 				C5F63D281C6D6A9D004D8B25 /* ColorTransformClosedLoopFRGB.H */,
+				C5528B3D1BEAC27700CCADA5 /* ColorTransformClosedLoopRGB.H */,
 				C5528B411BEAE68800CCADA5 /* ColorTransformClosedLoopY.H */,
 				C51C5E9F1A03155900AE5E15 /* ColorTransformFVDO.H */,
 				C5BD26AF19CCAC10003F1B51 /* ColorTransformGeneric.H */,
 				C5BD26B019CCAC10003F1B51 /* ColorTransformNull.H */,
+				C580D7201CAF469300E01A76 /* ColorTransformRGBAdjust.H */,
 				C5DE88DE1A0D774600248B84 /* ColorTransformXYZ2YUpVp.H */,
 				C57D22191B4F5C7200DA1E4C /* ColorTransformYAdjust.H */,
+				C5496AB31CEE97F00052AB6D /* ColorTransformYAdjustHLG.H */,
+				C56A3F631CDD26DB0045291B /* ColorTransformYAdjust2ndOrder.H */,
 				C5BE37921B58612F00350F6D /* ColorTransformYAdjustAlt.H */,
 				C5528B391BE96C4700CCADA5 /* ColorTransformYAdjustFast.H */,
+				C5C22C731CA5D82D00A539F3 /* ColorTransformYAdjustFull.H */,
 				C53E9BC41C10C9FA00448F69 /* ColorTransformYAdjustLFast.H */,
 				C53E9BBA1C0EA3AD00448F69 /* ColorTransformYAdjustTele.H */,
 				C501510E1BF6CBE600980F49 /* ColorTransformYAdjustXYZ.H */,
+				C56A3F5D1CDBDBE10045291B /* ColorTransformYLin.H */,
+				C56A3F5F1CDBDBF10045291B /* ColorTransformYSumLin.H */,
 				C5DA4E3D1A5B674600DA2F2E /* Conv420to422Generic.H */,
 				C51896311ACF62920021356F /* Conv420to444Adaptive.H */,
+				C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */,
 				C5BD26B419CCAC10003F1B51 /* Conv420to444Generic.H */,
 				C5BD26B319CCAC10003F1B51 /* Conv420to444NN.H */,
 				C5F1E38619D2035F00327932 /* Conv422to420Generic.H */,
 				C50BC6B51AE0C5F600F1A398 /* Conv444to420Adaptive.H */,
-				C53E9BBE1C0FCF7100448F69 /* Conv444to420CrEdge.H */,
-				C53E9BC81C10F87C00448F69 /* Conv444to420CrBounds.H */,
-				C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */,
 				C5BD26B519CCAC10003F1B51 /* Conv444to420BI.H */,
+				C53E9BC81C10F87C00448F69 /* Conv444to420CrBounds.H */,
+				C53E9BBE1C0FCF7100448F69 /* Conv444to420CrEdge.H */,
+				C53E9BCC1C1261A100448F69 /* Conv444to420CrFBounds.H */,
 				C5BD26B619CCAC10003F1B51 /* Conv444to420Generic.H */,
-				C5F63D221C62C47F004D8B25 /* Conv444to422Generic.H */,
 				C5BD26B719CCAC10003F1B51 /* Conv444to420NN.H */,
-				C5F63D201C618A25004D8B25 /* Conv444to422NN.H */,
+				C5F63D221C62C47F004D8B25 /* Conv444to422Generic.H */,
 				C5C79C2A1AC4E37D00FB9A29 /* Conv444to422GenericOld.H */,
+				C5F63D201C618A25004D8B25 /* Conv444to422NN.H */,
 				C5BD26B819CCAC10003F1B51 /* Convert.H */,
 				C5BD26BB19CCAC10003F1B51 /* ConvertBitDepth.H */,
 				C5BD26B219CCAC10003F1B51 /* ConvertColorFormat.H */,
@@ -954,16 +1092,19 @@
 				C5133E7D19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H */,
 				C5CC7E2E1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H */,
 				C5DE3F3219DB5303006FA313 /* DistortionMetricTFPSNR.H */,
+				C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */,
+				C580D7211CAF469300E01A76 /* DistortionMetricVQM.H */,
 				C5CC7E321BB0A90B00EBE780 /* DistortionTransferFunction.H */,
-				C5BD26C219CCAC10003F1B51 /* FastMemory.H */,
+				C580D78E1CB4937500E01A76 /* Eigenvalue.H */,
+				C580D7231CAF469300E01A76 /* FFT.H */,
 				C5C2CC3D1B19166500AD96EA /* Filter1D.H */,
 				C5BD26C319CCAC10003F1B51 /* Frame.H */,
 				C585BD0E1B06C3A900235FE6 /* FrameFilter.H */,
 				C5C2CC371B1906D600AD96EA /* FrameFilter2DSep.H */,
 				C585BD141B06C54700235FE6 /* FrameFilterDeblock.H */,
+				C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */,
 				C585BD121B06C48B00235FE6 /* FrameFilterNull.H */,
 				C59D6C6F1B1672F3009F704D /* FrameFilterWiener2D.H */,
-				C53E9BD01C175C3800448F69 /* FrameFilterNLMeans.H */,
 				C5CC7E3A1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H */,
 				C5E382EF1AE8107200FE5693 /* FrameFormat.H */,
 				C5E384B11AFF1BB900FE5693 /* FrameScale.H */,
@@ -975,10 +1116,12 @@
 				C5BD26C719CCAC10003F1B51 /* ImgToBufBasic.H */,
 				C5BD26C819CCAC10003F1B51 /* ImgToBufEndian.H */,
 				C5BD26C919CCAC10003F1B51 /* Input.H */,
+				C56CC7661CA0BCE500235480 /* InputDPX.H */,
 				C5BD26CA19CCAC10003F1B51 /* InputEXR.H */,
 				C5BD26CB19CCAC10003F1B51 /* InputTIFF.H */,
-				C5BD26CC19CCAC10003F1B51 /* InputYUV.H */,
 				C5B080421C2B6B50000335A7 /* InputY4M.H */,
+				C5BD26CC19CCAC10003F1B51 /* InputYUV.H */,
+				C56CC76A1CA0CF0400235480 /* IODPX.H */,
 				C5BD26CD19CCAC10003F1B51 /* IOFunctions.H */,
 				C5BD26D019CCAC10003F1B51 /* IOTIFF.H */,
 				C5BD26CE19CCAC10003F1B51 /* IOVideo.H */,
@@ -987,9 +1130,11 @@
 				C5DA4E3F1A5CB5B500DA2F2E /* OutputAVI.H */,
 				C5BD26D219CCAC10003F1B51 /* OutputEXR.H */,
 				C5DE88D61A09B7E300248B84 /* OutputTIFF.H */,
-				C5BD26D319CCAC10003F1B51 /* OutputYUV.H */,
 				C5B0803E1C2B6957000335A7 /* OutputY4M.H */,
+				C5BD26D319CCAC10003F1B51 /* OutputYUV.H */,
 				C5BD26D419CCAC10003F1B51 /* Parameters.H */,
+				C580D7241CAF469300E01A76 /* PUEncode.H */,
+				C580D7251CAF469300E01A76 /* ResizeBiCubic.H */,
 				C51896351ACF64230021356F /* ScaleFilter.H */,
 				C530C38A1B7E946300FD6D7E /* ToneMapping.H */,
 				C530C38C1B7E951300FD6D7E /* ToneMappingNull.H */,
@@ -1001,6 +1146,7 @@
 				C5E382ED1AE80FDB00FE5693 /* TransferFunctionAPQScaled.H */,
 				C5E383171AEFB8ED00FE5693 /* TransferFunctionBiasedMPQ.H */,
 				C5DE3F3A19E3B7A1006FA313 /* TransferFunctionHG.H */,
+				C580D7261CAF469300E01A76 /* TransferFunctionHGold.H */,
 				C5BE37C41B7AA62700350F6D /* TransferFunctionHLG.H */,
 				C5AED38B1BD92BAC00682304 /* TransferFunctionHPQ.H */,
 				C5528B311BE3046600CCADA5 /* TransferFunctionHPQ2.H */,
@@ -1031,34 +1177,41 @@
 				C5E383091AEAE66600FE5693 /* ColorTransformCL.cpp */,
 				C54BDE091ACB236A000A34BE /* ColorTransformClosedLoop.cpp */,
 				C5528B331BE4515000CCADA5 /* ColorTransformClosedLoopCr.cpp */,
-				C5528B3B1BEAC24900CCADA5 /* ColorTransformClosedLoopRGB.cpp */,
 				C5F63D261C6D6A89004D8B25 /* ColorTransformClosedLoopFRGB.cpp */,
+				C5528B3B1BEAC24900CCADA5 /* ColorTransformClosedLoopRGB.cpp */,
 				C5528B3F1BEAE67A00CCADA5 /* ColorTransformClosedLoopY.cpp */,
 				C51C5E9D1A0303AB00AE5E15 /* ColorTransformFVDO.cpp */,
 				C5BD26E319CCAC17003F1B51 /* ColorTransformGeneric.cpp */,
 				C5BD26E419CCAC17003F1B51 /* ColorTransformNull.cpp */,
+				C580D72E1CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp */,
 				C5DE88DC1A0D76DD00248B84 /* ColorTransformXYZ2YUpVp.cpp */,
 				C57D22171B4F58C900DA1E4C /* ColorTransformYAdjust.cpp */,
+				C5496AB11CEE97D50052AB6D /* ColorTransformYAdjustHLG.cpp */,
+				C56A3F611CDD26C50045291B /* ColorTransformYAdjust2ndOrder.cpp */,
 				C5BE37901B58612300350F6D /* ColorTransformYAdjustAlt.cpp */,
 				C5528B371BE96C2D00CCADA5 /* ColorTransformYAdjustFast.cpp */,
+				C5C22C711CA5D81A00A539F3 /* ColorTransformYAdjustFull.cpp */,
 				C53E9BC21C10C20100448F69 /* ColorTransformYAdjustLFast.cpp */,
 				C53E9BB81C0EA34200448F69 /* ColorTransformYAdjustTele.cpp */,
 				C501510C1BF6CBCC00980F49 /* ColorTransformYAdjustXYZ.cpp */,
+				C56A3F591CDBDBAD0045291B /* ColorTransformYLin.cpp */,
+				C56A3F5B1CDBDBC70045291B /* ColorTransformYSumLin.cpp */,
 				C5DA4E391A5B17ED00DA2F2E /* Conv420to422Generic.cpp */,
 				C518962D1ACF62530021356F /* Conv420to444Adaptive.cpp */,
+				C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */,
 				C5BD26E819CCAC17003F1B51 /* Conv420to444Generic.cpp */,
 				C5BD26E719CCAC17003F1B51 /* Conv420to444NN.cpp */,
 				C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */,
 				C50BC6B31AE0C5D600F1A398 /* Conv444to420Adaptive.cpp */,
-				C53E9BBC1C0FCF2500448F69 /* Conv444to420CrEdge.cpp */,
-				C53E9BC61C10F83600448F69 /* Conv444to420CrBounds.cpp */,
-				C53E9BCA1C12615500448F69 /* Conv444to420CrFBounds.cpp */,
 				C5BD26E919CCAC17003F1B51 /* Conv444to420BI.cpp */,
+				C53E9BC61C10F83600448F69 /* Conv444to420CrBounds.cpp */,
+				C53E9BBC1C0FCF2500448F69 /* Conv444to420CrEdge.cpp */,
+				C53E9BCA1C12615500448F69 /* Conv444to420CrFBounds.cpp */,
 				C5BD26EA19CCAC17003F1B51 /* Conv444to420Generic.cpp */,
-				C5F63D241C62C49F004D8B25 /* Conv444to422Generic.cpp */,
 				C5BD26EB19CCAC17003F1B51 /* Conv444to420NN.cpp */,
-				C5F63D1E1C61896B004D8B25 /* Conv444to422NN.cpp */,
+				C5F63D241C62C49F004D8B25 /* Conv444to422Generic.cpp */,
 				C5C79C281AC4E34500FB9A29 /* Conv444to422GenericOld.cpp */,
+				C5F63D1E1C61896B004D8B25 /* Conv444to422NN.cpp */,
 				C5BD26EC19CCAC17003F1B51 /* Convert.cpp */,
 				C5BD26EF19CCAC17003F1B51 /* ConvertBitDepth.cpp */,
 				C5BD26E519CCAC17003F1B51 /* ConvertColorFormat.cpp */,
@@ -1082,15 +1235,19 @@
 				9E856AAB19D0145C00C5499A /* DistortionMetricSigmaCompare.cpp */,
 				C5CC7E2C1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp */,
 				C5DE3F3419DB5330006FA313 /* DistortionMetricTFPSNR.cpp */,
+				C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */,
+				C580D72F1CAF46D500E01A76 /* DistortionMetricVQM.cpp */,
 				C5CC7E301BB0A86000EBE780 /* DistortionTransferFunction.cpp */,
+				C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */,
+				C580D7301CAF46D500E01A76 /* FFT.cpp */,
 				C5C2CC3B1B19164E00AD96EA /* Filter1D.cpp */,
 				C5BD26F519CCAC17003F1B51 /* Frame.cpp */,
 				C585BD0C1B06C39200235FE6 /* FrameFilter.cpp */,
 				C5C2CC391B19070600AD96EA /* FrameFilter2DSep.cpp */,
 				C585BD161B06C55B00235FE6 /* FrameFilterDeblock.cpp */,
+				C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */,
 				C585BD101B06C44100235FE6 /* FrameFilterNull.cpp */,
 				C59D6C711B167306009F704D /* FrameFilterWiener2D.cpp */,
-				C53E9BCE1C175C2000448F69 /* FrameFilterNLMeans.cpp */,
 				C5CC7E381BCCDC6400EBE780 /* FrameFilterWiener2DDark.cpp */,
 				C5E384B31AFF1BD000FE5693 /* FrameScale.cpp */,
 				C5E384B91AFF311500FE5693 /* FrameScaleHalf.cpp */,
@@ -1099,18 +1256,20 @@
 				C5BD26F719CCAC17003F1B51 /* ImgToBufBasic.cpp */,
 				C5BD26F819CCAC17003F1B51 /* ImgToBufEndian.cpp */,
 				C5BD26F919CCAC17003F1B51 /* Input.cpp */,
+				C56CC7681CA0BCFA00235480 /* InputDPX.cpp */,
 				C5BD26FA19CCAC17003F1B51 /* InputEXR.cpp */,
 				C5BD26FB19CCAC17003F1B51 /* InputTIFF.cpp */,
-				C5BD26FC19CCAC17003F1B51 /* InputYUV.cpp */,
 				C5B080401C2B6975000335A7 /* InputY4M.cpp */,
+				C5BD26FC19CCAC17003F1B51 /* InputYUV.cpp */,
 				C5BD26FD19CCAC17003F1B51 /* IOFunctions.cpp */,
 				C5BD26FE19CCAC17003F1B51 /* Output.cpp */,
 				C5DA4E411A5CB64800DA2F2E /* OutputAVI.cpp */,
 				C5BD26FF19CCAC17003F1B51 /* OutputEXR.cpp */,
 				C5DE88D41A09B7CC00248B84 /* OutputTIFF.cpp */,
-				C5BD270019CCAC17003F1B51 /* OutputYUV.cpp */,
 				C5B0803C1C2B6920000335A7 /* OutputY4M.cpp */,
+				C5BD270019CCAC17003F1B51 /* OutputYUV.cpp */,
 				C5BD270119CCAC17003F1B51 /* Parameters.cpp */,
+				C580D7311CAF46D500E01A76 /* ResizeBiCubic.cpp */,
 				C51896331ACF63D80021356F /* ScaleFilter.cpp */,
 				C530C3881B7E93D100FD6D7E /* ToneMapping.cpp */,
 				C530C38E1B7E955400FD6D7E /* ToneMappingNull.cpp */,
@@ -1122,6 +1281,7 @@
 				C5E382EB1AE80FA900FE5693 /* TransferFunctionAPQScaled.cpp */,
 				C5E383131AEFB8C700FE5693 /* TransferFunctionBiasedMPQ.cpp */,
 				C5DE3F3C19E3B877006FA313 /* TransferFunctionHG.cpp */,
+				C580D7321CAF46D500E01A76 /* TransferFunctionHGold.cpp */,
 				C5BE37C61B7AA64800350F6D /* TransferFunctionHLG.cpp */,
 				C5AED3891BD92B8800682304 /* TransferFunctionHPQ.cpp */,
 				C5528B2F1BE3045300CCADA5 /* TransferFunctionHPQ2.cpp */,
@@ -1182,6 +1342,7 @@
 		C5DE891F1A15604000248B84 /* Projects */ = {
 			isa = PBXGroup;
 			children = (
+				C580D7381CAF477D00E01A76 /* HDRVQM */,
 				C5BE37941B752C4900350F6D /* HDRConvScaler */,
 				C567FCE11A44E0FE006035B1 /* HDRMontage */,
 				C5F1E38819D2381E00327932 /* ChromaConvert */,
@@ -1267,6 +1428,8 @@
 				C5E382F01AE8107200FE5693 /* FrameFormat.H in Headers */,
 				C5528B321BE3046600CCADA5 /* TransferFunctionHPQ2.H in Headers */,
 				C5BE37C91B7BE6D700350F6D /* DisplayGammaAdjust.H in Headers */,
+				C56CC7671CA0BCE500235480 /* InputDPX.H in Headers */,
+				C5496AB41CEE97F00052AB6D /* ColorTransformYAdjustHLG.H in Headers */,
 				C5133DDC19CCF59B00D64D48 /* AddNoiseNull.H in Headers */,
 				C585BD131B06C48B00235FE6 /* FrameFilterNull.H in Headers */,
 				C53E9BCD1C1261A100448F69 /* Conv444to420CrFBounds.H in Headers */,
@@ -1276,6 +1439,7 @@
 				C5133DDD19CCF59B00D64D48 /* AddNoiseNormal.H in Headers */,
 				C50BC6B61AE0C5F600F1A398 /* Conv444to420Adaptive.H in Headers */,
 				C5133DDE19CCF59B00D64D48 /* BufToImg.H in Headers */,
+				C580D72A1CAF469300E01A76 /* FFT.H in Headers */,
 				C5DE88D71A09B7E300248B84 /* OutputTIFF.H in Headers */,
 				C5BE37931B58612F00350F6D /* ColorTransformYAdjustAlt.H in Headers */,
 				C59D6C701B1672F3009F704D /* FrameFilterWiener2D.H in Headers */,
@@ -1283,6 +1447,7 @@
 				C5FF1E7D1A1AD18B008CFF60 /* TransferFunctionPower.H in Headers */,
 				C57D221A1B4F5C7200DA1E4C /* ColorTransformYAdjust.H in Headers */,
 				C5CC7E331BB0A90B00EBE780 /* DistortionTransferFunction.H in Headers */,
+				C56A3F5E1CDBDBE10045291B /* ColorTransformYLin.H in Headers */,
 				C501510F1BF6CBE600980F49 /* ColorTransformYAdjustXYZ.H in Headers */,
 				C5133DDF19CCF59B00D64D48 /* BufToImgBasic.H in Headers */,
 				C5528B3E1BEAC27700CCADA5 /* ColorTransformClosedLoopRGB.H in Headers */,
@@ -1300,12 +1465,17 @@
 				C51896361ACF64230021356F /* ScaleFilter.H in Headers */,
 				C5133DE319CCF59B00D64D48 /* ColorTransformNull.H in Headers */,
 				C5528B3A1BE96C4700CCADA5 /* ColorTransformYAdjustFast.H in Headers */,
+				C56A3F641CDD26DB0045291B /* ColorTransformYAdjust2ndOrder.H in Headers */,
+				C580D7421CAF47C900E01A76 /* ProjectParameters.H in Headers */,
 				C5E384BC1AFF315000FE5693 /* FrameScaleHalf.H in Headers */,
 				C53E9BC91C10F87C00448F69 /* Conv444to420CrBounds.H in Headers */,
 				C5528B421BEAE68800CCADA5 /* ColorTransformClosedLoopY.H in Headers */,
+				C580D7281CAF469300E01A76 /* DistortionMetricVQM.H in Headers */,
+				C5C22C741CA5D82D00A539F3 /* ColorTransformYAdjustFull.H in Headers */,
 				C585BD151B06C54700235FE6 /* FrameFilterDeblock.H in Headers */,
 				C585BD0F1B06C3A900235FE6 /* FrameFilter.H in Headers */,
 				C5AED38C1BD92BAC00682304 /* TransferFunctionHPQ.H in Headers */,
+				C580D7411CAF47C900E01A76 /* HDRVQMFrame.H in Headers */,
 				C5C2CC3E1B19166500AD96EA /* Filter1D.H in Headers */,
 				C5133DE419CCF59B00D64D48 /* ConvertColorFormatNull.H in Headers */,
 				C5133DE519CCF59B00D64D48 /* ConvertColorFormat.H in Headers */,
@@ -1317,6 +1487,7 @@
 				C5133DE819CCF59B00D64D48 /* Conv444to420BI.H in Headers */,
 				C5CC7E2F1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H in Headers */,
 				C5CC7E3B1BCCDC7E00EBE780 /* FrameFilterWiener2DDark.H in Headers */,
+				C580D7971CB4979500E01A76 /* DistortionMetricVIF.H in Headers */,
 				C530C3931B7E976D00FD6D7E /* ToneMappingRoll.H in Headers */,
 				C5133DE919CCF59B00D64D48 /* Conv444to420Generic.H in Headers */,
 				C5C2CC381B1906D600AD96EA /* FrameFilter2DSep.H in Headers */,
@@ -1332,24 +1503,28 @@
 				C5DA4E401A5CB5B500DA2F2E /* OutputAVI.H in Headers */,
 				C530C38B1B7E946300FD6D7E /* ToneMapping.H in Headers */,
 				C5BE379E1B752C8A00350F6D /* HDRConvScalerEXR.H in Headers */,
+				C56CC76B1CA0CF0400235480 /* IODPX.H in Headers */,
 				C530C3D91BA2390B00FD6D7E /* DistortionMetricBlockinessJ341.H in Headers */,
 				C5133DEE19CCF59B00D64D48 /* ConvertBitDepth.H in Headers */,
 				C5133DEF19CCF59B00D64D48 /* ConvFloatToFixed.H in Headers */,
 				C5133DF019CCF59C00D64D48 /* Defines.H in Headers */,
 				C5133DF119CCF59C00D64D48 /* DistortionMetric.H in Headers */,
 				C5133DF219CCF59C00D64D48 /* DistortionMetricDeltaE.H in Headers */,
+				C580D7271CAF469300E01A76 /* ColorTransformRGBAdjust.H in Headers */,
 				C5BE37A11B752C8A00350F6D /* ProjectParameters.H in Headers */,
 				C5BE378F1B57312800350F6D /* TransferFunctionPQLB.H in Headers */,
 				C5E384B81AFF2EE600FE5693 /* FrameScaleNull.H in Headers */,
+				C56A3F601CDBDBF10045291B /* ColorTransformYSumLin.H in Headers */,
 				C5528B361BE4535500CCADA5 /* ColorTransformClosedLoopCr.H in Headers */,
 				C51896321ACF62920021356F /* Conv420to444Adaptive.H in Headers */,
 				C5133DF319CCF59C00D64D48 /* DistortionMetricPSNR.H in Headers */,
 				C5DA4E441A5CB7C400DA2F2E /* AVILib.H in Headers */,
 				C5133DF419CCF59C00D64D48 /* DistortionMetricmPSNR.H in Headers */,
-				C5133DF519CCF59C00D64D48 /* FastMemory.H in Headers */,
 				C54BDE0C1ACB2384000A34BE /* ColorTransformClosedLoop.H in Headers */,
+				C580D72D1CAF469300E01A76 /* TransferFunctionHGold.H in Headers */,
 				C5133DF619CCF59C00D64D48 /* Frame.H in Headers */,
 				C5133DF719CCF59C00D64D48 /* Global.H in Headers */,
+				C580D78F1CB4937500E01A76 /* Eigenvalue.H in Headers */,
 				C5B0803F1C2B6957000335A7 /* OutputY4M.H in Headers */,
 				C53E9BC51C10C9FA00448F69 /* ColorTransformYAdjustLFast.H in Headers */,
 				C5BE379F1B752C8A00350F6D /* HDRConvScalerTIFF.H in Headers */,
@@ -1363,6 +1538,7 @@
 				C5133DFC19CCF59C00D64D48 /* Input.H in Headers */,
 				C5F1E38719D2035F00327932 /* Conv422to420Generic.H in Headers */,
 				C5F63D291C6D6A9D004D8B25 /* ColorTransformClosedLoopFRGB.H in Headers */,
+				C5D169321CC6EF2300A4A487 /* Conv420to444CrBounds.H in Headers */,
 				C5133DFD19CCF59C00D64D48 /* InputEXR.H in Headers */,
 				C5DE88DF1A0D774600248B84 /* ColorTransformXYZ2YUpVp.H in Headers */,
 				C5133DFE19CCF59C00D64D48 /* InputTIFF.H in Headers */,
@@ -1375,14 +1551,17 @@
 				C5DE3F3319DB5303006FA313 /* DistortionMetricTFPSNR.H in Headers */,
 				C5133E0419CCF59C00D64D48 /* Output.H in Headers */,
 				C5133E0519CCF59C00D64D48 /* OutputEXR.H in Headers */,
+				C580D7401CAF47C900E01A76 /* HDRVQM.H in Headers */,
 				C5C79C2B1AC4E37D00FB9A29 /* Conv444to422GenericOld.H in Headers */,
 				C53E9BD11C175C3800448F69 /* FrameFilterNLMeans.H in Headers */,
 				C5133E0619CCF59C00D64D48 /* OutputYUV.H in Headers */,
+				C580D72B1CAF469300E01A76 /* PUEncode.H in Headers */,
 				C5133E0719CCF59C00D64D48 /* Parameters.H in Headers */,
 				C5133E0819CCF59D00D64D48 /* TransferFunction.H in Headers */,
 				C5C2CC401B1D41C800AD96EA /* DistortionMetricRegionPSNR.H in Headers */,
 				C5133E0919CCF59D00D64D48 /* TransferFunctionNormalize.H in Headers */,
 				C5133E0A19CCF59D00D64D48 /* TransferFunctionNull.H in Headers */,
+				C580D72C1CAF469300E01A76 /* ResizeBiCubic.H in Headers */,
 				C5CC7E371BB3677200EBE780 /* DistortionMetricBlockAct.H in Headers */,
 				C5BE37A01B752C8A00350F6D /* HDRConvScalerYUV.H in Headers */,
 				C51C5E9A19FED96900AE5E15 /* TransferFunctionAPQ.H in Headers */,
@@ -1467,6 +1646,24 @@
 			productReference = C567FCF21A44E149006035B1 /* HDRMontage */;
 			productType = "com.apple.product-type.tool";
 		};
+		C580D7491CAF47F500E01A76 /* HDRVQM */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C580D7531CAF47F500E01A76 /* Build configuration list for PBXNativeTarget "HDRVQM" */;
+			buildPhases = (
+				C580D74C1CAF47F500E01A76 /* Sources */,
+				C580D7501CAF47F500E01A76 /* Frameworks */,
+				C580D7521CAF47F500E01A76 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C580D74A1CAF47F500E01A76 /* PBXTargetDependency */,
+			);
+			name = HDRVQM;
+			productName = HDRMetrics;
+			productReference = C580D7561CAF47F500E01A76 /* HDRVQM */;
+			productType = "com.apple.product-type.tool";
+		};
 		C5BE37AF1B752D2D00350F6D /* HDRConvScaler */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C5BE37B41B752D2D00350F6D /* Build configuration list for PBXNativeTarget "HDRConvScaler" */;
@@ -1546,6 +1743,7 @@
 				C5F1E39C19D23C7E00327932 /* ChromaConvert */,
 				C567FCE51A44E149006035B1 /* HDRMontage */,
 				C5BE37AF1B752D2D00350F6D /* HDRConvScaler */,
+				C580D7491CAF47F500E01A76 /* HDRVQM */,
 			);
 		};
 /* End PBXProject section */
@@ -1577,20 +1775,22 @@
 				C5133E1619CCF5B700D64D48 /* ColorTransformNull.cpp in Sources */,
 				C53E9BBD1C0FCF2500448F69 /* Conv444to420CrEdge.cpp in Sources */,
 				C5BE378D1B5730F800350F6D /* TransferFunctionPQLB.cpp in Sources */,
+				C5C22C721CA5D81A00A539F3 /* ColorTransformYAdjustFull.cpp in Sources */,
 				C53E9BC71C10F83600448F69 /* Conv444to420CrBounds.cpp in Sources */,
+				C5D169301CC6EEF900A4A487 /* Conv420to444CrBounds.cpp in Sources */,
 				C5133E1719CCF5B700D64D48 /* ConvertColorFormat.cpp in Sources */,
 				C51896341ACF63D80021356F /* ScaleFilter.cpp in Sources */,
 				C5133E1819CCF5B700D64D48 /* ConvertColorFormatNull.cpp in Sources */,
 				C5133E1919CCF5B700D64D48 /* Conv420to444NN.cpp in Sources */,
 				C5C2CC3A1B19070600AD96EA /* FrameFilter2DSep.cpp in Sources */,
 				C5133E1A19CCF5B700D64D48 /* Conv420to444Generic.cpp in Sources */,
-				C5BE37A71B752CA000350F6D /* HDRConvScaler.cpp in Sources */,
-				C5BE37A91B752CA000350F6D /* HDRConvScalerTIFF.cpp in Sources */,
 				C5BE37C71B7AA64800350F6D /* TransferFunctionHLG.cpp in Sources */,
 				C5133E1B19CCF5B700D64D48 /* Conv444to420BI.cpp in Sources */,
 				C53E9BCB1C12615500448F69 /* Conv444to420CrFBounds.cpp in Sources */,
+				C5496AB21CEE97D50052AB6D /* ColorTransformYAdjustHLG.cpp in Sources */,
 				C5F1E38519D2030A00327932 /* Conv422to420Generic.cpp in Sources */,
 				C5133E1C19CCF5B700D64D48 /* Conv444to420Generic.cpp in Sources */,
+				C56A3F5A1CDBDBAD0045291B /* ColorTransformYLin.cpp in Sources */,
 				C59D6C721B167306009F704D /* FrameFilterWiener2D.cpp in Sources */,
 				C5E384B41AFF1BD000FE5693 /* FrameScale.cpp in Sources */,
 				C5DA4E3A1A5B17ED00DA2F2E /* Conv420to422Generic.cpp in Sources */,
@@ -1598,23 +1798,24 @@
 				C5133E1E19CCF5B700D64D48 /* Convert.cpp in Sources */,
 				C5133E1F19CCF5B700D64D48 /* ConvertNull.cpp in Sources */,
 				C5F63D271C6D6A89004D8B25 /* ColorTransformClosedLoopFRGB.cpp in Sources */,
-				C5BE37AB1B752CA000350F6D /* ProjectParameters.cpp in Sources */,
 				C530C3DB1BA2393500FD6D7E /* DistortionMetricBlockinessJ341.cpp in Sources */,
 				C585BD051B041F9000235FE6 /* TransferFunctionAMPQ.cpp in Sources */,
 				C585BD171B06C55B00235FE6 /* FrameFilterDeblock.cpp in Sources */,
 				C5133E2019CCF5B700D64D48 /* ConvFixedToFloat.cpp in Sources */,
+				C580D7951CB4973200E01A76 /* DistortionMetricVIF.cpp in Sources */,
 				C5B080411C2B6975000335A7 /* InputY4M.cpp in Sources */,
 				C5DE3F3D19E3B877006FA313 /* TransferFunctionHG.cpp in Sources */,
+				C580D7361CAF46D500E01A76 /* ResizeBiCubic.cpp in Sources */,
 				C585BD091B05190500235FE6 /* TransferFunctionAPH.cpp in Sources */,
 				C5528B3C1BEAC24900CCADA5 /* ColorTransformClosedLoopRGB.cpp in Sources */,
 				C5133E2119CCF5B700D64D48 /* ConvertBitDepth.cpp in Sources */,
 				C585BD0D1B06C39200235FE6 /* FrameFilter.cpp in Sources */,
 				C530C3911B7E973800FD6D7E /* ToneMappingRoll.cpp in Sources */,
-				C5BE37A81B752CA000350F6D /* HDRConvScalerEXR.cpp in Sources */,
 				C585BD111B06C44100235FE6 /* FrameFilterNull.cpp in Sources */,
 				C57D22181B4F58C900DA1E4C /* ColorTransformYAdjust.cpp in Sources */,
 				C530C38F1B7E955400FD6D7E /* ToneMappingNull.cpp in Sources */,
 				C5133E2219CCF5B700D64D48 /* ConvFloatToFixed.cpp in Sources */,
+				C56CC7691CA0BCFA00235480 /* InputDPX.cpp in Sources */,
 				C5DE88D51A09B7CC00248B84 /* OutputTIFF.cpp in Sources */,
 				C5133E2319CCF5B700D64D48 /* DistortionMetric.cpp in Sources */,
 				C5CC7E2D1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp in Sources */,
@@ -1624,11 +1825,11 @@
 				C5133E2519CCF5B700D64D48 /* DistortionMetricPSNR.cpp in Sources */,
 				C5F63D251C62C49F004D8B25 /* Conv444to422Generic.cpp in Sources */,
 				C5133E2619CCF5B700D64D48 /* DistortionMetricmPSNR.cpp in Sources */,
+				C580D7341CAF46D500E01A76 /* DistortionMetricVQM.cpp in Sources */,
 				C501510D1BF6CBCC00980F49 /* ColorTransformYAdjustXYZ.cpp in Sources */,
 				C5CC7E311BB0A86000EBE780 /* DistortionTransferFunction.cpp in Sources */,
 				C518962E1ACF62530021356F /* Conv420to444Adaptive.cpp in Sources */,
 				C5133E2719CCF5B700D64D48 /* Frame.cpp in Sources */,
-				C5BE37AA1B752CA000350F6D /* HDRConvScalerYUV.cpp in Sources */,
 				C5133E2819CCF5B700D64D48 /* ImgToBuf.cpp in Sources */,
 				C5133E2919CCF5B700D64D48 /* ImgToBufBasic.cpp in Sources */,
 				C5FF1E7B1A1AD166008CFF60 /* TransferFunctionPower.cpp in Sources */,
@@ -1640,9 +1841,13 @@
 				C5BE37CB1B7BE73200350F6D /* DisplayGammaAdjust.cpp in Sources */,
 				C5DA4E421A5CB64800DA2F2E /* OutputAVI.cpp in Sources */,
 				C50BC6B41AE0C5D600F1A398 /* Conv444to420Adaptive.cpp in Sources */,
+				C580D78D1CB490E900E01A76 /* Eigenvalue.cpp in Sources */,
 				C5528B301BE3045300CCADA5 /* TransferFunctionHPQ2.cpp in Sources */,
 				C5133E2D19CCF5B700D64D48 /* InputTIFF.cpp in Sources */,
+				C580D7331CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp in Sources */,
+				C580D7371CAF46D500E01A76 /* TransferFunctionHGold.cpp in Sources */,
 				C5E384B61AFF2EC300FE5693 /* FrameScaleNull.cpp in Sources */,
+				C56A3F5C1CDBDBC70045291B /* ColorTransformYSumLin.cpp in Sources */,
 				C5C2CC461B1E2F1300AD96EA /* DistortionMetricRegionTFPSNR.cpp in Sources */,
 				C51C5E9E1A0303AB00AE5E15 /* ColorTransformFVDO.cpp in Sources */,
 				C5133E2E19CCF5B700D64D48 /* InputYUV.cpp in Sources */,
@@ -1654,7 +1859,9 @@
 				C5CC7E351BB3675900EBE780 /* DistortionMetricBlockAct.cpp in Sources */,
 				C54BDE0A1ACB236A000A34BE /* ColorTransformClosedLoop.cpp in Sources */,
 				C5133E3119CCF5B700D64D48 /* OutputEXR.cpp in Sources */,
+				C580D7351CAF46D500E01A76 /* FFT.cpp in Sources */,
 				C5E3830A1AEAE66600FE5693 /* ColorTransformCL.cpp in Sources */,
+				C56A3F621CDD26C60045291B /* ColorTransformYAdjust2ndOrder.cpp in Sources */,
 				C5F63D1F1C61896B004D8B25 /* Conv444to422NN.cpp in Sources */,
 				C5AED38A1BD92B8800682304 /* TransferFunctionHPQ.cpp in Sources */,
 				C5DE3F3719DE9170006FA313 /* DistortionMetricmPSNRfast.cpp in Sources */,
@@ -1706,6 +1913,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C580D74C1CAF47F500E01A76 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C580D7571CAF485000E01A76 /* HDRVQM.cpp in Sources */,
+				C580D7581CAF485000E01A76 /* HDRVQMFrame.cpp in Sources */,
+				C580D7591CAF485000E01A76 /* ProjectParameters.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C5BE37AC1B752D2D00350F6D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1745,6 +1962,11 @@
 			isa = PBXTargetDependency;
 			target = C5133DD519CCF31100D64D48 /* HDRToolsCommon */;
 			targetProxy = C567FCE71A44E149006035B1 /* PBXContainerItemProxy */;
+		};
+		C580D74A1CAF47F500E01A76 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C5133DD519CCF31100D64D48 /* HDRToolsCommon */;
+			targetProxy = C580D74B1CAF47F500E01A76 /* PBXContainerItemProxy */;
 		};
 		C5BE37B81B752F1900350F6D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2101,6 +2323,90 @@
 			};
 			name = Release;
 		};
+		C580D7541CAF47F500E01A76 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = NO;
+				CLANG_WARN_ENUM_CONVERSION = NO;
+				CLANG_WARN_INT_CONVERSION = NO;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRIP_STYLE = all;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../projects/HDRVQM/inc\"";
+			};
+			name = Debug;
+		};
+		C580D7551CAF47F500E01A76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
+				CLANG_CXX_LIBRARY = "libstdc++";
+				CLANG_ENABLE_MODULES = NO;
+				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES;
+				CLANG_WARN_EMPTY_BODY = NO;
+				CLANG_WARN_ENUM_CONVERSION = NO;
+				CLANG_WARN_INT_CONVERSION = NO;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = NO;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = NO;
+				GCC_WARN_UNINITIALIZED_AUTOS = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				STRIP_STYLE = all;
+				USER_HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../../projects/HDRVQM/inc\"";
+			};
+			name = Release;
+		};
 		C5BD26A619CCABF3003F1B51 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2318,6 +2624,15 @@
 			buildConfigurations = (
 				C567FCF01A44E149006035B1 /* Debug */,
 				C567FCF11A44E149006035B1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C580D7531CAF47F500E01A76 /* Build configuration list for PBXNativeTarget "HDRVQM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C580D7541CAF47F500E01A76 /* Debug */,
+				C580D7551CAF47F500E01A76 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
