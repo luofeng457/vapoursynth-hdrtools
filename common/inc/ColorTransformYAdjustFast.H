@@ -104,6 +104,7 @@ private:
   double              m_lumaOffset;
   double              m_chromaOffset;
   int                 m_iLumaWeight;
+  bool                m_useAlternate;
 
   TransferFunction   *m_transferFunction;
   void                calcBounds(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);

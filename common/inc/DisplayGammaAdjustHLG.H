@@ -78,11 +78,13 @@ public:
   
   virtual void setup  (Frame *frame);
   virtual void forward(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2);
-  virtual void inverse(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2);
-  virtual void forward(Frame *frame);
-  virtual void inverse(Frame *frame);  
+  virtual void forward(double &comp0, double &comp1, double &comp2);
   virtual void forward(Frame *out,  const Frame *inp);
+  virtual void forward(Frame *frame);
+  virtual void inverse(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2);
+  virtual void inverse(double &comp0, double &comp1, double &comp2);
   virtual void inverse(Frame *out,  const Frame *inp);
+  virtual void inverse(Frame *frame);  
 };
 
 #endif

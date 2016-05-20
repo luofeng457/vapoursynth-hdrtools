@@ -90,7 +90,7 @@ private:
   int                 m_mode;
   int                 m_invMode;
   int                 m_modeRGB2XYZ;
-  bool                m_isICtCp;
+  bool                m_useNoBounds;
   
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;
@@ -109,6 +109,7 @@ private:
   TransferFunction   *m_transferFunction;
 
   void                allocateMemory(Frame* out, const Frame *inp);
+  void                convertToLinear (double &rComp, double &gComp, double &bComp);
   double              convertToYLinear(const double rComp, const double gComp, const double bComp);
   double              convertToY      (const double rComp, const double gComp, const double bComp);
   void                calcBoundsSloppy(int &ypBufLowPix, int &ypBufHighPix, double yLinear, double uComp, double vComp);

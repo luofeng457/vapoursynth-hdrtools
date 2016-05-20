@@ -87,6 +87,7 @@ private:
   int                 m_invMode;
   int                 m_modeRGB2XYZ;
   bool                m_isICtCp;
+  bool                m_useAlternate;
   
   ConvertColorFormat *m_fwdColorFormat;
   ConvertColorFormat *m_invColorFormat;

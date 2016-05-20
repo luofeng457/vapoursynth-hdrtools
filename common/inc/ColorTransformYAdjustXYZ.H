@@ -107,6 +107,7 @@ private:
   double              m_lumaOffset;
   double              m_chromaOffset;
   int                 m_iLumaWeight;
+  bool                m_useAlternate;
 
   TransferFunction   *m_transferFunction;
 

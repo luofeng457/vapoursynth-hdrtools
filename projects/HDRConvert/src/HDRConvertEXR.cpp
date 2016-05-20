@@ -531,7 +531,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
     m_toneMapping->process(currentFrame);
     
     linearFrame = currentFrame;
-    
+        
     if (m_linearDownConversion == TRUE) {
       // m_normalizeFunction->inverse(m_pDFrameStore[3], currentFrame);
       // m_frameScale->process(m_dFrameStore, m_pDFrameStore[3]);
@@ -629,7 +629,6 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
       }
       else {
         if (!(output->m_iConstantLuminance != 0 && (output->m_colorSpace == CM_YCbCr || output->m_colorSpace == CM_ICtCp))) {
-
           // Apply transfer function
           if ( m_useSingleTransferStep == FALSE ) {
             processFrame = m_pFrameStore[1];

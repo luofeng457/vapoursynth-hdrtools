@@ -387,6 +387,9 @@
     <ClCompile Include="src\ColorTransformYAdjust2ndOrder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\ColorTransformYAdjustHLG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -800,5 +803,13 @@
     <ClInclude Include="inc\ColorTransformYAdjust2ndOrder.H">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="inc\ColorTransformYAdjustHLG.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\DistortionMetricVIF.cpp.updated">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -82,7 +82,7 @@ ColorTransformYAdjustHLG::ColorTransformYAdjustHLG( ColorTransformParams *params
     m_width    [index] = 0;       // width of each color component
   }
   m_memoryAllocated = FALSE;
-  m_isICtCp         = FALSE;  
+  m_useNoBounds     = FALSE;
   
   // Method supports mainly RGB to YCbCr conversion. LMS to ICtCp is partially supported but
   // due to monotonicity issues it might not always result in best performance.
@@ -160,7 +160,7 @@ ColorTransformYAdjustHLG::ColorTransformYAdjustHLG( ColorTransformParams *params
       m_mode = CTF_LMSD_2_ICtCp;
       m_invMode = m_mode;
       m_modeRGB2XYZ = CTF_LMSD_2_XYZ;
-      m_isICtCp = TRUE;
+      m_useNoBounds = TRUE;
     }
     else {
     // Not supported properly yet
@@ -217,6 +217,8 @@ ColorTransformYAdjustHLG::ColorTransformYAdjustHLG( ColorTransformParams *params
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
 
+  if (m_transferFunctions == TF_HLG)
+    m_useNoBounds = TRUE;
   m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
   m_displayGammaAdjust = DisplayGammaAdjust::create(params->m_displayAdjustment, 1.0f, params->m_oSystemGamma);
 }
@@ -339,6 +341,12 @@ double ColorTransformYAdjustHLG::convertToYLinear(const double rComp, const doub
   return (m_transformRGBtoY[0] * m_transferFunction->getForward(rComp) + m_transformRGBtoY[1] * m_transferFunction->getForward(gComp) + m_transformRGBtoY[2] * m_transferFunction->getForward(bComp));
 }
 
+void ColorTransformYAdjustHLG::convertToLinear(double &rComp, double &gComp, double &bComp) {
+  rComp = m_transferFunction->getForward(rComp);
+  gComp = m_transferFunction->getForward(gComp);
+  bComp = m_transferFunction->getForward(bComp);
+}
+
 double ColorTransformYAdjustHLG::convertToY(const double rComp, const double gComp, const double bComp) {
   return (m_transformRGBtoY[0] * rComp + m_transformRGBtoY[1] * gComp + m_transformRGBtoY[2] * bComp);
 }
@@ -408,25 +416,6 @@ void ColorTransformYAdjustHLG::process ( Frame* out, const Frame *inp) {
       double yComp, uComp, vComp;
       double rComp, gComp, bComp;
       
-      float *floatComp[3];
-      double scale = 1.0;
-      double (ColorTransformYAdjustHLG::*pt2Convert)(double, double, double) = NULL;
-      
-      if (inp->m_hasAlternate == TRUE) {
-        floatComp[0] = inp->m_altFrame->m_floatComp[0];
-        floatComp[1] = inp->m_altFrame->m_floatComp[1];
-        floatComp[2] = inp->m_altFrame->m_floatComp[2];
-        scale       = 1.0 / inp->m_altFrameNorm;
-        pt2Convert  = &ColorTransformYAdjustHLG::convertToY;
-      }
-      else {
-        floatComp[0] = inp->m_floatComp[0];
-        floatComp[1] = inp->m_floatComp[1];
-        floatComp[2] = inp->m_floatComp[2];
-        scale        = 1.0;        
-        pt2Convert  = &ColorTransformYAdjustHLG::convertToYLinear;
-      }
-
       // Allocate memory. Note that current code does not permit change of resolution. TBDL
       if (m_memoryAllocated == FALSE) { 
         allocateMemory(out, inp);
@@ -477,10 +466,12 @@ void ColorTransformYAdjustHLG::process ( Frame* out, const Frame *inp) {
       m_displayGammaAdjust->setup(out);
       for (int i = 0; i < inp->m_compSize[0]; i++) {
         // First compute the linear value of the target Y (given original data)
-        if (inp->m_hasAlternate != TRUE) { // need to double check this
-          m_displayGammaAdjust->forward(floatComp[0][i], floatComp[1][i] , floatComp[2][i], &rComp, &gComp, &bComp);
-        }
-        yLinear = (*this.*pt2Convert)((double)rComp * scale, (double) gComp * scale,(double) bComp * scale);
+          rComp = inp->m_floatComp[0][i];
+          gComp = inp->m_floatComp[1][i];
+          bComp = inp->m_floatComp[2][i];
+          convertToLinear(rComp, gComp, bComp);
+          m_displayGammaAdjust->forward(rComp, gComp, bComp);
+          yLinear = convertToY(rComp, gComp, bComp);
 
         // The real reconstructed value will be an integer.
         int yPrimeMin = (int) 0; 
@@ -490,24 +481,23 @@ void ColorTransformYAdjustHLG::process ( Frame* out, const Frame *inp) {
         uComp = (double) m_invFrameStore->m_floatComp[1][i];
         vComp = (double) m_invFrameStore->m_floatComp[2][i];
 
-        if (m_isICtCp == FALSE)
+        if (m_useNoBounds == FALSE)
           calcBounds(yPrimeMin, yPrimeMax, yLinear, uComp, vComp);
         
         // Give dummy values. If these values are still left after search, then replace them.
         yConvMin = -1.0;
         yConvMax = -1.0;
         // Given reconstruction convert also inverse data
-        for (int j = 0; (j < m_maxIterations) && (yPrimeMax > yPrimeMin + 1) ; j++) 
-        {
+        for (int j = 0; (j < m_maxIterations) && (yPrimeMax > yPrimeMin + 1) ; j++) {
           yPrimeCandidate = (yPrimeMin + yPrimeMax) / 2;
           
           yComp = (double) yPrimeCandidate / m_lumaWeight;
           convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
 
-          m_displayGammaAdjust->forward(rComp, gComp, bComp, &rComp, &gComp, &bComp);
-
-          yConv = convertToYLinear(rComp, gComp, bComp);
-          
+          convertToLinear(rComp, gComp, bComp);
+          m_displayGammaAdjust->forward(rComp, gComp, bComp);
+          yConv = convertToY(rComp, gComp, bComp);
+        
           if (yConv < yLinear) {
             yPrimeMin = yPrimeCandidate;
             yConvMin  = yConv;
@@ -523,15 +513,17 @@ void ColorTransformYAdjustHLG::process ( Frame* out, const Frame *inp) {
           // if -1.0 we have always taken the lower value -- we must calculate yConvMin
           yComp = (double) yPrimeMin / m_lumaWeight;
           convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
-          m_displayGammaAdjust->forward(rComp, gComp, bComp, &rComp, &gComp, &bComp);
-          yConvMin = convertToYLinear(rComp, gComp, bComp);
+          convertToLinear(rComp, gComp, bComp);
+          m_displayGammaAdjust->forward(rComp, gComp, bComp);
+          yConvMin = convertToY(rComp, gComp, bComp);
         }
         if(yConvMax < 0) { 
           // if 1.0 we have always taken the higher value -- we must calcualte yConvMax
           yComp = (double) yPrimeMax / m_lumaWeight;
           convertToRGB(yComp, uComp, vComp, &rComp, &gComp, &bComp);
-          m_displayGammaAdjust->forward(rComp, gComp, bComp, &rComp, &gComp, &bComp);
-          yConvMax = convertToYLinear(rComp, gComp, bComp);
+          convertToLinear(rComp, gComp, bComp);
+          m_displayGammaAdjust->forward(rComp, gComp, bComp);
+          yConvMax = convertToY(rComp, gComp, bComp);
         }
         
         

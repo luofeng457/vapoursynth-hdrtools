@@ -218,6 +218,10 @@ ColorTransformYAdjust::ColorTransformYAdjust( ColorTransformParams *params )
     m_chromaOffset = (double) (1 << (m_bitDepth - 1));
   }
 
+  if (m_transferFunctions != TF_HLG)
+    m_useAlternate = TRUE;
+  else
+    m_useAlternate = FALSE;
   m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
 }
 
@@ -411,7 +415,7 @@ void ColorTransformYAdjust::process ( Frame* out, const Frame *inp) {
       double scale = 1.0;
       double (ColorTransformYAdjust::*pt2Convert)(double, double, double) = NULL;
       
-      if (inp->m_hasAlternate == TRUE) {
+      if (m_useAlternate == TRUE && inp->m_hasAlternate == TRUE) {
         floatComp[0] = inp->m_altFrame->m_floatComp[0];
         floatComp[1] = inp->m_altFrame->m_floatComp[1];
         floatComp[2] = inp->m_altFrame->m_floatComp[2];

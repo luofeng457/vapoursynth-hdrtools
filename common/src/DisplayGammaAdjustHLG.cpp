@@ -80,6 +80,22 @@ void DisplayGammaAdjustHLG::setup(Frame *frame) {
   ColorTransformGeneric::setYConversion(frame->m_colorPrimaries, (const double **) &m_transformY);
 }
 
+void DisplayGammaAdjustHLG::forward(double &comp0, double &comp1, double &comp2)
+{
+  double vComp0, vComp1, vComp2;
+  
+  vComp0 = comp0 / m_tfScale;
+  vComp1 = comp1 / m_tfScale;
+  vComp2 = comp2 / m_tfScale;
+  
+  double ySignal = dMax(0.000001, m_transformY[R_COMP] * vComp0 + m_transformY[G_COMP] * vComp1 + m_transformY[B_COMP] * vComp2);
+  double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
+  
+  comp0 = (float) (vComp0 * yDisplay) ;
+  comp1 = (float) (vComp1 * yDisplay) ;
+  comp2 = (float) (vComp2 * yDisplay) ;
+}
+
 void DisplayGammaAdjustHLG::forward(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2)
 {
   double vComp0, vComp1, vComp2;
@@ -94,6 +110,27 @@ void DisplayGammaAdjustHLG::forward(const double iComp0, const double iComp1, co
   *oComp0 = (float) (vComp0 * yDisplay) ;
   *oComp1 = (float) (vComp1 * yDisplay) ;
   *oComp2 = (float) (vComp2 * yDisplay) ;
+}
+
+
+void DisplayGammaAdjustHLG::inverse(double &comp0, double &comp1, double &comp2)
+{
+  // 1. reverse any "burnt-in" system gamma to remove any display reference and leave only scene referred linear light
+  // 2. scale RGB signals by a factor of m_tfscale (12 if not using super-white, otherwise 19.68)
+  // 3. apply OETF (signals now in the range of 0.0 to 1.00/1.09 (i.e. super white)
+  // Step 3 is not performed in this process, but instead it is done as part of the TransferFunction Class.
+  double vComp0, vComp1, vComp2;
+  
+  vComp0 = dMax(0.0, (double) comp0 / m_linScale);
+  vComp1 = dMax(0.0, (double) comp1 / m_linScale);
+  vComp2 = dMax(0.0, (double) comp2 / m_linScale);
+  
+  double yDisplay = dMax(0.000001, m_transformY[R_COMP] * vComp0 + m_transformY[G_COMP] * vComp1 + m_transformY[B_COMP] * vComp2);
+  double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+  
+  comp0 = (float) (vComp0 * yDisplayGamma) ;
+  comp1 = (float) (vComp1 * yDisplayGamma) ;
+  comp2 = (float) (vComp2 * yDisplayGamma) ;
 }
 
 void DisplayGammaAdjustHLG::inverse(const double iComp0, const double iComp1, const double iComp2,  double *oComp0, double *oComp1, double *oComp2)

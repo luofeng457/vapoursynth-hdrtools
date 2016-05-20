@@ -154,6 +154,7 @@
     <ClCompile Include="src\ColorTransformYAdjustAlt.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustFast.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustFull.cpp" />
+    <ClCompile Include="src\ColorTransformYAdjustHLG.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustLFast.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustTele.cpp" />
     <ClCompile Include="src\ColorTransformYAdjustXYZ.cpp" />
@@ -282,6 +283,7 @@
     <ClInclude Include="inc\ColorTransformYAdjustAlt.H" />
     <ClInclude Include="inc\ColorTransformYAdjustFast.H" />
     <ClInclude Include="inc\ColorTransformYAdjustFull.H" />
+    <ClInclude Include="inc\ColorTransformYAdjustHLG.H" />
     <ClInclude Include="inc\ColorTransformYAdjustLFast.H" />
     <ClInclude Include="inc\ColorTransformYAdjustTele.H" />
     <ClInclude Include="inc\ColorTransformYAdjustXYZ.H" />
@@ -394,6 +396,9 @@
     <ClInclude Include="inc\TransferFunctionPQLB.H" />
     <ClInclude Include="inc\TypeDefs.H" />
     <ClInclude Include="inc\Win32.H" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\DistortionMetricVIF.cpp.updated" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
