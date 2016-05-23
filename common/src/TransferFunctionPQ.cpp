@@ -70,21 +70,6 @@ TransferFunctionPQ::TransferFunctionPQ() {
   c1 = (3424.0        ) / 4096.0;
   c2 = (2413.0 *  32.0) / 4096.0;
   c3 = (2392.0 *  32.0) / 4096.0;
-  
-  m_normalFactor = 1.0;
-  m_invNormalFactor = 1.0;
-}
-
-TransferFunctionPQ::TransferFunctionPQ(float normalFactor) {
-  
-  m1 = (2610.0        ) / (4096.0 * 4.0);
-  m2 = (2523.0 * 128.0) / 4096.0;
-  c1 = (3424.0        ) / 4096.0;
-  c2 = (2413.0 *  32.0) / 4096.0;
-  c3 = (2392.0 *  32.0) / 4096.0;
-  
-  m_normalFactor = normalFactor;
-  m_invNormalFactor = 1.0 / m_normalFactor;
 }
 
 TransferFunctionPQ::~TransferFunctionPQ() {

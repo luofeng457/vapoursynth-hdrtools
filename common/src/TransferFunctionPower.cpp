@@ -65,6 +65,8 @@
 
 
 TransferFunctionPower::TransferFunctionPower(double gamma, double normalScale) {
+// This may habe problems with m_Lw. Should likely be changed to 1.0 (or removed)
+// need to test in the future
   m_Lw = normalScale;
   m_Lb = 0.0;
   m_gamma = gamma;

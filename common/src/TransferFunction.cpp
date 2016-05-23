@@ -162,64 +162,6 @@ double TransferFunction::forwardLUT(double value) {
 TransferFunction *TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT) {
   TransferFunction *result = NULL;
   
-  if (singleStep == TRUE) {
-    switch (method){
-      case TF_NULL:
-        result = new TransferFunctionNull();
-        break;
-      case TF_APH:
-        result = new TransferFunctionAPH(scale, minValue, maxValue);
-        break;
-      case TF_APQ:
-        result = new TransferFunctionAPQ(scale, minValue, maxValue);
-        break;
-      case TF_APQS:
-        result = new TransferFunctionAPQScaled(scale, maxValue);
-        break;
-      case TF_PQ:
-        result = new TransferFunctionPQ(scale);
-        break;
-      case TF_HPQ:
-        result = new TransferFunctionHPQ(scale);
-        break;
-      case TF_HPQ2:
-        result = new TransferFunctionHPQ2(scale);
-        break;
-      case TF_PH:
-        result = new TransferFunctionPH(scale);
-        break;
-      case TF_HG:
-        result = new TransferFunctionHG(systemGamma);
-        break;
-      case TF_HLG:
-        result = new TransferFunctionHLG();
-        break;
-      case TF_NORMAL:
-        result = new TransferFunctionNormalize(scale);
-        break;
-      case TF_POWER:
-        result = new TransferFunctionPower(systemGamma, scale);
-        break;
-      case TF_MPQ:
-        result = new TransferFunctionMPQ(0.1f, 1.5f, scale);
-        break;
-      case TF_AMPQ:
-        result = new TransferFunctionAMPQ(0.1f, 1.5f, scale, minValue, maxValue);
-        break;
-      case TF_BiasedMPQ:
-        result = new TransferFunctionBiasedMPQ(0.1f, 2.0f, scale);
-        break;
-#ifdef __SIM2_SUPPORT_ENABLED__
-      case TF_SIM2:
-        result = new TransferFunctionSim2();
-        break;
-#endif
-      default:
-        fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
-        exit(EXIT_FAILURE);
-    }
-  }
-  else {
     switch (method){
       case TF_NULL:
         result = new TransferFunctionNull();
@@ -258,13 +200,13 @@ TransferFunction *TransferFunction::create(int method, bool singleStep, float sc
         result = new TransferFunctionPower(systemGamma, scale);
         break;
       case TF_MPQ:
-        result = new TransferFunctionMPQ(0.00001f, 1.5f);
+        result = new TransferFunctionMPQ(0.1f, 1.5f);
         break;
       case TF_AMPQ:
-        result = new TransferFunctionAMPQ(0.00001f, 1.5f, minValue, maxValue);
+        result = new TransferFunctionAMPQ(0.1f, 1.5f, minValue, maxValue);
         break;
       case TF_BiasedMPQ:
-        result = new TransferFunctionBiasedMPQ(0.00001f, 2.0f);
+        result = new TransferFunctionBiasedMPQ(0.1f, 2.0f);
         break;
 #ifdef __SIM2_SUPPORT_ENABLED__
       case TF_SIM2:
@@ -275,6 +217,13 @@ TransferFunction *TransferFunction::create(int method, bool singleStep, float sc
         fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
         exit(EXIT_FAILURE);
     }
+  if (singleStep == TRUE) {
+    result->m_normalFactor = scale;
+    result->m_invNormalFactor = 1.0 / scale;
+  }
+  else {
+    result->m_normalFactor = 1.0;
+    result->m_invNormalFactor = 1.0;
   }
   
   result->m_enableLUT = enableLUT;

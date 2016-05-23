@@ -70,11 +70,9 @@ private:
   double m_scale;
   double m_powerValue;
 
-  void  init (float normalFactor);
 public:
   // Construct/Deconstruct
   TransferFunctionHPQ2();
-  TransferFunctionHPQ2(float normalFactor);
   virtual ~TransferFunctionHPQ2();
   
   virtual double forward(double value);

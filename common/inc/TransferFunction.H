@@ -111,6 +111,9 @@ public:
   virtual ~TransferFunction() {};
   static TransferFunction *create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE);
   
+  double  getNormalFactor()       const { return m_normalFactor; };
+  void    setNormalFactor(double value) { m_normalFactor = value; m_invNormalFactor = 1.0 / value; };
+  
   void    forward           (Frame *frame);
   void    forward           (Frame *frame, int component);
   void    inverse           (Frame *frame);

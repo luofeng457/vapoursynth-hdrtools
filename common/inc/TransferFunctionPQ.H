@@ -67,7 +67,6 @@ private:
 public:
   // Construct/Deconstruct
   TransferFunctionPQ();
-  TransferFunctionPQ(float normalFactor);
   virtual ~TransferFunctionPQ();
   
   virtual double forward(double value);

@@ -66,6 +66,8 @@ private:
   double m_a;
   double m_b;
   double m_c;
+  double m_tfScale;
+  double m_invTfScale;
   
 public:
   // Constructor and destructor

@@ -81,7 +81,6 @@ private:
 public:
   // Construct/Deconstruct
   TransferFunctionAMPQ(float inflectionPoint, float scale, double minValue, double maxValue);
-  TransferFunctionAMPQ(float inflectionPoint, float scale, float normalFactor, double minValue, double maxValue);
   virtual ~TransferFunctionAMPQ();
   
   virtual double forward(double value);

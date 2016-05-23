@@ -74,7 +74,6 @@ private:
 public:
   // Construct/Deconstruct
   TransferFunctionBiasedMPQ(float inflectionPoint, float scale);
-  TransferFunctionBiasedMPQ(float inflectionPoint, float scale, float normalFactor);
   virtual ~TransferFunctionBiasedMPQ();
   
   virtual double forward(double value);

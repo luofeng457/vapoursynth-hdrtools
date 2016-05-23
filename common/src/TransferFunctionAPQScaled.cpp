@@ -78,21 +78,6 @@ TransferFunctionAPQScaled::TransferFunctionAPQScaled(double maxValue) {
   m_maxValueRec = forward(m_maxValueInv);
 }
 
-TransferFunctionAPQScaled::TransferFunctionAPQScaled(double normalFactor, double maxValue) {
-  
-  m1 = (2610.0        ) / (4096 * 4);
-  m2 = (2523.0 * 128.0) / 4096;
-  c1 = (3424.0        ) / 4096;
-  c2 = (2413.0 *  32.0) / 4096;
-  c3 = (2392.0 *  32.0) / 4096;
-  
-  m_normalFactor = normalFactor;
-  
-  m_maxValue    = maxValue / 10000.0;
-  m_maxValueInv = inversePQ(m_maxValue);
-  m_maxValueRec = forwardPQ(m_maxValueInv);
-}
-
 TransferFunctionAPQScaled::~TransferFunctionAPQScaled() {
 }
 

@@ -66,15 +66,6 @@
 TransferFunctionPH::TransferFunctionPH() {
   m_rho   = 25.0;
   m_gamma = 2.4;
-  
-  m_normalFactor = 1.0;
-}
-
-TransferFunctionPH::TransferFunctionPH(float normalFactor) {
-  m_rho   = 25.0;
-  m_gamma = 2.4;
-  
-  m_normalFactor = normalFactor;
 }
 
 TransferFunctionPH::~TransferFunctionPH() {

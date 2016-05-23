@@ -64,25 +64,11 @@
 //-----------------------------------------------------------------------------
 
 TransferFunctionHPQ::TransferFunctionHPQ() {
-  init(1.0);
-}
-
-TransferFunctionHPQ::TransferFunctionHPQ(float normalFactor) {
-  init(normalFactor);
-}
-
-TransferFunctionHPQ::~TransferFunctionHPQ() {
-}
-
-void TransferFunctionHPQ::init(float normalFactor) {
   m1 = (2610.0        ) / (4096.0 * 4.0);
   m2 = (2523.0 * 128.0) / 4096.0;
   c1 = (3424.0        ) / 4096.0;
   c2 = (2413.0 *  32.0) / 4096.0;
   c3 = (2392.0 *  32.0) / 4096.0;
-  
-  m_normalFactor = normalFactor;
-  m_invNormalFactor = 1.0 / m_normalFactor;
   
   m_linear = 4.5;
   m_value0 = 0.00018;
@@ -95,6 +81,10 @@ void TransferFunctionHPQ::init(float normalFactor) {
   m_iValue1 = m_scale;    
   m_iValue0 = (m_value0) * (m_scale * m_linear * 100.0);    
 }
+
+TransferFunctionHPQ::~TransferFunctionHPQ() {
+}
+
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------

@@ -72,7 +72,6 @@ private:
 public:
   // Construct/Deconstruct
   TransferFunctionAPH(double minValue = 0.0, double maxValue = 4000.0);
-  TransferFunctionAPH(float normalFactor, double minValue = 0.0, double maxValue = 4000.0);
   virtual ~TransferFunctionAPH();
   
   virtual double forward(double value);

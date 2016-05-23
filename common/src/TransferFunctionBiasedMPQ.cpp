@@ -82,21 +82,6 @@ TransferFunctionBiasedMPQ::TransferFunctionBiasedMPQ(float inflectionPoint, floa
   
 }
 
-TransferFunctionBiasedMPQ::TransferFunctionBiasedMPQ(float inflectionPoint, float scale, float normalFactor) {
-  m1 = (2610.0        ) / (4096.0 * 4.0);
-  m2 = (2523.0 * 128.0) / 4096.0;
-  c1 = (3424.0        ) / 4096.0;
-  c2 = (2413.0 *  32.0) / 4096.0;
-  c3 = (2392.0 *  32.0) / 4096.0;
-  
-  m_normalFactor        = (double) normalFactor;
-  m_invNormalFactor     = 1.0 / m_normalFactor;
-  m_inflectionPoint     = (double) inflectionPoint / m_normalFactor;
-  m_invInflectionPoint  = inversePQ(m_inflectionPoint);
-  m_scale               = scale;
-  m_invInflectionPointDiv2 = m_invInflectionPoint / m_scale;
-}
-
 TransferFunctionBiasedMPQ::~TransferFunctionBiasedMPQ() {
 }
 

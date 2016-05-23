@@ -77,11 +77,9 @@ private:
   double forwardPQ(double value);
   double inversePQ(double value);
 
-  void  init (float normalFactor);
 public:
   // Construct/Deconstruct
   TransferFunctionHPQ();
-  TransferFunctionHPQ(float normalFactor);
   virtual ~TransferFunctionHPQ();
   
   virtual double forward(double value);

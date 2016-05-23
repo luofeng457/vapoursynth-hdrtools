@@ -64,6 +64,8 @@
 
 TransferFunctionHLG::TransferFunctionHLG()
 {
+  m_tfScale      = 12.0; //19.6829249; // transfer function scaling - assuming super whites
+  m_invTfScale   = 1.0 / m_tfScale;
   m_normalFactor = 1.0;
   m_a            = 0.17883277;
   m_b            = 0.28466892;
@@ -76,10 +78,12 @@ TransferFunctionHLG::~TransferFunctionHLG()
 }
 
 double TransferFunctionHLG::forward(double value) {
-  return (value < 0.5 ? (value * value * 4.0) : (exp((value - m_c) / m_a) + m_b));
+  return ((value < 0.5 ? (value * value * 4.0) : (exp((value - m_c) / m_a) + m_b)) * m_invTfScale);
 }
 
 double TransferFunctionHLG::inverse(double value) {
+ //printf("the values are %10.7f\n", value);
+  value *= m_tfScale;
   return (value < 1.0 ? 0.5 * sqrt(value) : m_a * log(value - m_b) + m_c);
 }
 

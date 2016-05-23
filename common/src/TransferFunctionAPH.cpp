@@ -76,21 +76,6 @@ TransferFunctionAPH::TransferFunctionAPH(double minValue, double maxValue) {
   m_denomInv  = m_maxValueInv - m_minValueInv;
 }
 
-TransferFunctionAPH::TransferFunctionAPH(float normalFactor, double minValue, double maxValue) {
-  m_rho   = 25.0;
-  m_gamma = 2.4;
-  
-  m_normalFactor = normalFactor;
-  
-  m_minValue = minValue / 4000.0;
-  m_maxValue = maxValue / 4000.0;
-  m_minValueInv = inversePH(m_minValue);
-  m_maxValueInv = inversePH(m_maxValue);
-  
-  m_denomInv  = m_maxValueInv - m_minValueInv;
-
-}
-
 TransferFunctionAPH::~TransferFunctionAPH() {
 }
 

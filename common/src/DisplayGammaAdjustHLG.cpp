@@ -84,10 +84,13 @@ void DisplayGammaAdjustHLG::forward(double &comp0, double &comp1, double &comp2)
 {
   double vComp0, vComp1, vComp2;
   
-  vComp0 = comp0 / m_tfScale;
-  vComp1 = comp1 / m_tfScale;
-  vComp2 = comp2 / m_tfScale;
-  
+  //vComp0 = comp0 / m_tfScale;
+  //vComp1 = comp1 / m_tfScale;
+  //vComp2 = comp2 / m_tfScale;
+  vComp0 = comp0;
+  vComp1 = comp1;
+  vComp2 = comp2;
+
   double ySignal = dMax(0.000001, m_transformY[R_COMP] * vComp0 + m_transformY[G_COMP] * vComp1 + m_transformY[B_COMP] * vComp2);
   double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
   
@@ -100,9 +103,13 @@ void DisplayGammaAdjustHLG::forward(const double iComp0, const double iComp1, co
 {
   double vComp0, vComp1, vComp2;
   
-  vComp0 = iComp0 / m_tfScale;
-  vComp1 = iComp1 / m_tfScale;
-  vComp2 = iComp2 / m_tfScale;
+  //vComp0 = iComp0 / m_tfScale;
+  //vComp1 = iComp1 / m_tfScale;
+  //vComp2 = iComp2 / m_tfScale;
+  vComp0 = iComp0;
+  vComp1 = iComp1;
+  vComp2 = iComp2;
+
   
   double ySignal = dMax(0.000001, m_transformY[R_COMP] * vComp0 + m_transformY[G_COMP] * vComp1 + m_transformY[B_COMP] * vComp2);
   double yDisplay = m_linScale * pow(ySignal, m_gamma) / ySignal;
@@ -126,8 +133,9 @@ void DisplayGammaAdjustHLG::inverse(double &comp0, double &comp1, double &comp2)
   vComp2 = dMax(0.0, (double) comp2 / m_linScale);
   
   double yDisplay = dMax(0.000001, m_transformY[R_COMP] * vComp0 + m_transformY[G_COMP] * vComp1 + m_transformY[B_COMP] * vComp2);
-  double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
-  
+  //double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+  double yDisplayGamma = pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+
   comp0 = (float) (vComp0 * yDisplayGamma) ;
   comp1 = (float) (vComp1 * yDisplayGamma) ;
   comp2 = (float) (vComp2 * yDisplayGamma) ;
@@ -146,7 +154,8 @@ void DisplayGammaAdjustHLG::inverse(const double iComp0, const double iComp1, co
   vComp2 = dMax(0.0, (double) iComp2 / m_linScale);
   
   double yDisplay = dMax(0.000001, m_transformY[R_COMP] * vComp0 + m_transformY[G_COMP] * vComp1 + m_transformY[B_COMP] * vComp2);
-  double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+  //double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+  double yDisplayGamma = pow(yDisplay,(1.0 - m_gamma) / m_gamma);
   
   *oComp0 = (float) (vComp0 * yDisplayGamma) ;
   *oComp1 = (float) (vComp1 * yDisplayGamma) ;
@@ -164,7 +173,8 @@ void DisplayGammaAdjustHLG::forward(Frame *frame)
       
       for (int index = 0; index < frame->m_compSize[Y_COMP]; index++) {
         for(int component = 0; component < 3; component++)  {
-          vComp[component] = frame->m_floatComp[component][index] / m_tfScale;
+          //vComp[component] = frame->m_floatComp[component][index] / m_tfScale;
+          vComp[component] = frame->m_floatComp[component][index];
         }
         
         double ySignal = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
@@ -191,7 +201,8 @@ void DisplayGammaAdjustHLG::forward(Frame *out, const Frame *inp)
       
       for (int index = 0; index < inp->m_compSize[Y_COMP]; index++) {
         for(int component = 0; component < 3; component++)  {
-          vComp[component] = inp->m_floatComp[component][index] / m_tfScale;
+          //vComp[component] = inp->m_floatComp[component][index] / m_tfScale;
+          vComp[component] = inp->m_floatComp[component][index];
         }
         
         double ySignal = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
@@ -232,7 +243,8 @@ void DisplayGammaAdjustHLG::inverse(Frame *frame)
         }
                 
         double yDisplay = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
-        double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+        //double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+        double yDisplayGamma = pow(yDisplay,(1.0 - m_gamma) / m_gamma);
         
         for(int component = 0; component < 3; component++)  {
           frame->m_floatComp[component][index] = (float) (vComp[component] * yDisplayGamma) ;
@@ -263,7 +275,8 @@ void DisplayGammaAdjustHLG::inverse(Frame *out, const Frame *inp)
         }
         
         double yDisplay = dMax(0.000001, transformY[R_COMP] * vComp[R_COMP] + transformY[G_COMP] * vComp[G_COMP] + transformY[B_COMP] * vComp[B_COMP]);
-        double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+        //double yDisplayGamma = m_tfScale * pow(yDisplay,(1.0 - m_gamma) / m_gamma);
+        double yDisplayGamma = pow(yDisplay,(1.0 - m_gamma) / m_gamma);
         
         for(int component = 0; component < 3; component++)  {
           out->m_floatComp[component][index] = (float) (vComp[component] * yDisplayGamma) ;

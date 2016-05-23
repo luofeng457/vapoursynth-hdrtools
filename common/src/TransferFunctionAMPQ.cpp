@@ -88,29 +88,6 @@ TransferFunctionAMPQ::TransferFunctionAMPQ(float inflectionPoint, float scale, d
   
 }
 
-TransferFunctionAMPQ::TransferFunctionAMPQ(float inflectionPoint, float scale, float normalFactor, double minValue, double maxValue) {
-  m1 = (2610.0        ) / (4096.0 * 4.0);
-  m2 = (2523.0 * 128.0) / 4096.0;
-  c1 = (3424.0        ) / 4096.0;
-  c2 = (2413.0 *  32.0) / 4096.0;
-  c3 = (2392.0 *  32.0) / 4096.0;
-  
-  m_normalFactor        = (double) normalFactor;
-
-  m_minValue = minValue / 10000.0;
-  m_maxValue = maxValue / 10000.0;
-  m_minValueInv = inversePQ(m_minValue);
-  m_maxValueInv = inversePQ(m_maxValue);
-  
-  m_denomInv  = m_maxValueInv - m_minValueInv;
-  
-
-  m_inflectionPoint     = (double) inflectionPoint / m_normalFactor;
-  //m_invInflectionPoint  = inversePQ(m_inflectionPoint);
-  m_invInflectionPoint  = dMax(0.0, dMin(1.0, (inversePQ(m_inflectionPoint) - m_minValueInv) / m_denomInv));
-  m_scale               = scale;
-  m_invInflectionPointDiv2 = m_invInflectionPoint / m_scale;
-}
 
 TransferFunctionAMPQ::~TransferFunctionAMPQ() {
 }

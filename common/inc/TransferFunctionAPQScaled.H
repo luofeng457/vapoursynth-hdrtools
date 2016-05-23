@@ -72,7 +72,6 @@ private:
 public:
   // Construct/Deconstruct
   TransferFunctionAPQScaled(double maxValue);
-  TransferFunctionAPQScaled(double normalFactor, double maxValue);
   virtual ~TransferFunctionAPQScaled();
   
   virtual double forward(double value);

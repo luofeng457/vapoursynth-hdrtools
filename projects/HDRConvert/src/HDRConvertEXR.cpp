@@ -442,9 +442,17 @@ void HDRConvertEXR::init (ProjectParameters *inputParams) {
 
     m_outputTransferFunction  = TransferFunction::create(output->m_transferFunction, TRUE, inputParams->m_outNormalScale, output->m_systemGamma, inputParams->m_outMinValue, inputParams->m_outMaxValue, inputParams->m_enableTFunctionLUT);
   }
- 
+  
   m_srcDisplayGammaAdjust = DisplayGammaAdjust::create(input->m_displayAdjustment,  m_useSingleTransferStep ? inputParams->m_srcNormalScale : 1.0f, input->m_systemGamma);
   m_outDisplayGammaAdjust = DisplayGammaAdjust::create(output->m_displayAdjustment, m_useSingleTransferStep ? inputParams->m_outNormalScale : 1.0f, output->m_systemGamma);
+  
+  if (input->m_displayAdjustment == DA_HLG) {
+    m_inputTransferFunction->setNormalFactor(1.0);
+  }
+  if (output->m_displayAdjustment == DA_HLG) {
+    m_outputTransferFunction->setNormalFactor(1.0);
+  }
+
   
   m_toneMapping = ToneMapping::create(inputParams->m_toneMapping, &inputParams->m_tmParams);
 }
