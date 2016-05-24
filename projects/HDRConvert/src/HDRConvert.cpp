@@ -74,11 +74,12 @@
  ***********************************************************************
  */
 void HDRConvertExit (char *func_name) {
-    printf("Usage: %s [-h] {[-s] [-m]} [-f config.cfg] "
+    printf("Usage: %s [-h] {[-H] [-s] [-m]} [-f config.cfg] "
     "{[-p Param1=Value1]..[-p ParamM=ValueM]}\n\n"
 
     "Options:\n"
-    "   -h :  Help mode\n"
+    "   -h :  Help mode (this info)\n"
+    "   -H :  Help mode (long format)\n"
     "   -s :  Silent mode\n"
     "   -f :  Read <config.cfg> for reseting selected parameters.\n"
     "   -p :  Set parameter <ParamM> to <ValueM>.\n"
@@ -90,10 +91,10 @@ void HDRConvertExit (char *func_name) {
     "## Examples of usage:\n"
     "   %s\n"
     "   %s  -h\n"
+    "   %s  -H\n"
     "   %s  -f config.cfg\n"
     "   %s  -f config.cfg -p SourceFile=\"seq.yuv\" -p width=176 -p height=144\n" 
-    ,func_name,func_name,func_name,func_name,func_name);
-    exit(EXIT_FAILURE);
+    ,func_name,func_name,func_name,func_name,func_name,func_name);
 }
 
 HDRConvert *HDRConvert::create(ProjectParameters *inputParams) {
@@ -114,7 +115,7 @@ HDRConvert *HDRConvert::create(ProjectParameters *inputParams) {
 //-----------------------------------------------------------------------------
 
 int main(int argc, char **argv) {
-  int help_mode = FALSE;
+  int helpMode = 0;
   int a;
   HDRConvert* hdrProcess;
   int numCLParams = 0, par;
@@ -137,8 +138,10 @@ int main(int argc, char **argv) {
   
   for (a = 1; a < argc; a++) {
     if (argv[a][ZERO] == '-') {
-      if (strcasecmp(argv[a], "-h") == ZERO)
-        help_mode = TRUE;
+      if (strcmp(argv[a], "-h") == ZERO)
+        helpMode = 1;
+      else if (strcmp(argv[a], "-H") == ZERO)
+        helpMode = 2;
       else if (strcasecmp (argv[a], "-v") == ZERO) {
         printf("%s ",argv[ZERO]);
         printf("V." VERSION ": compiled " __DATE__ " " __TIME__ "\n");
@@ -174,13 +177,13 @@ int main(int argc, char **argv) {
         }
       }
       else
-        help_mode = TRUE;
+        helpMode = 3;
     }
     else
       break;
   }
   
-  if (help_mode == TRUE)
+  if (helpMode != 0)
     params->m_silentMode = FALSE;
   
   if (params->m_silentMode == FALSE) {
@@ -189,8 +192,23 @@ int main(int argc, char **argv) {
     printf("---------------------------------------------------------\n");
   }
   
-  if (help_mode == TRUE) {
+  if (helpMode != 0) {
     HDRConvertExit(argv[ZERO]);
+
+    if (helpMode == 2)
+      params->printParams();
+
+    for (par = 0; par < MAX_CL_PARAMS; par++){
+      delete [] cl_params[par];
+    }
+    
+    delete [] cl_params;
+    delete [] parfile;
+
+    if (helpMode == 3)
+      exit(EXIT_FAILURE);
+    else
+      exit(EXIT_SUCCESS);
   }
   
   // Prepare parameters

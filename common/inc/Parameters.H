@@ -119,7 +119,8 @@ public:
   Parameters();
   virtual  ~Parameters() = 0;
 
-
+  
+  void  printParams           ();
   void  setupFormat           ( FrameFormat *format );
   int   getNumberOfFrames     ( const FrameFormat *source, IOVideo *inputFile, int start_frame );
   void  configure             ( char *filename, char **cl_params, int numCLParams, bool readConfig );

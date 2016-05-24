@@ -374,6 +374,70 @@ int Parameters::parseCommandLineParams( char **cl_params, int numCLParams ) {
   return ONE;
 }
 
+// parse buffered command line parameters
+void Parameters::printParams() {
+  int i;
+  printf("Supported Parameters\n");
+  printf("====================\n\n");
+  printf("Integet type parameters:\n");
+  printf("------------------------\n");
+  printf("Name                                  Default         Min         Max   Description\n");
+  printf("===================================================================================\n");
+  for (i = 0; intParameterList[i].ptr != NULL; i++) {
+    printf("%-32s = %8d\t{%8d, %10d} %s\n",intParameterList[i].name,
+           intParameterList[i].default_val,
+           intParameterList[i].min_val,
+           intParameterList[i].max_val,
+           intParameterList[i].description);
+  }
+  printf("\n");
+  printf("Boolean type parameters:\n");
+  printf("------------------------\n");
+  printf("Name                                  Default         Min         Max   Description\n");
+  printf("===================================================================================\n");
+  for (i = 0; boolParameterList[i].ptr != NULL; i++) {
+    printf("%-32s = %8d\t{%8d, %10d} %s\n",boolParameterList[i].name,
+           boolParameterList[i].default_val,
+           boolParameterList[i].min_val,
+           boolParameterList[i].max_val,
+           boolParameterList[i].description);
+  }
+  printf("\n");
+  printf("Float type parameters:\n");
+  printf("----------------------\n");
+  printf("Name                                  Default      Min            Max      Description\n");
+  printf("======================================================================================\n");
+  for (i = 0; floatParameterList[i].ptr != NULL; i++) {
+    printf("%-32s = %13.5f {%7.5f, %14.5f} %s\n",floatParameterList[i].name,
+           floatParameterList[i].default_val,
+           floatParameterList[i].min_val,
+           floatParameterList[i].max_val,
+           floatParameterList[i].description);
+  }
+  printf("\n");
+  printf("Double type parameters:\n");
+  printf("-----------------------\n");
+  printf("Name                                  Default      Min            Max      Description\n");
+  printf("======================================================================================\n");
+  for (i = 0; doubleParameterList[i].ptr != NULL; i++) {
+    printf("%-32s = %13.5f {%7.5f, %14.5f} %s\n",doubleParameterList[i].name,
+           doubleParameterList[i].default_val,
+           doubleParameterList[i].min_val,
+           doubleParameterList[i].max_val,
+           doubleParameterList[i].description);
+  }
+  printf("\n");
+  printf("String type parameters:\n");
+  printf("-----------------------\n");
+  printf("Name                                                    Default         Description\n");
+  printf("===================================================================================\n");
+  for (i = 0; stringParameterList[i].ptr != NULL; i++) {
+    printf("%-32s = %32s\t%s\n",stringParameterList[i].name,
+           stringParameterList[i].default_val,
+           stringParameterList[i].description);
+  }
+}
+
 //-----------------------------------------------------------------------------
 // End of file
 //-----------------------------------------------------------------------------
