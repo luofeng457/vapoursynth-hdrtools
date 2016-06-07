@@ -499,7 +499,7 @@ void Output::copyFrame(Frame *frm) {
   }
   else {
     if (frm->m_bitDepth == 8)
-      m_data = m_data;
+      m_data = frm->m_data;
     else
       m_ui16Data = frm->m_ui16Data;
   }

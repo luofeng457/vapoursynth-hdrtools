@@ -665,6 +665,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
         // Output to m_pFrameStore[0] memory with appropriate color space conversion
         processFrame = m_pFrameStore[0];
         m_colorTransform->process(processFrame, currentFrame);
+
         currentFrame = processFrame;   
                 
         if (m_oFrameStore->m_chromaFormat != currentFrame->m_chromaFormat) {
@@ -672,13 +673,13 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
           processFrame = m_pFrameStore[3];
           if (m_filterInFloat == TRUE) {
             m_convertTo420->process  (processFrame, currentFrame);
+
             currentFrame = processFrame;
             processFrame = m_oFrameStore;
                         
             m_convertProcess->process(processFrame, currentFrame);        
           }
           else {
-          
             m_convertProcess->process(processFrame, currentFrame);
             currentFrame = processFrame;
             processFrame = m_oFrameStore;
@@ -693,6 +694,7 @@ void HDRConvertEXR::process( ProjectParameters *inputParams ) {
         }
       }
     }
+
     // frame output
     m_outputFrame->copyFrame(m_oFrameStore);
     m_outputFrame->writeOneFrame(m_outputFile, frameNumber, m_outputFile->m_fileHeader, 0);
