@@ -78,14 +78,14 @@
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
-void TransferFunction::initLUT() {  
+void TransferFunction::initLUT() {
   if (m_enableLUT == FALSE) {
     m_binsLUT = 0;
   }
   else {
     printf("Initializing LUTs for TF computations\n");
     uint32 i, j;
-    m_binsLUT = 10;
+    m_binsLUT = MAX_BIN_LUT;
     m_elementsLUT.resize    (m_binsLUT);
     m_multiplierLUT.resize  (m_binsLUT);
     m_boundLUT.resize       (m_binsLUT + 1);
@@ -93,7 +93,7 @@ void TransferFunction::initLUT() {
     m_fwdTransformLUT.resize(m_binsLUT);
     m_boundLUT[0] = 0.0;
     for (i = 0; i < m_binsLUT; i++) {
-      m_elementsLUT[i] = 10000; // Size of each bin. 
+      m_elementsLUT[i] = MAX_ELEMENTS_LUT; // Size of each bin.
                                 // Could be different for each bin, but for now lets set this to be the same.
       m_boundLUT[i + 1] = 1 / pow( 10.0 , (double) (m_binsLUT - i - 1)); // upper bin boundary
       double stepSize = (m_boundLUT[i + 1] -  m_boundLUT[i]) / (m_elementsLUT[i] - 1);
@@ -111,6 +111,40 @@ void TransferFunction::initLUT() {
   }
 }
 
+void TransferFunction::initfwdTFDerivLUT() {
+  if (m_enableFwdDerivLUT == FALSE) {
+    m_derivBinsLUT = 0;
+  }
+  else {
+    printf("Initializing TF derivative LUTs\n");
+    //bool enableLUT = m_enableLUT;
+    //m_enableLUT = FALSE;  // To initialize forward derivative using real TF calculations
+                            // the above does not really seem necessary. Lets use what we have.
+    uint32 i, j;
+    m_derivBinsLUT = MAX_BIN_DERIV_LUT;
+    m_derivElementsLUT.resize    (m_derivBinsLUT);
+    m_derivMultiplierLUT.resize  (m_derivBinsLUT);
+    m_derivBoundLUT.resize       (m_derivBinsLUT + 1);
+    m_fwdTFDerivativeLUT.resize  (m_derivBinsLUT);
+    
+    m_derivBoundLUT[0] = 0.0;
+    for (i = 0; i < m_derivBinsLUT; i++) {
+      m_derivElementsLUT[i] = MAX_ELEMENTS_DERIV_LUT; // Size of each bin.
+                                                      // Could be different for each bin, but for now lets set this to be the same.
+      m_derivBoundLUT[i + 1] = 1 / pow( 10.0 , (double) (m_derivBinsLUT - i - 1)); // upper bin boundary
+      double stepSize = (m_derivBoundLUT[i + 1] -  m_derivBoundLUT[i]) / (m_derivElementsLUT[i] - 1);
+      m_derivMultiplierLUT[i] = (double) (m_derivElementsLUT[i] - 1) / (m_derivBoundLUT[i + 1] -  m_derivBoundLUT[i]);
+      
+      // Allocate also memory for the derivative LUT
+      m_fwdTFDerivativeLUT[i].resize(m_derivElementsLUT[i]);
+      for (j = 0; j < m_derivElementsLUT[i] ; j++) {
+        double curValue = m_derivBoundLUT[i] + (double) j * stepSize;
+        m_fwdTFDerivativeLUT[i][j] = forwardDerivative(curValue);
+      }
+    }
+    //m_enableLUT = enableLUT;
+  }
+}
 
 
 double TransferFunction::inverseLUT(double value) {
@@ -145,11 +179,31 @@ double TransferFunction::forwardLUT(double value) {
     // now search for value in the table
     for (uint32 i = 0; i < m_binsLUT; i++) {
       if (value < m_boundLUT[i + 1]) { // value located
-        double satValue = (value - m_boundLUT[i]) * m_multiplierLUT[i];
-        //return (m_invTransformMap[(int) dRound(satValue)]);
-        int    valuePlus     = (int) dCeil(satValue) ;
-        double distancePlus  = (double) valuePlus - satValue;
+        double satValue     = (value - m_boundLUT[i]) * m_multiplierLUT[i];
+        int    valuePlus    = (int) dCeil(satValue) ;
+        double distancePlus = (double) valuePlus - satValue;
         return (m_fwdTransformLUT[i][valuePlus - 1] * distancePlus + m_fwdTransformLUT[i][valuePlus] * (1.0 - distancePlus));
+      }
+    }
+  }
+  return 0.0;
+}
+
+double TransferFunction::forwardDerivLUT(double value) {
+  if (value <= 0.0)
+    return m_fwdTFDerivativeLUT[0][0];
+  else if (value >= 1.0  ) {
+    // top value, most likely 1.0
+    return m_fwdTFDerivativeLUT[m_derivBinsLUT - 1][m_derivElementsLUT[m_derivBinsLUT - 1] - 1];
+  }
+  else {
+    // now search for value in the table
+    for (uint32 i = 0; i < m_derivBinsLUT; i++) {
+      if (value < m_derivBoundLUT[i + 1]) { // value located
+        double satValue     = (value - m_derivBoundLUT[i]) * m_derivMultiplierLUT[i];
+        int    valuePlus    = (int) dCeil(satValue) ;
+        double distancePlus = (double) valuePlus - satValue;
+        return (m_fwdTFDerivativeLUT[i][valuePlus - 1] * distancePlus + m_fwdTFDerivativeLUT[i][valuePlus] * (1.0 - distancePlus));
       }
     }
   }
@@ -159,7 +213,7 @@ double TransferFunction::forwardLUT(double value) {
 //-----------------------------------------------------------------------------
 // Public methods
 //-----------------------------------------------------------------------------
-TransferFunction *TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT) {
+TransferFunction *TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT, bool enableFwdDerivLUT) {
   TransferFunction *result = NULL;
   
     switch (method){
@@ -227,15 +281,16 @@ TransferFunction *TransferFunction::create(int method, bool singleStep, float sc
   }
   
   result->m_enableLUT = enableLUT;
+  result->m_enableFwdDerivLUT = enableFwdDerivLUT;
   
   result->initLUT();
+  result->initfwdTFDerivLUT();
   
   return result;
 }
 
 
-double TransferFunction::forwardDerivative(double value)
-{
+double TransferFunction::forwardDerivative(double value) {
   double low  = value - DERIV_STEP;
   double high = value + DERIV_STEP;
   low  = ( low  > DERIV_LOWER_BOUND  ) ? low  : DERIV_LOWER_BOUND;
@@ -244,14 +299,21 @@ double TransferFunction::forwardDerivative(double value)
   return (getForward(high) - getForward(low)) / (high - low) ;
 }
 
-double TransferFunction::inverseDerivative(double value)
-{
+double TransferFunction::inverseDerivative(double value) {
   double low  = value - DERIV_STEP;
   double high = value + DERIV_STEP;
   low  = ( low  > DERIV_LOWER_BOUND  ) ? low  : DERIV_LOWER_BOUND;
   high = ( high < DERIV_HIGHER_BOUND ) ? high : DERIV_HIGHER_BOUND;
   
   return (getInverse(high) - getInverse(low)) / (high - low) ;
+}
+
+double TransferFunction::getForwardDerivative(double value) {
+ // printf("Values %10.7f %10.7f %10.7f %10.7f\n", value, forwardDerivLUT(value), forwardDerivative(value), forwardDerivLUT(value) - forwardDerivative(value));
+  if (m_enableFwdDerivLUT == TRUE)
+    return forwardDerivLUT(value);
+  else
+    return forwardDerivative(value);
 }
 
 
@@ -293,7 +355,6 @@ void TransferFunction::forward( Frame* frame ) {
       }
     }
     else {
-      printf("in here\n");
       for (int i = 0; i < frame->m_size; i++) {
         frame->m_floatData[i] = (float) forwardLUT((double) frame->m_floatData[i]);
       }      

@@ -57,9 +57,13 @@
 #include "Frame.H"
 
 
-static const double DERIV_STEP         = 0.0000001;
-static const double DERIV_LOWER_BOUND  = 0.0000000;
-static const double DERIV_HIGHER_BOUND = 1.0000000;
+static const double DERIV_STEP             = 0.0000001;
+static const double DERIV_LOWER_BOUND      = 0.0000000;
+static const double DERIV_HIGHER_BOUND     = 1.0000000;
+static const int    MAX_BIN_LUT            = 10;
+static const int    MAX_ELEMENTS_LUT       = 10000;
+static const int    MAX_BIN_DERIV_LUT      = 10;
+static const int    MAX_ELEMENTS_DERIV_LUT = 10000;
 
 class TransferFunctionParams {
 public:
@@ -95,9 +99,20 @@ protected:
   vector<vector<double> > m_invTransformLUT;
   vector<vector<double> > m_fwdTransformLUT;
 
+
+  bool                    m_enableFwdDerivLUT;
+  uint32                  m_derivBinsLUT;
+  vector<uint32>          m_derivElementsLUT;
+  vector<double>          m_derivBoundLUT;
+  vector<double>          m_derivMultiplierLUT;
+  vector<vector<double> > m_fwdTFDerivativeLUT;
+
   void   initLUT();
+  void   initfwdTFDerivLUT();
+  
   double inverseLUT         (double value);
   double forwardLUT         (double value);
+  double forwardDerivLUT    (double value);
   
 public:
 
@@ -105,11 +120,14 @@ public:
     m_normalFactor = 1.0;
     m_invNormalFactor = 1.0;
     m_enableLUT = FALSE;
+    m_enableFwdDerivLUT = FALSE;
     m_binsLUT = 1;
+    m_derivBinsLUT = 1;
   }
+  
   // Construct/Deconstruct
   virtual ~TransferFunction() {};
-  static TransferFunction *create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE);
+  static TransferFunction *create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE, bool fwdTFDerivativeLUT = FALSE);
   
   double  getNormalFactor()       const { return m_normalFactor; };
   void    setNormalFactor(double value) { m_normalFactor = value; m_invNormalFactor = 1.0 / value; };
@@ -120,9 +138,11 @@ public:
   void    inverse           (Frame *frame, int component);
 
   double  getForward        (double value);
-  double  getInverse        (double value);  
+  double  getInverse        (double value);
+  
   double  forwardDerivative (double value);
   double  inverseDerivative (double value);
+  double  getForwardDerivative(double value);
    
   virtual double forward    (double value) = 0;
   virtual double inverse    (double value) = 0;

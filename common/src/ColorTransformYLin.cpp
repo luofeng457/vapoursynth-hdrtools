@@ -192,7 +192,7 @@ ColorTransformYLin::ColorTransformYLin( ColorTransformParams *params ) {
 
   m_iLumaWeight = (int) m_lumaWeight;
 
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs, params->m_enableTFDerivLUTs);
 }
 
 ColorTransformYLin::~ColorTransformYLin() {
@@ -211,7 +211,7 @@ ColorTransformYLin::~ColorTransformYLin() {
     m_invColorFormat = NULL;
   }
   
-   // Color format conversion frame stores
+  // Color format conversion frame stores
   if (m_fwdFrameStore) {
     delete m_fwdFrameStore;
     m_fwdFrameStore = NULL;
@@ -365,12 +365,11 @@ void ColorTransformYLin::process ( Frame* out, const Frame *inp) {
       }
       
       for (int i = 0; i < inp->m_compSize[0]; i++) {
-        
-        double deriv0 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[0][i] );
+        double deriv0 = m_transferFunction->getForwardDerivative( (double) inp->m_floatComp[0][i] );
         deriv0 *= deriv0;
-        double deriv1 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[1][i] );
+        double deriv1 = m_transferFunction->getForwardDerivative( (double) inp->m_floatComp[1][i] );
         deriv1 *= deriv1;
-        double deriv2 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[2][i] );
+        double deriv2 = m_transferFunction->getForwardDerivative( (double) inp->m_floatComp[2][i] );
         deriv2 *= deriv2;
         
         double uCompNewDiff = (double) m_invFrameStore->m_floatComp[1][i] - (double) out->m_floatComp[1][i];

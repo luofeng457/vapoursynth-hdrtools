@@ -83,6 +83,7 @@ public:
   vector <ChromaLocation> m_oChromaLocationType;
   bool                    m_useFloatPrecision;
   bool                    m_enableLUTs;
+  bool                    m_enableTFDerivLUTs;
   char                    m_yAdjustModelFile[MAX_LINE_LEN];
   float                   m_min;
   float                   m_max;
@@ -120,6 +121,7 @@ public:
     m_oChromaLocationType[FP_BOTTOM] = CL_TWO;
     m_useFloatPrecision = TRUE;
     m_enableLUTs = TRUE;
+    m_enableTFDerivLUTs = TRUE;
     m_min = 0.0f;
     m_max = 1.0f;
     m_iSystemGamma = 1.0f;

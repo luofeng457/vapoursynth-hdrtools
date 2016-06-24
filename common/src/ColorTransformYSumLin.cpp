@@ -227,7 +227,7 @@ ColorTransformYSumLin::ColorTransformYSumLin( ColorTransformParams *params ) {
   
   m_iLumaWeight = (int) m_lumaWeight;
   
-  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs);
+  m_transferFunction = TransferFunction::create(m_transferFunctions, TRUE, 1.0, params->m_oSystemGamma, 0.0, 1.0, params->m_enableLUTs, params->m_enableTFDerivLUTs);
 }
 
 ColorTransformYSumLin::~ColorTransformYSumLin() {
@@ -401,9 +401,9 @@ void ColorTransformYSumLin::process ( Frame* out, const Frame *inp) {
       }
             
       for (int i = 0; i < inp->m_compSize[0]; i++) {
-        double deriv0 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[0][i] ) * m_transformRGBtoY[0];
-        double deriv1 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[1][i] ) * m_transformRGBtoY[1];
-        double deriv2 = m_transferFunction->forwardDerivative( (double) inp->m_floatComp[2][i] ) * m_transformRGBtoY[2];
+        double deriv0 = m_transferFunction->getForwardDerivative( (double) inp->m_floatComp[0][i] ) * m_transformRGBtoY[0];
+        double deriv1 = m_transferFunction->getForwardDerivative( (double) inp->m_floatComp[1][i] ) * m_transformRGBtoY[1];
+        double deriv2 = m_transferFunction->getForwardDerivative( (double) inp->m_floatComp[2][i] ) * m_transformRGBtoY[2];
         
         double uCompNewDiff = (double) m_invFrameStore->m_floatComp[1][i] - (double) out->m_floatComp[1][i];
         double vCompNewDiff = (double) m_invFrameStore->m_floatComp[2][i] - (double) out->m_floatComp[2][i];

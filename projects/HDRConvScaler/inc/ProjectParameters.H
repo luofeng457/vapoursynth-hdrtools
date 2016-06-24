@@ -97,7 +97,9 @@ public:
   bool            m_bUseWienerFiltering;
   bool            m_bUse2DSepFiltering;
   bool            m_b2DSepMode;
-  bool            m_enableTFLUTs;
+  bool            m_enableTFunctionLUT;        //!< Use Transfer function LUT for some operations
+  bool            m_enableTFLUTs;              //!< Use Transfer function LUTs
+
 
 
   // Cropping parameters

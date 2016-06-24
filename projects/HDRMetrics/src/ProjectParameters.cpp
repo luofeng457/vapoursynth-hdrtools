@@ -190,8 +190,8 @@ BoolParameter boolParameterList[] = {
   { "EnableComponentmPSNRfast",  &dParams->m_enableCompmPSNRfast,                   FALSE,  FALSE,  TRUE,    "Enable per component mPSNR (fast)"             },
   { "EnableSymmetricmPSNRfast",  &dParams->m_enableSymmetry,                        FALSE,  FALSE,  TRUE,    "Enable symmetric mPSNR computation(fast)"        },
   { "EnableLogSSIM",             &ssim->m_useLog,                                   FALSE,  FALSE,  TRUE,    "Enable log reporting of SSIM results"             },
-  { "EnableTFunctionLUT",        &ssim->m_tfLUTEnable,                              FALSE,  FALSE,  TRUE,    "Enable TF LUT for some operations"               }, 
-  { "EnableTFunctionLUT",        &snr->m_tfLUTEnable,                               FALSE,  FALSE,  TRUE,    "Enable TF LUT for some operations"               }, 
+  { "EnableTFunctionLUT",        &ssim->m_tfLUTEnable,                              FALSE,  FALSE,  TRUE,    "Enable TF LUT for SSIM computations"               },
+  { "EnableTFunctionLUT",        &snr->m_tfLUTEnable,                               FALSE,  FALSE,  TRUE,    "Enable TF LUT for SNR computations"               },
   
   { "",                          NULL,                                              FALSE,  FALSE, FALSE,    "Boolean Termination entry"                     }
 };

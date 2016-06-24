@@ -149,7 +149,9 @@ ColorTransform *ColorTransform::create(
   ColorTransform *result = NULL;
   if (iParams != NULL)
     params = *iParams;
-    
+  else
+    params.m_enableTFDerivLUTs = enableTFLuts;
+
   params.m_iColorSpace = iColorSpace;
   params.m_oColorSpace = oColorSpace;
   params.m_iColorPrimaries = iColorPrimaries; 
@@ -171,6 +173,7 @@ ColorTransform *ColorTransform::create(
   params.m_oChromaFormat = oChromaFormat;
   params.m_useFloatPrecision = useFloatPrecision;
   params.m_enableLUTs = enableTFLuts;
+  
   if (oChromaLocationType != NULL) {
     params.m_oChromaLocationType[FP_TOP   ] = oChromaLocationType[FP_TOP   ];
     params.m_oChromaLocationType[FP_BOTTOM] = oChromaLocationType[FP_BOTTOM];

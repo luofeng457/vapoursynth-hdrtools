@@ -166,8 +166,10 @@ BoolParameter boolParameterList[] = {
   { "UseNLMeansFiltering",        &pParams->m_bUseNLMeansFiltering,           FALSE,       FALSE,         TRUE,    "NLMeans Filtering before conversion"        },
   { "Use2DSepFiltering",          &pParams->m_bUse2DSepFiltering,             FALSE,       FALSE,         TRUE,    "Separable Filtering before conversion"      },
   { "2DSepFilteringMode",         &pParams->m_b2DSepMode,                     FALSE,       FALSE,         TRUE,    "Edge Adaptation On or OFF"                  },
-  { "EnableTFunctionLUT",         &pParams->m_enableTFunctionLUT,             FALSE,       FALSE,         TRUE,    "Enable TF LUT for some operations"          }, 
+  { "EnableTFunctionLUT",         &pParams->m_enableTFunctionLUT,             FALSE,       FALSE,         TRUE,    "Enable TF LUT for some operations"          },
   { "EnableTFunctionLUT",         &pParams->m_enableTFLUTs,                   FALSE,       FALSE,         TRUE,    "Enable TF LUTs for closed loop conversions" }, 
+  { "EnableTFunctionLUT",         &ctp->m_enableLUTs,                         FALSE,       FALSE,         TRUE,    "Enable TF LUTs for closed loop conversions" },
+  { "EnableTFDerivLUT",           &ctp->m_enableTFDerivLUTs,                  FALSE,       FALSE,         TRUE,    "Enable TF derivative LUTs  " },
   { "",                           NULL,                                           0,           0,            0,    "Boolean Termination entry"                  }
 };
 
