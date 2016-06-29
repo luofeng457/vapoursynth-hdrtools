@@ -226,6 +226,7 @@
     <ClCompile Include="src\InputY4M.cpp" />
     <ClCompile Include="src\InputYUV.cpp" />
     <ClCompile Include="src\IOFunctions.cpp" />
+    <ClCompile Include="src\LookUpTable.cpp" />
     <ClCompile Include="src\Output.cpp" />
     <ClCompile Include="src\OutputAVI.cpp" />
     <ClCompile Include="src\OutputEXR.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="inc\IOFunctions.H" />
     <ClInclude Include="inc\IOTIFF.H" />
     <ClInclude Include="inc\IOVideo.H" />
+    <ClInclude Include="inc\LookUpTable.H" />
     <ClInclude Include="inc\OpenEXR.H" />
     <ClInclude Include="inc\Output.H" />
     <ClInclude Include="inc\OutputAVI.H" />

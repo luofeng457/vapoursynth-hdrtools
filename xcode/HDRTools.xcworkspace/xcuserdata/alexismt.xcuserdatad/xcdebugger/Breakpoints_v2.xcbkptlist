@@ -201,7 +201,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "173"
             endingLineNumber = "173"
-            landmarkName = "TransferFunction::forwardDerivLUT(double value)"
+            landmarkName = "TransferFunction::forwardLUT(double value)"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

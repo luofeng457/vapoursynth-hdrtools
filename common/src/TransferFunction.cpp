@@ -78,6 +78,51 @@
 //-----------------------------------------------------------------------------
 // Private methods
 //-----------------------------------------------------------------------------
+void TransferFunction::initInvTFLUTs(LookUpTable *lut) {
+  uint32 i, j;
+  for (i = 0; i < m_invLUT->getBins(); i++) {
+    double stepSize = (lut->m_bound[i + 1] -  lut->m_bound[i]) / (lut->m_elements[i] - 1);
+    for (j = 0; j < lut->m_elements[i] ; j++) {
+      double curValue = lut->m_bound[i] + (double) j * stepSize;
+      lut->m_data[i][j] = inverse(curValue);
+    }
+  }
+}
+
+
+void TransferFunction::initFwdTFLUTs(LookUpTable *lut) {
+  uint32 i, j;
+  for (i = 0; i < lut->getBins(); i++) {
+    double stepSize = (lut->m_bound[i + 1] -  lut->m_bound[i]) / (lut->m_elements[i] - 1);
+    for (j = 0; j < lut->m_elements[i] ; j++) {
+      double curValue = lut->m_bound[i] + (double) j * stepSize;
+      lut->m_data[i][j] = forward(curValue);
+    }
+  }
+}
+
+void TransferFunction::initTFLUTs(LookUpTable *lut, double (*method) (double)) {
+  uint32 i, j;
+  for (i = 0; i < lut->getBins(); i++) {
+    double stepSize = (lut->m_bound[i + 1] -  lut->m_bound[i]) / (lut->m_elements[i] - 1);
+    for (j = 0; j < lut->m_elements[i] ; j++) {
+      double curValue = lut->m_bound[i] + (double) j * stepSize;
+      lut->m_data[i][j] = method(curValue);
+    }
+  }
+}
+
+void TransferFunction::initDevTFLUTs(LookUpTable *lut) {
+  uint32 i, j;
+  for (i = 0; i < lut->getBins(); i++) {
+    double stepSize = (lut->m_bound[i + 1] -  lut->m_bound[i]) / (lut->m_elements[i] - 1);
+    for (j = 0; j < lut->m_elements[i] ; j++) {
+      double curValue = lut->m_bound[i] + (double) j * stepSize;
+      lut->m_data[i][j] = forwardDerivative(curValue);
+    }
+  }
+}
+
 void TransferFunction::initLUT() {
   if (m_enableLUT == FALSE) {
     m_binsLUT = 0;
@@ -282,9 +327,39 @@ TransferFunction *TransferFunction::create(int method, bool singleStep, float sc
   
   result->m_enableLUT = enableLUT;
   result->m_enableFwdDerivLUT = enableFwdDerivLUT;
-  
+
   result->initLUT();
   result->initfwdTFDerivLUT();
+
+  // Unfortunately since we are using virtual functions, we cannot simply use the function pointer
+  // There might be a way, but currently the init process is done as a separate step unfortunately
+  // Currently this code is disabled.
+#if 0
+  if (enableLUT == TRUE) {
+    // Create memory
+    result->m_invLUT = new LookUpTable(enableLUT, MAX_BIN_LUT, MAX_ELEMENTS_LUT);
+    result->m_fwdLUT = new LookUpTable(enableLUT, MAX_BIN_LUT, MAX_ELEMENTS_LUT);
+    // Now set to appropriate values
+    result->initInvTFLUTs(result->m_invLUT);
+    result->initFwdTFLUTs(result->m_fwdLUT);
+    // We can basically use m_fwdLUT->compute(value)/m_invLUT->compute(value) instead of forwardLUT(value)/inverseLUT(value) to access the luts
+  }
+  else {
+    result->m_invLUT = NULL;
+    result->m_fwdLUT = NULL;
+  }
+   
+  if (enableFwdDerivLUT == TRUE) {
+    // Create memory
+    result->m_fwdDerivLUT = new LookUpTable(enableFwdDerivLUT, MAX_BIN_DERIV_LUT, MAX_ELEMENTS_DERIV_LUT);
+    // Now set to appropriate values
+    result->initDevTFLUTs(result->m_fwdDerivLUT);
+    // We can basically use m_fwdDerivLUT->compute(value) instead of forwardDerivLUT(value) to access the lut
+  }
+  else {
+    result->m_fwdDerivLUT = NULL;
+  }
+#endif
   
   return result;
 }
@@ -309,7 +384,6 @@ double TransferFunction::inverseDerivative(double value) {
 }
 
 double TransferFunction::getForwardDerivative(double value) {
- // printf("Values %10.7f %10.7f %10.7f %10.7f\n", value, forwardDerivLUT(value), forwardDerivative(value), forwardDerivLUT(value) - forwardDerivative(value));
   if (m_enableFwdDerivLUT == TRUE)
     return forwardDerivLUT(value);
   else

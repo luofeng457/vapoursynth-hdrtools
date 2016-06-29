@@ -390,6 +390,9 @@
     <ClCompile Include="src\ColorTransformYAdjustHLG.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LookUpTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -804,6 +807,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\ColorTransformYAdjustHLG.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\LookUpTable.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

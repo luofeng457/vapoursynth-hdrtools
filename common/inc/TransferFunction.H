@@ -55,7 +55,7 @@
 #include "Global.H"
 #include "Parameters.H"
 #include "Frame.H"
-
+#include "LookUpTable.H"
 
 static const double DERIV_STEP             = 0.0000001;
 static const double DERIV_LOWER_BOUND      = 0.0000000;
@@ -114,6 +114,15 @@ protected:
   double forwardLUT         (double value);
   double forwardDerivLUT    (double value);
   
+  LookUpTable *m_invLUT;
+  LookUpTable *m_fwdLUT;
+  LookUpTable *m_fwdDerivLUT;
+
+  void initInvTFLUTs(LookUpTable *lut);
+  void initFwdTFLUTs(LookUpTable *lut);
+  void initDevTFLUTs(LookUpTable *lut);
+  void initTFLUTs(LookUpTable *lut, double (*method) (double));
+  
 public:
 
   TransferFunction() {
@@ -123,10 +132,27 @@ public:
     m_enableFwdDerivLUT = FALSE;
     m_binsLUT = 1;
     m_derivBinsLUT = 1;
+    m_invLUT = NULL;
+    m_fwdLUT = NULL;
+    m_fwdDerivLUT = NULL;
   }
   
   // Construct/Deconstruct
-  virtual ~TransferFunction() {};
+  virtual ~TransferFunction() {
+    if (m_invLUT != NULL) {
+      delete m_invLUT;
+      m_invLUT = NULL;
+    }
+    if (m_fwdLUT != NULL) {
+      delete m_fwdLUT;
+      m_fwdLUT = NULL;
+    }
+    if (m_fwdDerivLUT != NULL) {
+      delete m_fwdDerivLUT;
+      m_fwdDerivLUT = NULL;
+    }
+  };
+  
   static TransferFunction *create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT = FALSE, bool fwdTFDerivativeLUT = FALSE);
   
   double  getNormalFactor()       const { return m_normalFactor; };

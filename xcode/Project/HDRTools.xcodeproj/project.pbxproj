@@ -293,6 +293,8 @@
 		C5E384B81AFF2EE600FE5693 /* FrameScaleNull.H in Headers */ = {isa = PBXBuildFile; fileRef = C5E384B71AFF2EE600FE5693 /* FrameScaleNull.H */; };
 		C5E384BA1AFF311500FE5693 /* FrameScaleHalf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5E384B91AFF311500FE5693 /* FrameScaleHalf.cpp */; };
 		C5E384BC1AFF315000FE5693 /* FrameScaleHalf.H in Headers */ = {isa = PBXBuildFile; fileRef = C5E384BB1AFF315000FE5693 /* FrameScaleHalf.H */; };
+		C5E6F71E1D1DE0CD000339B7 /* LookUpTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5E6F71D1D1DE0CD000339B7 /* LookUpTable.cpp */; };
+		C5E6F7201D1DE1BF000339B7 /* LookUpTable.H in Headers */ = {isa = PBXBuildFile; fileRef = C5E6F71F1D1DE1BF000339B7 /* LookUpTable.H */; };
 		C5F1E38519D2030A00327932 /* Conv422to420Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */; };
 		C5F1E38719D2035F00327932 /* Conv422to420Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5F1E38619D2035F00327932 /* Conv422to420Generic.H */; };
 		C5F45AF41A1E978300AF6D26 /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F1E3AC19D240E800327932 /* ProjectParameters.cpp */; };
@@ -733,6 +735,8 @@
 		C5E384B71AFF2EE600FE5693 /* FrameScaleNull.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameScaleNull.H; path = ../common/inc/FrameScaleNull.H; sourceTree = "<group>"; };
 		C5E384B91AFF311500FE5693 /* FrameScaleHalf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = FrameScaleHalf.cpp; path = ../common/src/FrameScaleHalf.cpp; sourceTree = "<group>"; };
 		C5E384BB1AFF315000FE5693 /* FrameScaleHalf.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameScaleHalf.H; path = ../common/inc/FrameScaleHalf.H; sourceTree = "<group>"; };
+		C5E6F71D1D1DE0CD000339B7 /* LookUpTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LookUpTable.cpp; path = ../common/src/LookUpTable.cpp; sourceTree = "<group>"; };
+		C5E6F71F1D1DE1BF000339B7 /* LookUpTable.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = LookUpTable.H; path = ../common/inc/LookUpTable.H; sourceTree = "<group>"; };
 		C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv422to420Generic.cpp; path = ../common/src/Conv422to420Generic.cpp; sourceTree = "<group>"; };
 		C5F1E38619D2035F00327932 /* Conv422to420Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv422to420Generic.H; path = ../common/inc/Conv422to420Generic.H; sourceTree = "<group>"; };
 		C5F1E38C19D23A7E00327932 /* ChromaConvert.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ChromaConvert.cfg; path = ../../bin/ChromaConvert.cfg; sourceTree = "<group>"; };
@@ -1098,6 +1102,7 @@
 				C580D78E1CB4937500E01A76 /* Eigenvalue.H */,
 				C580D7231CAF469300E01A76 /* FFT.H */,
 				C5C2CC3D1B19166500AD96EA /* Filter1D.H */,
+				C5E6F71F1D1DE1BF000339B7 /* LookUpTable.H */,
 				C5BD26C319CCAC10003F1B51 /* Frame.H */,
 				C585BD0E1B06C3A900235FE6 /* FrameFilter.H */,
 				C5C2CC371B1906D600AD96EA /* FrameFilter2DSep.H */,
@@ -1241,6 +1246,7 @@
 				C580D78C1CB490E900E01A76 /* Eigenvalue.cpp */,
 				C580D7301CAF46D500E01A76 /* FFT.cpp */,
 				C5C2CC3B1B19164E00AD96EA /* Filter1D.cpp */,
+				C5E6F71D1D1DE0CD000339B7 /* LookUpTable.cpp */,
 				C5BD26F519CCAC17003F1B51 /* Frame.cpp */,
 				C585BD0C1B06C39200235FE6 /* FrameFilter.cpp */,
 				C5C2CC391B19070600AD96EA /* FrameFilter2DSep.cpp */,
@@ -1554,6 +1560,7 @@
 				C580D7401CAF47C900E01A76 /* HDRVQM.H in Headers */,
 				C5C79C2B1AC4E37D00FB9A29 /* Conv444to422GenericOld.H in Headers */,
 				C53E9BD11C175C3800448F69 /* FrameFilterNLMeans.H in Headers */,
+				C5E6F7201D1DE1BF000339B7 /* LookUpTable.H in Headers */,
 				C5133E0619CCF59C00D64D48 /* OutputYUV.H in Headers */,
 				C580D72B1CAF469300E01A76 /* PUEncode.H in Headers */,
 				C5133E0719CCF59C00D64D48 /* Parameters.H in Headers */,
@@ -1847,6 +1854,7 @@
 				C580D7331CAF46D500E01A76 /* ColorTransformRGBAdjust.cpp in Sources */,
 				C580D7371CAF46D500E01A76 /* TransferFunctionHGold.cpp in Sources */,
 				C5E384B61AFF2EC300FE5693 /* FrameScaleNull.cpp in Sources */,
+				C5E6F71E1D1DE0CD000339B7 /* LookUpTable.cpp in Sources */,
 				C56A3F5C1CDBDBC70045291B /* ColorTransformYSumLin.cpp in Sources */,
 				C5C2CC461B1E2F1300AD96EA /* DistortionMetricRegionTFPSNR.cpp in Sources */,
 				C51C5E9E1A0303AB00AE5E15 /* ColorTransformFVDO.cpp in Sources */,

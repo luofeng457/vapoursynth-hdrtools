@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file Conv420to444Generic.cpp
+ * \file Filter1D
  *
  * \brief
- *    Convert 420 to 444 using a Generic separable filter approach
+ *    1D filtering
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
