@@ -53,7 +53,7 @@
 
 #include "ProjectParameters.H"
 // Tool version
-#define CONVERT_422TO420_VERSION "0.4"
+#define CONVERT_422TO420_VERSION "0.5"
 
 class ChromaConvert {
 protected:

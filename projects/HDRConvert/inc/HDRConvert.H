@@ -53,7 +53,7 @@
 
 #include "ProjectParameters.H"
 // Tool version
-#define HDR_CONVERT_VERSION "0.9"
+#define HDR_CONVERT_VERSION "0.10"
 
 class HDRConvert {
 protected:

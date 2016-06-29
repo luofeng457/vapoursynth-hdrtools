@@ -52,7 +52,7 @@
 #define __HDRMetrics_H__
 
 #include "ProjectParameters.H"
-#define HDR_METRIC_VERSION "0.6"
+#define HDR_METRIC_VERSION "0.7"
 
 class HDRMetrics {
 protected:

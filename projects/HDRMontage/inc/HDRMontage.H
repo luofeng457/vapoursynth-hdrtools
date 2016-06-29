@@ -52,7 +52,7 @@
 #define __HDRMontage_H__
 
 #include "ProjectParameters.H"
-#define HDR_MONTAGE_VERSION "0.2"
+#define HDR_MONTAGE_VERSION "0.3"
 
 class HDRMontage {
 protected:
