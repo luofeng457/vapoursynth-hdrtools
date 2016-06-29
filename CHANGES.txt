@@ -1,7 +1,9 @@
 Changes in HDRTools Version 0.12 (since 0.10)
 ---------------------------------------------
 - LUT support also for the TF derivatives in JCTVC-W0107 (AN, AT)
+- Generalized LUT support
 - Clipping bug fixes (AT)
+- Configuration file updates (PH, AT)
 
 Changes in HDRTools Version 0.11 (since 0.10)
 ---------------------------------------------
@@ -154,6 +156,7 @@ MK      Madhu Krishnan
 MN      Matteo Naccari
 MP      Manish Pindoria
 MTP     Mahsa T. Pourazad 
+PH      Per Hermansson
 PN      Panos Nasiopoulos
 PY      Peng Yin
 RB      Robert Brondijk
