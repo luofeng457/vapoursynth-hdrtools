@@ -1,4 +1,4 @@
-Changes in HDRTools Version 0.12 (since 0.10)
+Changes in HDRTools Version 0.12 (since 0.11)
 ---------------------------------------------
 - LUT support also for the TF derivatives in JCTVC-W0107 (AN, AT)
 - Generalized LUT support
