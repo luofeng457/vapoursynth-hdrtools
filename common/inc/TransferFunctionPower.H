@@ -68,6 +68,7 @@ private:
 public:
   // Construct/Deconstruct
   TransferFunctionPower(double gamma, double normalScale);
+  TransferFunctionPower(double gamma);
   virtual ~TransferFunctionPower();
   
   virtual double forward(double value);

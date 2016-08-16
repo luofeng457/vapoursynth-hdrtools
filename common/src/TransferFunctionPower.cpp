@@ -73,7 +73,21 @@ TransferFunctionPower::TransferFunctionPower(double gamma, double normalScale) {
   m_inverseGamma = 1.0 / gamma;
   m_alpha = pow(pow(m_Lw,m_inverseGamma) - pow(m_Lb,m_inverseGamma), m_gamma);
   m_beta  = pow(m_Lb, m_inverseGamma)/(pow(m_Lw,m_inverseGamma) - pow(m_Lb,m_inverseGamma));
+  m_normalFactor = 1.0;
+  m_invNormalFactor = 1.0;
 }
+
+TransferFunctionPower::TransferFunctionPower(double gamma) {
+// This may habe problems with m_Lw. Should likely be changed to 1.0 (or removed)
+// need to test in the future
+  m_Lw = 1.0;
+  m_Lb = 0.0;
+  m_gamma = gamma;
+  m_inverseGamma = 1.0 / gamma;
+  m_alpha = pow(pow(m_Lw,m_inverseGamma) - pow(m_Lb,m_inverseGamma), m_gamma);
+  m_beta  = pow(m_Lb, m_inverseGamma)/(pow(m_Lw,m_inverseGamma) - pow(m_Lb,m_inverseGamma));
+}
+
 
 TransferFunctionPower::~TransferFunctionPower() {
 }

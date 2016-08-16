@@ -206,10 +206,12 @@ ColorTransformGeneric::ColorTransformGeneric(ColorTransformParams *params) {
 
     if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB709_2_RGB2020;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGB2020;
       m_isForward = FALSE;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGBP3D65_2_RGB2020;
@@ -235,13 +237,16 @@ ColorTransformGeneric::ColorTransformGeneric(ColorTransformParams *params) {
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGBP3D60_2_RGB2020;
       m_isForward = FALSE;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_P3D60) {
       m_mode = CTF_RGB709_2_RGBP3D60;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_P3D60 && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGBP3D60;
       m_isForward = FALSE;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGB2020_2_RGBEXT;
@@ -249,20 +254,25 @@ ColorTransformGeneric::ColorTransformGeneric(ColorTransformParams *params) {
     else if (m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_2020) {
       m_mode = CTF_RGB2020_2_RGBEXT;
       m_isForward = FALSE;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_709 && m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGB709_2_RGBEXT;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_709) {
       m_mode = CTF_RGB709_2_RGBEXT;
       m_isForward = FALSE;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_P3D65 && m_oColorPrimaries == CP_EXT) {
       m_mode = CTF_RGBP3D65_2_RGBEXT;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_EXT && m_oColorPrimaries == CP_P3D65) {
       m_mode = CTF_RGBP3D65_2_RGBEXT;
       m_isForward = FALSE;
+      m_sClip = 2;
     }
     else if (m_iColorPrimaries == CP_2020 && m_oColorPrimaries == CP_LMSD) {
       m_mode = CTF_RGB2020_2_LMSD;

@@ -88,6 +88,9 @@ void AddNoiseNull::process ( Frame* out, Frame *inp) {
   }
 }
 
+void AddNoiseNull::process ( Frame *inp) {
+}
+
 
 //-----------------------------------------------------------------------------
 // End of file

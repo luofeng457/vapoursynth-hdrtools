@@ -88,10 +88,10 @@ AddNoiseNormal::~AddNoiseNormal() {
 
 double AddNoiseNormal::generateGaussianNoise(const double &variance, const double mean)
 {
-  
+
 	if(m_haveSpare)	{
 		m_haveSpare = false;
-		return sqrt(variance * m_rand1) * sin(m_rand2) + mean;
+		return (sqrt(variance * m_rand1) * sin(m_rand2) + mean) / 100.0;
 	}
   
 	m_haveSpare = true;
@@ -101,8 +101,9 @@ double AddNoiseNormal::generateGaussianNoise(const double &variance, const doubl
     m_rand1 = 1e-100;
 	m_rand1 = -2 * log(m_rand1);
 	m_rand2 = (rand() / ((double) RAND_MAX)) * TWO_PI;
-    
-	return sqrt(variance * m_rand1) * cos(m_rand2) + mean;
+  
+  //  printf("noise value %10.7f %10.7f  %10.7f\n", variance, mean, sqrt(variance * m_rand1) * cos(m_rand2) + mean);
+	return (sqrt(variance * m_rand1) * cos(m_rand2) + mean) / 100.0;
 }
 
 void AddNoiseNormal::addNoiseData (const uint16 *iData, uint16 *oData, int size, int maxSampleValue)
@@ -122,7 +123,9 @@ void AddNoiseNormal::addNoiseData (const imgpel *iData, imgpel *oData, int size,
 void AddNoiseNormal::addNoiseData (const float *iData, float *oData, int size, double maxSampleValue)
 {
   for (int i = 0; i < size; i++) {
-    *oData++ = (float) dClip((double) *iData++ + (imgpel) generateGaussianNoise(m_variance, m_mean), 0.0, maxSampleValue);
+    double noise = generateGaussianNoise(m_variance, m_mean);
+    //printf("noise value %10.7f\n", noise);
+    *oData++ = (float) dClip((double) *iData++ + noise, 0.0, maxSampleValue);
   }
 }
 
@@ -156,6 +159,21 @@ void AddNoiseNormal::process ( Frame* out, Frame *inp)
   }
 }
 
+void AddNoiseNormal::process ( Frame *inp)
+{
+  if (inp->m_isFloat == TRUE) {
+    for (int c = Y_COMP; c < inp->m_noComponents; c++)
+      addNoiseData (inp->m_floatComp[c], inp->m_floatComp[c], inp->m_compSize[c], inp->m_maxPelValue[c]);
+  }
+  else if (inp->m_bitDepth > 8) {
+    for (int c = Y_COMP; c < inp->m_noComponents; c++)
+      addNoiseData (inp->m_ui16Comp[c], inp->m_ui16Comp[c], inp->m_compSize[c], inp->m_maxPelValue[c]);
+  }
+  else { // 8 bit data
+    for (int c = Y_COMP; c < inp->m_noComponents; c++)
+      addNoiseData (inp->m_comp[c], inp->m_comp[c], inp->m_compSize[c], inp->m_maxPelValue[c]);
+  }
+}
 
 
 //-----------------------------------------------------------------------------

@@ -63,6 +63,7 @@ public:
   virtual ~AddNoiseNull();
   
   virtual void process(Frame *out,  Frame *inp);
+  virtual void process(Frame *inp);
 };
 
 #endif

@@ -61,8 +61,11 @@
 #include "ConvertColorFormat.H"
 #include "ColorTransform.H"
 #include "TransferFunction.H"
+#include "AddNoise.H"
+#include "FrameScale.H"
 #include "FrameFilter.H"
 #include "DisplayGammaAdjust.H"
+#include "ToneMapping.H"
 
 
 class HDRConvertYUV : public HDRConvert {
@@ -92,10 +95,16 @@ private:
   
   DisplayGammaAdjust   *m_srcDisplayGammaAdjust;    // Source Display Gamma adjustment (for the HLG TF)
   DisplayGammaAdjust   *m_outDisplayGammaAdjust;    // Output Display Gamma adjustment (for the HLG TF)
+  AddNoise             *m_addNoise;                 // Noise Addition
+  //FrameScale           *m_frameScale;
 
   TransferFunction   *m_normalizeFunction;        // Data normalization for OpenEXR inputs with linear light data
   TransferFunction   *m_inputTransferFunction;  // Transfer function
   TransferFunction   *m_outputTransferFunction;  // Transfer function
+  
+ //ToneMapping          *m_toneMapping;
+
+  
   bool                m_useSingleTransferStep;
   int                 m_startFrame;
   int                 m_filterInFloat;

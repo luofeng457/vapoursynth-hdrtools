@@ -70,6 +70,7 @@ public:
   static AddNoise *create(int method, double noiseVariance = 1.0, double noiseMean = 0.0);
   
   virtual void process(Frame *out,  Frame *inp) = 0;
+  virtual void process(Frame *inp) = 0;
 };
 
 #endif

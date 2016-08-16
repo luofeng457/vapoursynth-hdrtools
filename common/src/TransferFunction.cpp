@@ -261,61 +261,62 @@ double TransferFunction::forwardDerivLUT(double value) {
 TransferFunction *TransferFunction::create(int method, bool singleStep, float scale, float systemGamma, float minValue, float maxValue, bool enableLUT, bool enableFwdDerivLUT) {
   TransferFunction *result = NULL;
   
-    switch (method){
-      case TF_NULL:
-        result = new TransferFunctionNull();
-        break;
-      case TF_APH:
-        result = new TransferFunctionAPH(minValue, maxValue);
-        break;
-      case TF_APQ:
-        result = new TransferFunctionAPQ(minValue, maxValue);
-        break;
-      case TF_APQS:
-        result = new TransferFunctionAPQScaled(maxValue);
-        break;
-      case TF_PQ:
-        result = new TransferFunctionPQ();
-        break;
-      case TF_HPQ:
-        result = new TransferFunctionHPQ();
-        break;
-      case TF_HPQ2:
-        result = new TransferFunctionHPQ2();
-        break;
-      case TF_PH:
-        result = new TransferFunctionPH();
-        break;
-      case TF_HG:
-        result = new TransferFunctionHG(systemGamma);
-        break;
-      case TF_HLG:
-        result = new TransferFunctionHLG();
-        break;
-      case TF_NORMAL:
-        result = new TransferFunctionNormalize(scale);
-        break;
-      case TF_POWER:
-        result = new TransferFunctionPower(systemGamma, scale);
-        break;
-      case TF_MPQ:
-        result = new TransferFunctionMPQ(0.1f, 1.5f);
-        break;
-      case TF_AMPQ:
-        result = new TransferFunctionAMPQ(0.1f, 1.5f, minValue, maxValue);
-        break;
-      case TF_BiasedMPQ:
-        result = new TransferFunctionBiasedMPQ(0.1f, 2.0f);
-        break;
+  switch (method){
+    case TF_NULL:
+      result = new TransferFunctionNull();
+      break;
+    case TF_APH:
+      result = new TransferFunctionAPH(minValue, maxValue);
+      break;
+    case TF_APQ:
+      result = new TransferFunctionAPQ(minValue, maxValue);
+      break;
+    case TF_APQS:
+      result = new TransferFunctionAPQScaled(maxValue);
+      break;
+    case TF_PQ:
+      result = new TransferFunctionPQ();
+      break;
+    case TF_HPQ:
+      result = new TransferFunctionHPQ();
+      break;
+    case TF_HPQ2:
+      result = new TransferFunctionHPQ2();
+      break;
+    case TF_PH:
+      result = new TransferFunctionPH();
+      break;
+    case TF_HG:
+      result = new TransferFunctionHG(systemGamma);
+      break;
+    case TF_HLG:
+      result = new TransferFunctionHLG();
+      break;
+    case TF_NORMAL:
+      result = new TransferFunctionNormalize(scale);
+      break;
+    case TF_POWER:
+      result = new TransferFunctionPower(systemGamma);
+      break;
+    case TF_MPQ:
+      result = new TransferFunctionMPQ(0.1f, 1.5f);
+      break;
+    case TF_AMPQ:
+      result = new TransferFunctionAMPQ(0.1f, 1.5f, minValue, maxValue);
+      break;
+    case TF_BiasedMPQ:
+      result = new TransferFunctionBiasedMPQ(0.1f, 2.0f);
+      break;
 #ifdef __SIM2_SUPPORT_ENABLED__
-      case TF_SIM2:
-        result = new TransferFunctionSim2();
-        break;
+    case TF_SIM2:
+      result = new TransferFunctionSim2();
+      break;
 #endif
-      default:
-        fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
-        exit(EXIT_FAILURE);
-    }
+    default:
+      fprintf(stderr, "\nUnsupported Transfer Function %d\n", method);
+      exit(EXIT_FAILURE);
+  }
+  
   if (singleStep == TRUE) {
     result->m_normalFactor = scale;
     result->m_invNormalFactor = 1.0 / scale;

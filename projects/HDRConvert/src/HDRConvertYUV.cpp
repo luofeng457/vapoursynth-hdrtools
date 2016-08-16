@@ -75,6 +75,7 @@ HDRConvertYUV::HDRConvertYUV(ProjectParameters *inputParams) {
   m_inputFrame             = NULL;
   m_outputFrame            = NULL;
   m_convertFormatIn        = NULL;
+  m_addNoise                 = NULL;
   m_convertFormatOut       = NULL;
   m_frameFilter            = NULL;
   m_frameFilterNoise0      = NULL;
@@ -113,6 +114,11 @@ HDRConvertYUV::HDRConvertYUV(ProjectParameters *inputParams) {
 //-----------------------------------------------------------------------------
 
 void HDRConvertYUV::destroy() {
+  if (m_addNoise != NULL) {
+    delete m_addNoise;
+    m_addNoise = NULL;
+  }
+
   if (m_frameFilter != NULL) {
     delete m_frameFilter;
     m_frameFilter = NULL;    
@@ -473,6 +479,7 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   if (output->m_displayAdjustment == DA_HLG) {
     m_outputTransferFunction->setNormalFactor(1.0);
   }
+    m_addNoise = AddNoise::create(inputParams->m_addNoise, inputParams->m_noiseVariance, inputParams->m_noiseMean);
 }
 
 //-----------------------------------------------------------------------------
@@ -550,6 +557,9 @@ void HDRConvertYUV::process( ProjectParameters *inputParams ) {
       // Convert to different format if needed (integer to float)
       m_convertIQuantize->process(m_convertFrameStore, currentFrame);
     }
+    
+    // Add noise
+    m_addNoise->process(m_convertFrameStore);
     
     if (m_bUseWienerFiltering == TRUE)
       m_frameFilterNoise0->process(m_convertFrameStore);

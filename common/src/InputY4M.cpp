@@ -131,11 +131,10 @@ InputY4M::InputY4M(IOVideo *inputFile, FrameFormat *format) {
 
   if (m_isInterleaved) {
     m_iBuffer.resize((unsigned int) m_size * format->m_picUnitSizeShift3);
+    m_iBuf = &m_iBuffer[0];
   }
 
   m_buffer.resize((unsigned int) m_size * format->m_picUnitSizeShift3);
-
-  m_iBuf = &m_iBuffer[0];
   m_buf  = &m_buffer[0];
 
   if (format->m_picUnitSizeShift3 > 1) {
