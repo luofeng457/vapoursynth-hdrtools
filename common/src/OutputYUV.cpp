@@ -125,7 +125,7 @@ OutputYUV::OutputYUV(IOVideo *outputFile, FrameFormat *format) {
 
   if (m_isInterleaved) {
     m_iBuffer.resize((unsigned int) m_size * m_picUnitSizeShift3);
-    m_iBuf  = &m_iBuffer[0];
+    m_iBuf = &m_iBuffer[0];
   }
 
   m_buffer.resize((unsigned int) m_size * m_picUnitSizeShift3);

@@ -135,7 +135,7 @@ InputY4M::InputY4M(IOVideo *inputFile, FrameFormat *format) {
   }
 
   m_buffer.resize((unsigned int) m_size * format->m_picUnitSizeShift3);
-  m_buf  = &m_buffer[0];
+  m_buf = &m_buffer[0];
 
   if (format->m_picUnitSizeShift3 > 1) {
     m_ui16Data.resize((unsigned int) m_size);
@@ -377,7 +377,7 @@ void InputY4M::parseRatio (int *value0, int *value1,  char *taggedField) {
     if (p1 == NULL) {
       // invalid
     }
-    int position = p1 - p2;
+    int position = (int) (p1 - p2);
     taggedField[position] = '\0';
     *value0 = atoi(taggedField);
     *value1 = atoi(&p1[1]);

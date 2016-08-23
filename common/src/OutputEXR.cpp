@@ -368,8 +368,8 @@ void OutputEXR::freeMemory()
 }
 
 int OutputEXR::writeAttributeAndType( int vfile, char *attributeName, char *attributeType, int attributeSize, char *attributeValue) {
-  int lenName = strlen(attributeName);
-  int lenType = strlen(attributeType);
+  int lenName = (int) strlen(attributeName);
+  int lenType = (int) strlen(attributeType);
   int cCount = 0;
   char endByte = 0;
   

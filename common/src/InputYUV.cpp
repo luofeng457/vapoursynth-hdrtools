@@ -117,8 +117,7 @@ InputYUV::InputYUV(IOVideo *inputFile, FrameFormat *format) {
   }
   
   m_buffer.resize((unsigned int) m_size * format->m_picUnitSizeShift3);
-  m_buf  = &m_buffer[0];
-
+  m_buf = &m_buffer[0];
 
   if (format->m_picUnitSizeShift3 > 1) {
     m_ui16Data.resize((unsigned int) m_size);

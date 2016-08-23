@@ -336,7 +336,7 @@ void ResizeBiCubic::compute( float * _src, const int srcW, const int srcH, float
 
 	for( dx = 0; dx < dstW; dx++ )	{
 		fx = (float)(((double) dx + 0.5) * scaleX - 0.5);
-		sx = (int)floor(fx);
+		sx = (int) floor(fx);
 		fx -= sx;
 
 		if( sx < kSize2 - 1 ) {
@@ -348,7 +348,7 @@ void ResizeBiCubic::compute( float * _src, const int srcW, const int srcH, float
 		}
 
 		if( sx + kSize2 >= srcW ) {
-			xMax = std::min( xMax, dx );
+			xMax = iMin( xMax, dx );
 			if( sx >= srcW-1 ) {
 				fx = 0.0f; 
         sx = srcW - 1;

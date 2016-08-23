@@ -363,7 +363,7 @@ int InputEXR::readAttributeInfo( int vfile, FrameFormat *source)
         
         //printf("name %s\n", m_channels[channel].name);
         p_channelData += strlen(p_channelData) + 1;
-        countData     += strlen(p_channelData) + 1;
+        countData     += (int) strlen(p_channelData) + 1;
         m_channels[channel].pixelType = *(int32 *)p_channelData;
         if (m_channels[channel].pixelType != HALF && m_channels[channel].pixelType != FLOAT) {
           printf("InputEXR::readAttributeInfo: Only half and single precision float data are supported (type %d). Please check your input file.\n", m_channels[channel].pixelType);
