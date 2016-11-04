@@ -542,6 +542,9 @@ void DistortionMetricPSNR::printHeader()
           printf("  wMSE-U   "); // 11
           printf("  wMSE-V   "); // 11
         }
+        if (m_enablexPSNR == TRUE) {
+          printf(" mxPSNRYUV "); // 11
+        }
         break;
       case CM_RGB:
         printf("wPSNR-R "); // 8
@@ -551,6 +554,9 @@ void DistortionMetricPSNR::printHeader()
           printf("  wMSE-R   "); // 11
           printf("  wMSE-G   "); // 11
           printf("  wMSE-B   "); // 11
+        }
+        if (m_enablexPSNR == TRUE) {
+          printf(" mxPSNRRGB "); // 11
         }
         break;
       case CM_XYZ:
@@ -562,6 +568,9 @@ void DistortionMetricPSNR::printHeader()
           printf("  wMSE-Y   "); // 11
           printf("  wMSE-Z   "); // 11
         }
+        if (m_enablexPSNR == TRUE) {
+          printf(" mxPSNRXYZ "); // 11
+        }
         break;
       default:
         printf("wPSNRC0 "); // 8
@@ -571,6 +580,9 @@ void DistortionMetricPSNR::printHeader()
           printf("  wMSE-C0  "); // 11
           printf("  wMSE-C1  "); // 11
           printf("  wMSE-C2  "); // 11
+        }
+        if (m_enablexPSNR == TRUE) {
+          printf(" mxPSNRCMP "); // 11
         }
         break;
     }
