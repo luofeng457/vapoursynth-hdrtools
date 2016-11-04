@@ -551,7 +551,6 @@ void Frame::copy(Frame *f)
       return;
   }
 
-
   for (int c = ZERO; c < 3; c++) {
     m_minPelValue[c]  = f->m_minPelValue[c];
     m_midPelValue[c]  = f->m_midPelValue[c];
@@ -625,7 +624,7 @@ void Frame::copy(Frame *f, int sourceMinX, int sourceMinY, int sourceMaxX, int s
       fprintf(stderr, "Warning: trying to copy frames of different chroma format (%d %d). \n",m_chromaFormat,f->m_chromaFormat);
       return;
   }
-    
+  
   for (int c = ZERO; c < 3; c++) {
     m_minPelValue[c]  = f->m_minPelValue[c];
     m_midPelValue[c]  = f->m_midPelValue[c];

@@ -75,6 +75,8 @@ enum DistortionMetrics{
   DIST_BLK          = 15,
   DIST_VQM			    = 16, // HDR Video Quality Metric
   DIST_VIF          = 17, // VIF Distortion Metric
+  DIST_SSIM         = 18, // SSIM Metric
+  DIST_TFSSIM       = 19,
   DIST_METRICS
 };
 
@@ -175,23 +177,29 @@ public:
   bool    m_computePsnrInYUpVp;
   DistortionFunction m_tfDistortion;
   bool    m_tfLUTEnable;
-  int                m_rPSNRBlockSizeX;
-  int                m_rPSNRBlockSizeY;
-  int                m_rPSNROverlapX;
-  int                m_rPSNROverlapY;
+  bool    m_enablexPSNR;
+  int     m_rPSNRBlockSizeX;
+  int     m_rPSNRBlockSizeY;
+  int     m_rPSNROverlapX;
+  int     m_rPSNROverlapY;
+  double  m_xPSNRweights[T_COMP];
+  
   PSNRParams() {
-    m_enableShowMSE             = FALSE;
-    m_computePsnrInYCbCr        = TRUE;
-    m_computePsnrInRgb          = FALSE;
-    m_computePsnrInXYZ          = FALSE;
-    m_computePsnrInYUpVp        = FALSE;
-    m_tfDistortion  = DIF_PQPH10K;
-    m_tfLUTEnable   = FALSE;
-    m_rPSNRBlockSizeX           = 64;
-    m_rPSNRBlockSizeY           = 64;
-    m_rPSNROverlapX             = 4;
-    m_rPSNROverlapY             = 4;
-
+    m_enableShowMSE       = FALSE;
+    m_computePsnrInYCbCr  = TRUE;
+    m_computePsnrInRgb    = FALSE;
+    m_computePsnrInXYZ    = FALSE;
+    m_computePsnrInYUpVp  = FALSE;
+    m_enablexPSNR         = FALSE;
+    m_tfDistortion        = DIF_PQPH10K;
+    m_tfLUTEnable         = FALSE;
+    m_rPSNRBlockSizeX     = 64;
+    m_rPSNRBlockSizeY     = 64;
+    m_rPSNROverlapX       = 4;
+    m_rPSNROverlapY       = 4;
+    for (int c = Y_COMP; c < T_COMP; c++) {
+      m_xPSNRweights[c] = 1.0;
+    }
   }
 };
 

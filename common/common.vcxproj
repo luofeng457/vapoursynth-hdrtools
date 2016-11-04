@@ -28,7 +28,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -41,7 +41,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -168,6 +168,8 @@
     <ClCompile Include="src\Conv420to444Generic.cpp" />
     <ClCompile Include="src\Conv420to444NN.cpp" />
     <ClCompile Include="src\Conv422to420Generic.cpp" />
+    <ClCompile Include="src\Conv422to444Generic.cpp" />
+    <ClCompile Include="src\Conv422to444NN.cpp" />
     <ClCompile Include="src\Conv444to420Adaptive.cpp" />
     <ClCompile Include="src\Conv444to420BI.cpp" />
     <ClCompile Include="src\Conv444to420CrBounds.cpp" />
@@ -199,8 +201,10 @@
     <ClCompile Include="src\DistortionMetricRegionPSNR.cpp" />
     <ClCompile Include="src\DistortionMetricRegionTFPSNR.cpp" />
     <ClCompile Include="src\DistortionMetricSigmaCompare.cpp" />
+    <ClCompile Include="src\DistortionMetricSSIM.cpp" />
     <ClCompile Include="src\DistortionMetricTFMSSSIM.cpp" />
     <ClCompile Include="src\DistortionMetricTFPSNR.cpp" />
+    <ClCompile Include="src\DistortionMetricTFSSIM.cpp" />
     <ClCompile Include="src\DistortionMetricVIF.cpp" />
     <ClCompile Include="src\DistortionMetricVQM.cpp" />
     <ClCompile Include="src\DistortionTransferFunction.cpp" />
@@ -298,6 +302,8 @@
     <ClInclude Include="inc\Conv420to444Generic.H" />
     <ClInclude Include="inc\Conv420to444NN.H" />
     <ClInclude Include="inc\Conv422to420Generic.H" />
+    <ClInclude Include="inc\Conv422to444Generic.H" />
+    <ClInclude Include="inc\Conv422to444NN.H" />
     <ClInclude Include="inc\Conv444to420Adaptive.H" />
     <ClInclude Include="inc\Conv444to420BI.H" />
     <ClInclude Include="inc\Conv444to420CrBounds.H" />
@@ -330,8 +336,10 @@
     <ClInclude Include="inc\DistortionMetricRegionPSNR.H" />
     <ClInclude Include="inc\DistortionMetricRegionTFPSNR.H" />
     <ClInclude Include="inc\DistortionMetricSigmaCompare.H" />
+    <ClInclude Include="inc\DistortionMetricSSIM.H" />
     <ClInclude Include="inc\DistortionMetricTFMSSSIM.H" />
     <ClInclude Include="inc\DistortionMetricTFPSNR.H" />
+    <ClInclude Include="inc\DistortionMetricTFSSIM.H" />
     <ClInclude Include="inc\DistortionMetricVIF.H" />
     <ClInclude Include="inc\DistortionMetricVQM.H" />
     <ClInclude Include="inc\DistortionTransferFunction.H" />

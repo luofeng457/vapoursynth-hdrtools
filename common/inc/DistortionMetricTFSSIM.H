@@ -5,9 +5,9 @@
  *
  * <OWNER> = Apple Inc.
  * <ORGANIZATION> = Apple Inc.
- * <YEAR> = 2014
+ * <YEAR> = 2016
  *
- * Copyright (c) 2014, Apple Inc.
+ * Copyright (c) 2016, Apple Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -37,10 +37,10 @@
 
 /*!
  *************************************************************************************
- * \file DistortionMetricPSNR.H
+ * \file DistortionMetricTFSSIM.H
  *
  * \brief
- *    PSNR distortion computation class
+ *    TF MS-SSIM distortion computation class
  *
  * \author
  *     - Alexis Michael Tourapis         <atourapis@apple.com>
@@ -49,51 +49,56 @@
  */
 
 
-#ifndef __DistortionMetricPSNR_H__
-#define __DistortionMetricPSNR_H__
+#ifndef __DistortionMetricTFSSIM_H__
+#define __DistortionMetricTFSSIM_H__
 
 #include "Global.H"
 #include "Frame.H"
 #include "DistortionMetric.H"
+#include "DistortionTransferFunction.H"
+#include <vector>
 
-class DistortionMetricPSNR : public DistortionMetric {
+
+#ifndef UNBIASED_VARIANCE
+//#define UNBIASED_VARIANCE // unbiased estimation of the variance
+#endif
+
+
+class DistortionMetricTFSSIM : public DistortionMetric {
 private:
+  vector<float> m_dataY0;
+  vector<float> m_dataY1;
+  int m_memWidth;
+  int m_memHeight;
+
+  int m_dsWidth;
+  int m_dsHeight;
+
+  vector<double> m_temp;
+  vector<double> m_dest;
+  
+  DistortionTransferFunction *m_transferFunction;
   ColorSpace        m_colorSpace;
-  bool              m_enableShowMSE;
-  bool              m_enablexPSNR;
-  double            m_xPSNRweights[T_COMP];
   double            m_maxValue[T_COMP];
-  double            m_sse[T_COMP];
-  double            m_mse[T_COMP];
-  double            m_oError;
-  double            m_xPSNR;
+  double            m_K1;
+  double            m_K2;
+  double            m_bias;
   
+  int m_blockDistance;
+  int m_blockSizeX;
+  int m_blockSizeY;
+  bool m_useLogSSIM;
   
+  void setColorConversion(int colorPrimaries, const double **transform0, const double **transform1, const double **transform2);
+  void convertToXYZ(double *rgb, double *xyz, const double *transform0, const double *transform1, const double *transform2);
   
-  MetricStatistics  m_sseStats[T_COMP];
-  MetricStatistics  m_mseStats[T_COMP];
-  MetricStatistics  m_xPSNRStats;
+  void  compute                    (Frame* inp0, Frame* inp1);
+  float computePlane               (float  *inp0Data, float  *inp1Data, int height, int width, int windowHeight, int windowWidth, float maxPixelValue);
   
-  int            m_width;
-  int            m_height;
-  vector<double> m_chromaError;
-
-  double computeLumaError(const float  *iComp0, const float  *iComp1, int width, int height, int shiftwidth, int shiftheight, double maxValue, double weight);
-  uint64 computeLumaError(const uint16 *iComp0, const uint16 *iComp1, int width, int height, int shiftwidth, int shiftheight, double weight);
-  uint64 computeLumaError(const uint8  *iComp0, const uint8  *iComp1, int width, int height, int shiftwidth, int shiftheight, double weight);
-
-  double computeChromaError(const float  *iComp0, const float  *iComp1, int size, double maxValue, bool addError, double weight);
-  uint64 computeChromaError(const uint16 *iComp0, const uint16 *iComp1, int size, bool addError, double weight);
-  uint64 computeChromaError(const uint8  *iComp0, const uint8  *iComp1, int size, bool addError, double weight);
-
-  
-  double compute(const float *iComp0, const float *iComp1, int size, double maxValue);
-  uint64 compute(const uint16 *iComp0, const uint16 *iComp1, int size);
-  uint64 compute(const uint8 *iComp0, const uint8 *iComp1, int size);
 public:
   // Construct/Deconstruct
-  DistortionMetricPSNR(const FrameFormat *format, bool enableShowMSE, double maxSampleValue, bool enablexPSNR, double *xPSNRweights);
-  virtual ~DistortionMetricPSNR();
+  DistortionMetricTFSSIM(const FrameFormat *format, SSIMParams *params, double maxSampleValue);
+  virtual ~DistortionMetricTFSSIM();
   
   virtual void   computeMetric (Frame* inp0, Frame* inp1);                // Compute metric for all components
   virtual void   computeMetric (Frame* inp0, Frame* inp1, int component); // Compute metric for only one component

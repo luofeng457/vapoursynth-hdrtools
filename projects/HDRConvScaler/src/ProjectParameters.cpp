@@ -87,8 +87,8 @@ StringParameter stringParameterList[] = {
 };
 
 IntegerParameter intParameterList[] = {
-  { "SourceWidth",             &src->m_width [Y_COMP],                      176,           0,         4096,    "Input source width"                        },
-  { "SourceHeight",            &src->m_height[Y_COMP],                      144,           0,         4096,    "Input source height"                       },
+  { "SourceWidth",             &src->m_width [Y_COMP],                      176,           0,        65536,    "Input source width"                        },
+  { "SourceHeight",            &src->m_height[Y_COMP],                      144,           0,        65536,    "Input source height"                       },
   { "SourceChromaFormat",      (int *) &src->m_chromaFormat,              CF_420,      CF_400,       CF_444,    "Source Chroma Format"                     },
   { "SourceChromaLocationTop", (int *) &src->m_chromaLocation[FP_TOP],  CL_ZERO,     CL_ZERO,   CL_TOTAL-1,    "Source Chroma Location Type (Top/Frame)"   },
   { "SourceChromaLocationBottom", (int *) &src->m_chromaLocation[FP_BOTTOM], CL_ZERO, CL_ZERO,  CL_TOTAL-1,    "Source Chroma Location Type (Bottom)"      },
@@ -109,8 +109,8 @@ IntegerParameter intParameterList[] = {
 
   
   // Currently we do not need rescaling so we can keep these parameters disabled (could be added in the future if needed).
-  { "OutputWidth",             &out->m_width[Y_COMP],                        176,           0,           4096,    "Output/Processing width"                   },
-  { "OutputHeight",            &out->m_height[Y_COMP],                       144,           0,           4096,    "Output/Processing height"                  },
+  { "OutputWidth",             &out->m_width[Y_COMP],                        176,           0,          65536,    "Output/Processing width"                   },
+  { "OutputHeight",            &out->m_height[Y_COMP],                       144,           0,          65536,    "Output/Processing height"                  },
   { "OutputChromaFormat",      (int *) &out->m_chromaFormat,              CF_420,      CF_400,         CF_444,    "Output Chroma Format"                     },
   { "OutputChromaLocationTop", (int *) &out->m_chromaLocation[FP_TOP],   CL_ZERO,     CL_ZERO,     CL_TOTAL-1,    "Output Chroma Location Type (Top/Frame)"   },
   { "OutputChromaLocationBottom", (int *) &out->m_chromaLocation[FP_BOTTOM], CL_ZERO, CL_ZERO,     CL_TOTAL-1,    "Output Chroma Location Type (Bottom)"      },

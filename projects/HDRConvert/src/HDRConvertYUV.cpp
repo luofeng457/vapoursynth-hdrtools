@@ -423,7 +423,7 @@ void HDRConvertYUV::init (ProjectParameters *inputParams) {
   else if (input->m_chromaFormat == CF_444 && output->m_chromaFormat == CF_420) {
     m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaDownsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveDownsampling, inputParams->m_useMinMax);
   }
-  else if (input->m_chromaFormat == CF_420 && output->m_chromaFormat == CF_444) {
+  else if ((input->m_chromaFormat == CF_420 || input->m_chromaFormat == CF_422) && output->m_chromaFormat == CF_444) {
     m_convertFormatIn = ConvertColorFormat::create(output->m_width[Y_COMP], output->m_height[Y_COMP], m_inputFrame->m_chromaFormat, output->m_chromaFormat, inputParams->m_chromaUpsampleFilter, m_inputFrame->m_chromaLocation, output->m_chromaLocation, inputParams->m_useAdaptiveUpsampling, inputParams->m_useMinMax);
   }
 

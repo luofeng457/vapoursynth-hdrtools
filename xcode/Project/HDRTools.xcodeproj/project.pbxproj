@@ -116,6 +116,8 @@
 		C5133E7919CCFAF200D64D48 /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5133E7519CCFAF200D64D48 /* ProjectParameters.cpp */; };
 		C5133E7A19CD08AE00D64D48 /* libHDRToolsHDRTools.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C5133DD619CCF31100D64D48 /* libHDRToolsHDRTools.a */; };
 		C5133E7E19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H in Headers */ = {isa = PBXBuildFile; fileRef = C5133E7D19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H */; };
+		C51645D91DC1910100E5C1E5 /* DistortionMetricSSIM.H in Headers */ = {isa = PBXBuildFile; fileRef = C51645D81DC1910100E5C1E5 /* DistortionMetricSSIM.H */; };
+		C51645DD1DC1912A00E5C1E5 /* DistortionMetricTFSSIM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C51645DC1DC1912A00E5C1E5 /* DistortionMetricTFSSIM.cpp */; };
 		C518962E1ACF62530021356F /* Conv420to444Adaptive.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C518962D1ACF62530021356F /* Conv420to444Adaptive.cpp */; };
 		C51896321ACF62920021356F /* Conv420to444Adaptive.H in Headers */ = {isa = PBXBuildFile; fileRef = C51896311ACF62920021356F /* Conv420to444Adaptive.H */; };
 		C51896341ACF63D80021356F /* ScaleFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C51896331ACF63D80021356F /* ScaleFilter.cpp */; };
@@ -124,6 +126,8 @@
 		C51C5E9A19FED96900AE5E15 /* TransferFunctionAPQ.H in Headers */ = {isa = PBXBuildFile; fileRef = C51C5E9919FED96900AE5E15 /* TransferFunctionAPQ.H */; };
 		C51C5E9E1A0303AB00AE5E15 /* ColorTransformFVDO.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C51C5E9D1A0303AB00AE5E15 /* ColorTransformFVDO.cpp */; };
 		C51C5EA01A03155900AE5E15 /* ColorTransformFVDO.H in Headers */ = {isa = PBXBuildFile; fileRef = C51C5E9F1A03155900AE5E15 /* ColorTransformFVDO.H */; };
+		C52E10B71DC42AB10022CE9B /* DistortionMetricTFSSIM.H in Headers */ = {isa = PBXBuildFile; fileRef = C52E10B61DC42AB10022CE9B /* DistortionMetricTFSSIM.H */; };
+		C52E10B91DC42AE60022CE9B /* DistortionMetricSSIM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C52E10B81DC42AE60022CE9B /* DistortionMetricSSIM.cpp */; };
 		C530C3891B7E93D100FD6D7E /* ToneMapping.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C530C3881B7E93D100FD6D7E /* ToneMapping.cpp */; };
 		C530C38B1B7E946300FD6D7E /* ToneMapping.H in Headers */ = {isa = PBXBuildFile; fileRef = C530C38A1B7E946300FD6D7E /* ToneMapping.H */; };
 		C530C38D1B7E951300FD6D7E /* ToneMappingNull.H in Headers */ = {isa = PBXBuildFile; fileRef = C530C38C1B7E951300FD6D7E /* ToneMappingNull.H */; };
@@ -295,6 +299,10 @@
 		C5E384BC1AFF315000FE5693 /* FrameScaleHalf.H in Headers */ = {isa = PBXBuildFile; fileRef = C5E384BB1AFF315000FE5693 /* FrameScaleHalf.H */; };
 		C5E6F71E1D1DE0CD000339B7 /* LookUpTable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5E6F71D1D1DE0CD000339B7 /* LookUpTable.cpp */; };
 		C5E6F7201D1DE1BF000339B7 /* LookUpTable.H in Headers */ = {isa = PBXBuildFile; fileRef = C5E6F71F1D1DE1BF000339B7 /* LookUpTable.H */; };
+		C5F0F2511DCAB41C009BACAD /* Conv422to444Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F0F2501DCAB41C009BACAD /* Conv422to444Generic.cpp */; };
+		C5F0F2531DCAD27A009BACAD /* Conv422to444Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5F0F2521DCAD27A009BACAD /* Conv422to444Generic.H */; };
+		C5F0F2551DCAD44F009BACAD /* Conv422to444NN.H in Headers */ = {isa = PBXBuildFile; fileRef = C5F0F2541DCAD44F009BACAD /* Conv422to444NN.H */; };
+		C5F0F2571DCAD493009BACAD /* Conv422to444NN.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F0F2561DCAD493009BACAD /* Conv422to444NN.cpp */; };
 		C5F1E38519D2030A00327932 /* Conv422to420Generic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */; };
 		C5F1E38719D2035F00327932 /* Conv422to420Generic.H in Headers */ = {isa = PBXBuildFile; fileRef = C5F1E38619D2035F00327932 /* Conv422to420Generic.H */; };
 		C5F45AF41A1E978300AF6D26 /* ProjectParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C5F1E3AC19D240E800327932 /* ProjectParameters.cpp */; };
@@ -440,6 +448,8 @@
 		C5133E7419CCFAF200D64D48 /* HDRMetricsFrame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HDRMetricsFrame.cpp; path = ../projects/HDRMetrics/src/HDRMetricsFrame.cpp; sourceTree = "<group>"; };
 		C5133E7519CCFAF200D64D48 /* ProjectParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ProjectParameters.cpp; path = ../projects/HDRMetrics/src/ProjectParameters.cpp; sourceTree = "<group>"; };
 		C5133E7D19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricSigmaCompare.H; path = ../common/inc/DistortionMetricSigmaCompare.H; sourceTree = "<group>"; };
+		C51645D81DC1910100E5C1E5 /* DistortionMetricSSIM.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricSSIM.H; path = ../common/inc/DistortionMetricSSIM.H; sourceTree = "<group>"; };
+		C51645DC1DC1912A00E5C1E5 /* DistortionMetricTFSSIM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricTFSSIM.cpp; path = ../common/src/DistortionMetricTFSSIM.cpp; sourceTree = "<group>"; };
 		C518962D1ACF62530021356F /* Conv420to444Adaptive.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv420to444Adaptive.cpp; path = ../common/src/Conv420to444Adaptive.cpp; sourceTree = "<group>"; };
 		C51896311ACF62920021356F /* Conv420to444Adaptive.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv420to444Adaptive.H; path = ../common/inc/Conv420to444Adaptive.H; sourceTree = "<group>"; };
 		C51896331ACF63D80021356F /* ScaleFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScaleFilter.cpp; path = ../common/src/ScaleFilter.cpp; sourceTree = "<group>"; };
@@ -448,6 +458,8 @@
 		C51C5E9919FED96900AE5E15 /* TransferFunctionAPQ.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TransferFunctionAPQ.H; path = ../common/inc/TransferFunctionAPQ.H; sourceTree = "<group>"; };
 		C51C5E9D1A0303AB00AE5E15 /* ColorTransformFVDO.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ColorTransformFVDO.cpp; path = ../common/src/ColorTransformFVDO.cpp; sourceTree = "<group>"; };
 		C51C5E9F1A03155900AE5E15 /* ColorTransformFVDO.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ColorTransformFVDO.H; path = ../common/inc/ColorTransformFVDO.H; sourceTree = "<group>"; };
+		C52E10B61DC42AB10022CE9B /* DistortionMetricTFSSIM.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = DistortionMetricTFSSIM.H; path = ../common/inc/DistortionMetricTFSSIM.H; sourceTree = "<group>"; };
+		C52E10B81DC42AE60022CE9B /* DistortionMetricSSIM.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DistortionMetricSSIM.cpp; path = ../common/src/DistortionMetricSSIM.cpp; sourceTree = "<group>"; };
 		C530C3881B7E93D100FD6D7E /* ToneMapping.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ToneMapping.cpp; path = ../common/src/ToneMapping.cpp; sourceTree = "<group>"; };
 		C530C38A1B7E946300FD6D7E /* ToneMapping.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ToneMapping.H; path = ../common/inc/ToneMapping.H; sourceTree = "<group>"; };
 		C530C38C1B7E951300FD6D7E /* ToneMappingNull.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = ToneMappingNull.H; path = ../common/inc/ToneMappingNull.H; sourceTree = "<group>"; };
@@ -737,6 +749,10 @@
 		C5E384BB1AFF315000FE5693 /* FrameScaleHalf.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = FrameScaleHalf.H; path = ../common/inc/FrameScaleHalf.H; sourceTree = "<group>"; };
 		C5E6F71D1D1DE0CD000339B7 /* LookUpTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LookUpTable.cpp; path = ../common/src/LookUpTable.cpp; sourceTree = "<group>"; };
 		C5E6F71F1D1DE1BF000339B7 /* LookUpTable.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = LookUpTable.H; path = ../common/inc/LookUpTable.H; sourceTree = "<group>"; };
+		C5F0F2501DCAB41C009BACAD /* Conv422to444Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv422to444Generic.cpp; path = ../common/src/Conv422to444Generic.cpp; sourceTree = "<group>"; };
+		C5F0F2521DCAD27A009BACAD /* Conv422to444Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv422to444Generic.H; path = ../common/inc/Conv422to444Generic.H; sourceTree = "<group>"; };
+		C5F0F2541DCAD44F009BACAD /* Conv422to444NN.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv422to444NN.H; path = ../common/inc/Conv422to444NN.H; sourceTree = "<group>"; };
+		C5F0F2561DCAD493009BACAD /* Conv422to444NN.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv422to444NN.cpp; path = ../common/src/Conv422to444NN.cpp; sourceTree = "<group>"; };
 		C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Conv422to420Generic.cpp; path = ../common/src/Conv422to420Generic.cpp; sourceTree = "<group>"; };
 		C5F1E38619D2035F00327932 /* Conv422to420Generic.H */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Conv422to420Generic.H; path = ../common/inc/Conv422to420Generic.H; sourceTree = "<group>"; };
 		C5F1E38C19D23A7E00327932 /* ChromaConvert.cfg */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = ChromaConvert.cfg; path = ../../bin/ChromaConvert.cfg; sourceTree = "<group>"; };
@@ -1060,7 +1076,9 @@
 				C51896311ACF62920021356F /* Conv420to444Adaptive.H */,
 				C5D169311CC6EF2300A4A487 /* Conv420to444CrBounds.H */,
 				C5BD26B419CCAC10003F1B51 /* Conv420to444Generic.H */,
+				C5F0F2521DCAD27A009BACAD /* Conv422to444Generic.H */,
 				C5BD26B319CCAC10003F1B51 /* Conv420to444NN.H */,
+				C5F0F2541DCAD44F009BACAD /* Conv422to444NN.H */,
 				C5F1E38619D2035F00327932 /* Conv422to420Generic.H */,
 				C50BC6B51AE0C5F600F1A398 /* Conv444to420Adaptive.H */,
 				C5BD26B519CCAC10003F1B51 /* Conv444to420BI.H */,
@@ -1090,11 +1108,13 @@
 				C5BD26C119CCAC10003F1B51 /* DistortionMetricmPSNR.H */,
 				C5DE3F3819DE917F006FA313 /* DistortionMetricmPSNRfast.H */,
 				C5F45AF71A1FE61800AF6D26 /* DistortionMetricMSSSIM.H */,
+				C51645D81DC1910100E5C1E5 /* DistortionMetricSSIM.H */,
 				C5BD26C019CCAC10003F1B51 /* DistortionMetricPSNR.H */,
 				C5C2CC3F1B1D41C800AD96EA /* DistortionMetricRegionPSNR.H */,
 				C5C2CC431B1E2EE900AD96EA /* DistortionMetricRegionTFPSNR.H */,
 				C5133E7D19D0F55E00D64D48 /* DistortionMetricSigmaCompare.H */,
 				C5CC7E2E1BB0832700EBE780 /* DistortionMetricTFMSSSIM.H */,
+				C52E10B61DC42AB10022CE9B /* DistortionMetricTFSSIM.H */,
 				C5DE3F3219DB5303006FA313 /* DistortionMetricTFPSNR.H */,
 				C580D7961CB4979500E01A76 /* DistortionMetricVIF.H */,
 				C580D7211CAF469300E01A76 /* DistortionMetricVQM.H */,
@@ -1205,7 +1225,9 @@
 				C518962D1ACF62530021356F /* Conv420to444Adaptive.cpp */,
 				C5D1692F1CC6EEF900A4A487 /* Conv420to444CrBounds.cpp */,
 				C5BD26E819CCAC17003F1B51 /* Conv420to444Generic.cpp */,
+				C5F0F2501DCAB41C009BACAD /* Conv422to444Generic.cpp */,
 				C5BD26E719CCAC17003F1B51 /* Conv420to444NN.cpp */,
+				C5F0F2561DCAD493009BACAD /* Conv422to444NN.cpp */,
 				C5F1E38419D2030A00327932 /* Conv422to420Generic.cpp */,
 				C50BC6B31AE0C5D600F1A398 /* Conv444to420Adaptive.cpp */,
 				C5BD26E919CCAC17003F1B51 /* Conv444to420BI.cpp */,
@@ -1234,11 +1256,13 @@
 				C5BD26F419CCAC17003F1B51 /* DistortionMetricmPSNR.cpp */,
 				C5DE3F3619DE9170006FA313 /* DistortionMetricmPSNRfast.cpp */,
 				C5F45AFB1A1FE7CD00AF6D26 /* DistortionMetricMSSSIM.cpp */,
+				C52E10B81DC42AE60022CE9B /* DistortionMetricSSIM.cpp */,
 				C5BD26F319CCAC17003F1B51 /* DistortionMetricPSNR.cpp */,
 				C5C2CC411B1D41E100AD96EA /* DistortionMetricRegionPSNR.cpp */,
 				C5C2CC451B1E2F1300AD96EA /* DistortionMetricRegionTFPSNR.cpp */,
 				9E856AAB19D0145C00C5499A /* DistortionMetricSigmaCompare.cpp */,
 				C5CC7E2C1BB082CD00EBE780 /* DistortionMetricTFMSSSIM.cpp */,
+				C51645DC1DC1912A00E5C1E5 /* DistortionMetricTFSSIM.cpp */,
 				C5DE3F3419DB5330006FA313 /* DistortionMetricTFPSNR.cpp */,
 				C580D7941CB4973200E01A76 /* DistortionMetricVIF.cpp */,
 				C580D72F1CAF46D500E01A76 /* DistortionMetricVQM.cpp */,
@@ -1440,7 +1464,9 @@
 				C585BD131B06C48B00235FE6 /* FrameFilterNull.H in Headers */,
 				C53E9BCD1C1261A100448F69 /* Conv444to420CrFBounds.H in Headers */,
 				C5E382F21AE8129100FE5693 /* TypeDefs.H in Headers */,
+				C51645D91DC1910100E5C1E5 /* DistortionMetricSSIM.H in Headers */,
 				C5BE379D1B752C8A00350F6D /* HDRConvScaler.H in Headers */,
+				C52E10B71DC42AB10022CE9B /* DistortionMetricTFSSIM.H in Headers */,
 				C5E383181AEFB8ED00FE5693 /* TransferFunctionBiasedMPQ.H in Headers */,
 				C5133DDD19CCF59B00D64D48 /* AddNoiseNormal.H in Headers */,
 				C50BC6B61AE0C5F600F1A398 /* Conv444to420Adaptive.H in Headers */,
@@ -1448,6 +1474,7 @@
 				C580D72A1CAF469300E01A76 /* FFT.H in Headers */,
 				C5DE88D71A09B7E300248B84 /* OutputTIFF.H in Headers */,
 				C5BE37931B58612F00350F6D /* ColorTransformYAdjustAlt.H in Headers */,
+				C5F0F2531DCAD27A009BACAD /* Conv422to444Generic.H in Headers */,
 				C59D6C701B1672F3009F704D /* FrameFilterWiener2D.H in Headers */,
 				C5F63D211C618A25004D8B25 /* Conv444to422NN.H in Headers */,
 				C5FF1E7D1A1AD18B008CFF60 /* TransferFunctionPower.H in Headers */,
@@ -1544,6 +1571,7 @@
 				C5133DFC19CCF59C00D64D48 /* Input.H in Headers */,
 				C5F1E38719D2035F00327932 /* Conv422to420Generic.H in Headers */,
 				C5F63D291C6D6A9D004D8B25 /* ColorTransformClosedLoopFRGB.H in Headers */,
+				C5F0F2551DCAD44F009BACAD /* Conv422to444NN.H in Headers */,
 				C5D169321CC6EF2300A4A487 /* Conv420to444CrBounds.H in Headers */,
 				C5133DFD19CCF59C00D64D48 /* InputEXR.H in Headers */,
 				C5DE88DF1A0D774600248B84 /* ColorTransformXYZ2YUpVp.H in Headers */,
@@ -1765,6 +1793,7 @@
 				C5133E0E19CCF5B700D64D48 /* AddNoise.cpp in Sources */,
 				C5133E0F19CCF5B700D64D48 /* AddNoiseNull.cpp in Sources */,
 				C5133E1019CCF5B700D64D48 /* AddNoiseNormal.cpp in Sources */,
+				C51645DD1DC1912A00E5C1E5 /* DistortionMetricTFSSIM.cpp in Sources */,
 				C5E383141AEFB8C700FE5693 /* TransferFunctionBiasedMPQ.cpp in Sources */,
 				C5528B401BEAE67A00CCADA5 /* ColorTransformClosedLoopY.cpp in Sources */,
 				C5BE37CD1B7BEA2900350F6D /* DisplayGammaAdjustNull.cpp in Sources */,
@@ -1797,6 +1826,7 @@
 				C5496AB21CEE97D50052AB6D /* ColorTransformYAdjustHLG.cpp in Sources */,
 				C5F1E38519D2030A00327932 /* Conv422to420Generic.cpp in Sources */,
 				C5133E1C19CCF5B700D64D48 /* Conv444to420Generic.cpp in Sources */,
+				C52E10B91DC42AE60022CE9B /* DistortionMetricSSIM.cpp in Sources */,
 				C56A3F5A1CDBDBAD0045291B /* ColorTransformYLin.cpp in Sources */,
 				C59D6C721B167306009F704D /* FrameFilterWiener2D.cpp in Sources */,
 				C5E384B41AFF1BD000FE5693 /* FrameScale.cpp in Sources */,
@@ -1810,6 +1840,7 @@
 				C585BD171B06C55B00235FE6 /* FrameFilterDeblock.cpp in Sources */,
 				C5133E2019CCF5B700D64D48 /* ConvFixedToFloat.cpp in Sources */,
 				C580D7951CB4973200E01A76 /* DistortionMetricVIF.cpp in Sources */,
+				C5F0F2511DCAB41C009BACAD /* Conv422to444Generic.cpp in Sources */,
 				C5B080411C2B6975000335A7 /* InputY4M.cpp in Sources */,
 				C5DE3F3D19E3B877006FA313 /* TransferFunctionHG.cpp in Sources */,
 				C580D7361CAF46D500E01A76 /* ResizeBiCubic.cpp in Sources */,
@@ -1865,6 +1896,7 @@
 				C5133E3019CCF5B700D64D48 /* Output.cpp in Sources */,
 				C51C5E9819FED92E00AE5E15 /* TransferFunctionAPQ.cpp in Sources */,
 				C5CC7E351BB3675900EBE780 /* DistortionMetricBlockAct.cpp in Sources */,
+				C5F0F2571DCAD493009BACAD /* Conv422to444NN.cpp in Sources */,
 				C54BDE0A1ACB236A000A34BE /* ColorTransformClosedLoop.cpp in Sources */,
 				C5133E3119CCF5B700D64D48 /* OutputEXR.cpp in Sources */,
 				C580D7351CAF46D500E01A76 /* FFT.cpp in Sources */,

@@ -393,6 +393,18 @@
     <ClCompile Include="src\LookUpTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Conv422to444Generic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Conv422to444NN.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DistortionMetricSSIM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\DistortionMetricTFSSIM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inc\AddNoise.H">
@@ -810,6 +822,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="inc\LookUpTable.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv422to444Generic.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\Conv422to444NN.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricSSIM.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\DistortionMetricTFSSIM.H">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

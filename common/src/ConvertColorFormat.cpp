@@ -61,6 +61,8 @@
 #include "Conv420to444Adaptive.H"
 #include "Conv420to444CrBounds.H"
 #include "Conv420to444Generic.H"
+#include "Conv422to444NN.H"
+#include "Conv422to444Generic.H"
 #include "Conv444to420NN.H"
 #include "Conv444to422NN.H"
 #include "Conv444to420BI.H"
@@ -82,7 +84,7 @@
 //-----------------------------------------------------------------------------
 ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaFormat iChromaFormat, ChromaFormat oChromaFormat, int method, ChromaLocation *iChromaLocationType, ChromaLocation *oChromaLocationType, int useAdaptiveFilter, int useMinMax) {
   ConvertColorFormat *result = NULL;
- 
+
   if (iChromaFormat == oChromaFormat) { // Do nothing
     if ((iChromaFormat == CF_422 || iChromaFormat == CF_400) && iChromaLocationType[FP_FRAME] != oChromaLocationType[FP_FRAME]) {
       printf("Change in Chroma Sample Location type is currently not supported. \n");
@@ -224,6 +226,27 @@ ConvertColorFormat *ConvertColorFormat::create(int width, int height, ChromaForm
           result = new Conv420to444Adaptive(width, height, method, iChromaLocationType);
         else //if (useAdaptiveFilter == (int) ADF_CRBOUNDS) {
           result = new Conv420to444CrBounds(width, height, method, iChromaLocationType);
+        break;
+      default:
+        fprintf(stderr, "Not supported chroma upsampling method %d\n", method);
+        exit(EXIT_FAILURE);
+        break;
+    }
+  }
+  else if (iChromaFormat == CF_422 && oChromaFormat == CF_444) { // Upsample 422 to 444
+    switch (method) {
+      case UF_NN: // Nearest Neighbor
+        result = new Conv422to444NN();
+        break;
+      case UF_F0:
+      case UF_FV:
+      case UF_GS:
+      case UF_LS3:
+      case UF_LS4:
+      case UF_LS5:
+      case UF_LS6:
+      case UF_TM:
+          result = new Conv422to444Generic(width, height, method, iChromaLocationType);
         break;
       default:
         fprintf(stderr, "Not supported chroma upsampling method %d\n", method);

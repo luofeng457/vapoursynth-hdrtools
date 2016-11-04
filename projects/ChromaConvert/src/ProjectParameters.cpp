@@ -85,8 +85,8 @@ StringParameter stringParameterList[] = {
 };
 
 IntegerParameter intParameterList[] = {
-  { "SourceWidth",             &src->m_width[0],                            176,           0,         4096,    "Input source width"                },
-  { "SourceHeight",            &src->m_height[0],                           144,           0,         4096,    "Input source height"               },
+  { "SourceWidth",             &src->m_width[0],                            176,           0,        65536,    "Input source width"                },
+  { "SourceHeight",            &src->m_height[0],                           144,           0,        65536,    "Input source height"               },
   { "SourceChromaFormat",     (int *) &src->m_chromaFormat,              CF_420,      CF_400,       CF_444,    "Source Chroma Format"              },
   { "SourceFourCCCode",       (int *) &src->m_pixelFormat,              PF_UYVY,     PF_UYVY,       PF_XYZ,    "Source Pixel Format"               },
   { "SourceBitDepthCmp0",     (int *) &src->m_bitDepthComp[Y_COMP],           8,           8,           16,    "Source Bitdepth Cmp0"              },
@@ -97,8 +97,8 @@ IntegerParameter intParameterList[] = {
   { "SourceSampleRange",      (int *) &src->m_sampleRange,          SR_STANDARD, SR_STANDARD,       SR_SDI,    "Source Sample Range"               },
 
   // Currently we do not need rescaling so we can keep these parameters disabled (could be added in the future if needed).
-  //{ "OutputWidth",             &out->m_width[0],                          176,           0,         4096,    "Output/Processing width"           },
-  //{ "OutputHeight",            &out->m_height[0],                         144,           0,         4096,    "Output/Processing height"          },
+  //{ "OutputWidth",             &out->m_width[0],                          176,           0,        65536,    "Output/Processing width"           },
+  //{ "OutputHeight",            &out->m_height[0],                         144,           0,        65536,    "Output/Processing height"          },
   { "OutputChromaFormat",     (int *) &out->m_chromaFormat,              CF_420,      CF_400,       CF_444,    "Output Chroma Format"              },
   { "OutputBitDepthCmp0",     (int *) &out->m_bitDepthComp[Y_COMP],           8,           8,           16,    "Output Bitdepth Cmp0"              },
   { "OutputBitDepthCmp1",     (int *) &out->m_bitDepthComp[U_COMP],           8,           8,           16,    "Output Bitdepth Cmp1"              },

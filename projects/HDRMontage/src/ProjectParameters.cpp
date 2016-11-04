@@ -133,8 +133,8 @@ IntegerParameter intParameterList[] = {
   
 
   // Currently we do not need rescaling so we can keep these parameters disabled (could be added in the future if needed).
-  { "OutputWidth",            &out->m_width[0],                                    176,           0,         4096,    "Output/Processing width"               },
-  { "OutputHeight",           &out->m_height[0],                                   144,           0,         4096,    "Output/Processing height"              },
+  { "OutputWidth",            &out->m_width[0],                                    176,           0,        65536,    "Output/Processing width"               },
+  { "OutputHeight",           &out->m_height[0],                                   144,           0,        65536,    "Output/Processing height"              },
   { "OutputChromaFormat",     (int *) &out->m_chromaFormat,                     CF_420,      CF_400,       CF_444,    "Output Chroma Format"                  },
   { "OutputFourCCCode",       (int *) &out->m_pixelFormat,                     PF_UYVY,     PF_UYVY,       PF_XYZ,    "Output Pixel Format"                   },
   { "OutputBitDepthCmp0",     &out->m_bitDepthComp[Y_COMP],                          8,           8,           16,    "Output Bitdepth Cmp0"                  },

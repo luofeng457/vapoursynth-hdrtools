@@ -59,11 +59,13 @@
 #include "DistortionMetricmPSNR.H"
 #include "DistortionMetricmPSNRfast.H"
 #include "DistortionMetricMSSSIM.H"
+#include "DistortionMetricSSIM.H"
 #include "DistortionMetricDeltaE.H"
 #include "DistortionMetricSigmaCompare.H"
 #include "DistortionMetricRegionPSNR.H"
 #include "DistortionMetricRegionTFPSNR.H"
 #include "DistortionMetricTFMSSSIM.H"
+#include "DistortionMetricTFSSIM.H"
 #include "DistortionMetricBlockinessJ341.H"
 #include "DistortionMetricBlockAct.H"
 #include "DistortionMetricVQM.H"
@@ -119,7 +121,10 @@ DistortionMetric *DistortionMetric::create(const FrameFormat *format, int distor
     case DIST_PSNR:
       result = new DistortionMetricPSNR(format, 
                                         distortionParameters->m_PSNR.m_enableShowMSE, 
-                                        distortionParameters->m_maxSampleValue);
+                                        distortionParameters->m_maxSampleValue,
+                                        distortionParameters->m_PSNR.m_enablexPSNR,
+                                        distortionParameters->m_PSNR.m_xPSNRweights
+                                        );
       break;
     case DIST_MPSNR:
       result = new DistortionMetricmPSNR(format, 
@@ -179,6 +184,16 @@ DistortionMetric *DistortionMetric::create(const FrameFormat *format, int distor
       break;
     case DIST_VIF:
       result = new DistortionMetricVIF(format, &distortionParameters->m_VIF);
+      break;
+    case DIST_SSIM:
+      result = new DistortionMetricSSIM(format, 
+                                          &distortionParameters->m_SSIM,
+                                          distortionParameters->m_maxSampleValue);
+      break;
+    case DIST_TFSSIM:
+      result = new DistortionMetricTFSSIM(format,
+                                            &distortionParameters->m_SSIM,
+                                            distortionParameters->m_maxSampleValue);
       break;
   }
 
