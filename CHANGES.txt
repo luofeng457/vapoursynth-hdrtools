@@ -1,3 +1,11 @@
+Changes in HDRTools Version 0.13 (since 0.12)
+---------------------------------------------
+- SDR content colour conversion 
+- Scaling fixes (only 2x downscaling supported) (AT)
+- Support of 422 to 444 conversion (AT)
+- Support of the SSIM metric (AT)
+- Support of cross-component PSNR computation (AT)
+
 Changes in HDRTools Version 0.12 (since 0.11)
 ---------------------------------------------
 - LUT support also for the TF derivatives in JCTVC-W0107 (AN, AT)
