@@ -18,7 +18,8 @@
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- *  * Neither the name of the <ORGANIZATION> nor the names of its contributors may
+ *  * Neither the name of the <ORGANIZATION> nor the names of its contributors
+ *may
  *    be used to endorse or promote products derived from this software without
  *    specific prior written permission.
  *
@@ -47,7 +48,6 @@
  *************************************************************************************
  */
 
-
 //-----------------------------------------------------------------------------
 // Include headers
 //-----------------------------------------------------------------------------
@@ -73,165 +73,168 @@
  *   print help message and exit
  ***********************************************************************
  */
-void HDRConvertExit (char *func_name) {
+void HDRConvertExit(char *func_name)
+{
     printf("Usage: %s [-h] {[-H] [-s] [-m]} [-f config.cfg] "
-    "{[-p Param1=Value1]..[-p ParamM=ValueM]}\n\n"
+           "{[-p Param1=Value1]..[-p ParamM=ValueM]}\n\n"
 
-    "Options:\n"
-    "   -h :  Help mode (this info)\n"
-    "   -H :  Help mode (long format)\n"
-    "   -s :  Silent mode\n"
-    "   -f :  Read <config.cfg> for reseting selected parameters.\n"
-    "   -p :  Set parameter <ParamM> to <ValueM>.\n"
-    "         See default config.cfg file for description of all parameters.\n\n"
-    
-    "## Supported video file formats\n"
-    "   RAW:  .yuv -> YUV 4:2:0\n\n"
-    
-    "## Examples of usage:\n"
-    "   %s\n"
-    "   %s  -h\n"
-    "   %s  -H\n"
-    "   %s  -f config.cfg\n"
-    "   %s  -f config.cfg -p SourceFile=\"seq.yuv\" -p width=176 -p height=144\n" 
-    ,func_name,func_name,func_name,func_name,func_name,func_name);
+           "Options:\n"
+           "   -h :  Help mode (this info)\n"
+           "   -H :  Help mode (long format)\n"
+           "   -s :  Silent mode\n"
+           "   -f :  Read <config.cfg> for reseting selected parameters.\n"
+           "   -p :  Set parameter <ParamM> to <ValueM>.\n"
+           "         See default config.cfg file for description of all "
+           "parameters.\n\n"
+
+           "## Supported video file formats\n"
+           "   RAW:  .yuv -> YUV 4:2:0\n\n"
+
+           "## Examples of usage:\n"
+           "   %s\n"
+           "   %s  -h\n"
+           "   %s  -H\n"
+           "   %s  -f config.cfg\n"
+           "   %s  -f config.cfg -p SourceFile=\"seq.yuv\" -p width=176 -p "
+           "height=144\n",
+           func_name, func_name, func_name, func_name, func_name, func_name);
 }
 
-HDRConvert *HDRConvert::create(ProjectParameters *inputParams) {
-  HDRConvert *result = NULL;
-  
-  if (inputParams->m_inputFile.m_videoType == VIDEO_YUV)
-    result = new HDRConvertYUV(inputParams);
-  else if (inputParams->m_inputFile.m_videoType == VIDEO_TIFF || inputParams->m_inputFile.m_videoType == VIDEO_Y4M || inputParams->m_inputFile.m_videoType == VIDEO_DPX )
-    result = new HDRConvertTIFF(inputParams);
-  else
-    result = new HDRConvertEXR(inputParams);
-  return result;
-}
+HDRConvert *HDRConvert::create(ProjectParameters *inputParams)
+{
+    HDRConvert *result = NULL;
 
+    if (inputParams->m_inputFile.m_videoType == VIDEO_YUV)
+        result = new HDRConvertYUV(inputParams);
+    else if (inputParams->m_inputFile.m_videoType == VIDEO_TIFF ||
+             inputParams->m_inputFile.m_videoType == VIDEO_Y4M ||
+             inputParams->m_inputFile.m_videoType == VIDEO_DPX)
+        result = new HDRConvertTIFF(inputParams);
+    else
+        result = new HDRConvertEXR(inputParams);
+    return result;
+}
 
 //-----------------------------------------------------------------------------
 // Main function
 //-----------------------------------------------------------------------------
 
-int main(int argc, char **argv) {
-  int helpMode = 0;
-  int a;
-  HDRConvert* hdrProcess;
-  int numCLParams = 0, par;
-  char **cl_params = new char* [MAX_CL_PARAMS];
-  char *parfile= new char[FILE_NAME_SIZE];
-  bool readConfig = FALSE;
-  
-  params = &ccParams;
-  params->refresh();
-  
-  strcpy(parfile, DEFAULTCONFIGFILENAME );
-  for ( par = 0; par < MAX_CL_PARAMS; par++ ) {
-    cl_params[par] = new char [MAX_CL_PARAM_LENGTH];
-    //Lets reset this to make sure no garbage remains
-    memset(cl_params[par],0, MAX_CL_PARAM_LENGTH * sizeof(char));
-  }
-  
-  // start here
-  params->m_silentMode = FALSE;
-  
-  for (a = 1; a < argc; a++) {
-    if (argv[a][ZERO] == '-') {
-      if (strcmp(argv[a], "-h") == ZERO)
-        helpMode = 1;
-      else if (strcmp(argv[a], "-H") == ZERO)
-        helpMode = 2;
-      else if (strcasecmp (argv[a], "-v") == ZERO) {
-        printf("%s ",argv[ZERO]);
-        printf("V." VERSION ": compiled " __DATE__ " " __TIME__ "\n");
-        
-        exit(EXIT_FAILURE);
-      }
-      else if (strcasecmp(argv[a], "-s") == ZERO)
-        params->m_silentMode = TRUE;
-      else if (strcasecmp(argv[a], "-p") == ZERO) {
-        // copy parameter to buffer
-        if ( (a + 1) < argc ) {
-          strncpy( cl_params[ numCLParams ], argv[a + 1],strlen(argv[a + 1]));
-          numCLParams++;
-          // jump ahead or else the loop will break and the cfg filename will not be reached
-          // since it assumes it always finds "-"
-          a++;
-        }
-        else {
-          exit(EXIT_FAILURE);
-        }
-      }
-      else if (strcasecmp(argv[a], "-f") == ZERO) {
-        // input parameter file
-        if ( (a + 1) < argc ) {
-          strcpy(parfile, argv[a + 1]);
-          printf("Parsing configuration file %s.\n", parfile);
-          params->readConfigFile(parfile);
-          a++;
-          readConfig = TRUE;
-        }
-        else {
-          exit(EXIT_FAILURE);
-        }
-      }
-      else
-        helpMode = 3;
+int main(int argc, char **argv)
+{
+    int helpMode = 0;
+    int a;
+    HDRConvert *hdrProcess;
+    int numCLParams = 0, par;
+    char **cl_params = new char *[MAX_CL_PARAMS];
+    char *parfile = new char[FILE_NAME_SIZE];
+    bool readConfig = FALSE;
+
+    params = &ccParams;
+    params->refresh();
+
+    strcpy(parfile, DEFAULTCONFIGFILENAME);
+    for (par = 0; par < MAX_CL_PARAMS; par++) {
+        cl_params[par] = new char[MAX_CL_PARAM_LENGTH];
+        // Lets reset this to make sure no garbage remains
+        memset(cl_params[par], 0, MAX_CL_PARAM_LENGTH * sizeof(char));
     }
-    else
-      break;
-  }
-  
-  if (helpMode != 0)
+
+    // start here
     params->m_silentMode = FALSE;
-  
-  if (params->m_silentMode == FALSE) {
-    printf("---------------------------------------------------------\n");
-    printf(" HDR Video Conversion tool - Version %s (%s)\n",HDR_CONVERT_VERSION,VERSION);
-    printf("---------------------------------------------------------\n");
-  }
-  
-  if (helpMode != 0) {
-    HDRConvertExit(argv[ZERO]);
 
-    if (helpMode == 2)
-      params->printParams();
+    for (a = 1; a < argc; a++) {
+        if (argv[a][ZERO] == '-') {
+            if (strcmp(argv[a], "-h") == ZERO)
+                helpMode = 1;
+            else if (strcmp(argv[a], "-H") == ZERO)
+                helpMode = 2;
+            else if (strcasecmp(argv[a], "-v") == ZERO) {
+                printf("%s ", argv[ZERO]);
+                printf("V." VERSION ": compiled " __DATE__ " " __TIME__ "\n");
 
-    for (par = 0; par < MAX_CL_PARAMS; par++){
-      delete [] cl_params[par];
+                exit(EXIT_FAILURE);
+            } else if (strcasecmp(argv[a], "-s") == ZERO)
+                params->m_silentMode = TRUE;
+            else if (strcasecmp(argv[a], "-p") == ZERO) {
+                // copy parameter to buffer
+                if ((a + 1) < argc) {
+                    strncpy(cl_params[numCLParams], argv[a + 1],
+                            strlen(argv[a + 1]));
+                    numCLParams++;
+                    // jump ahead or else the loop will break and the cfg
+                    // filename will not be reached
+                    // since it assumes it always finds "-"
+                    a++;
+                } else {
+                    exit(EXIT_FAILURE);
+                }
+            } else if (strcasecmp(argv[a], "-f") == ZERO) {
+                // input parameter file
+                if ((a + 1) < argc) {
+                    strcpy(parfile, argv[a + 1]);
+                    printf("Parsing configuration file %s.\n", parfile);
+                    params->readConfigFile(parfile);
+                    a++;
+                    readConfig = TRUE;
+                } else {
+                    exit(EXIT_FAILURE);
+                }
+            } else
+                helpMode = 3;
+        } else
+            break;
     }
-    
-    delete [] cl_params;
-    delete [] parfile;
 
-    if (helpMode == 3)
-      exit(EXIT_FAILURE);
-    else
-      exit(EXIT_SUCCESS);
-  }
-  
-  // Prepare parameters
-  params->configure(parfile, cl_params, numCLParams, readConfig );
-  
-  hdrProcess = HDRConvert::create((ProjectParameters *) params);
-  
-  hdrProcess->init         ((ProjectParameters *) params);
-  hdrProcess->outputHeader ((ProjectParameters *) params);
-  hdrProcess->process      ((ProjectParameters *) params);
-  hdrProcess->outputFooter ((ProjectParameters *) params);
-  hdrProcess->destroy();
-  
-  delete hdrProcess;
-  
-  for (par = 0; par < MAX_CL_PARAMS; par++){
-    delete [] cl_params[par];
-  }
-  
-  delete [] cl_params;
-  delete [] parfile;
-  
-  return EXIT_SUCCESS;  
+    if (helpMode != 0)
+        params->m_silentMode = FALSE;
+
+    if (params->m_silentMode == FALSE) {
+        printf("---------------------------------------------------------\n");
+        printf(" HDR Video Conversion tool - Version %s (%s)\n",
+               HDR_CONVERT_VERSION, VERSION);
+        printf("---------------------------------------------------------\n");
+    }
+
+    if (helpMode != 0) {
+        HDRConvertExit(argv[ZERO]);
+
+        if (helpMode == 2)
+            params->printParams();
+
+        for (par = 0; par < MAX_CL_PARAMS; par++) {
+            delete[] cl_params[par];
+        }
+
+        delete[] cl_params;
+        delete[] parfile;
+
+        if (helpMode == 3)
+            exit(EXIT_FAILURE);
+        else
+            exit(EXIT_SUCCESS);
+    }
+
+    // Prepare parameters
+    params->configure(parfile, cl_params, numCLParams, readConfig);
+
+    hdrProcess = HDRConvert::create((ProjectParameters *)params);
+
+    hdrProcess->init((ProjectParameters *)params);
+    hdrProcess->outputHeader((ProjectParameters *)params);
+    hdrProcess->process((ProjectParameters *)params);
+    hdrProcess->outputFooter((ProjectParameters *)params);
+    hdrProcess->destroy();
+
+    delete hdrProcess;
+
+    for (par = 0; par < MAX_CL_PARAMS; par++) {
+        delete[] cl_params[par];
+    }
+
+    delete[] cl_params;
+    delete[] parfile;
+
+    return EXIT_SUCCESS;
 }
 
 //-----------------------------------------------------------------------------
