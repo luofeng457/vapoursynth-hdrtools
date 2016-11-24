@@ -134,7 +134,6 @@ public:
   virtual void init         (ProjectParameters *inputParams);
   virtual void process      (ProjectParameters *inputParams);
   virtual void destroy();
-  
 };
 
 #endif

@@ -1,5 +1,11 @@
+---
 BasedOnStyle: LLVM
 IndentWidth: 4
+
+---
+Language: Cpp
+
+ColumnLimit: 80
 BreakBeforeBraces: Linux
 AllowShortIfStatementsOnASingleLine: false
 IndentCaseLabels: true
