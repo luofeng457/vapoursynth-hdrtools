@@ -52,54 +52,60 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-#include "HDRConvertYUV.H"
+#include "../projects/HDRConvert/inc/HDRConvertYUV.H"
+#include "VapourSynth.h"
+#include "VSHelper.h"
+#include "VSScript.h"
 
 class YUVPlugin
 {
   public:
-    explicit create(const ::VSMap &in, ::VSMap &out, void *user_data_ptr,
-                    ::VSCore &core, const ::VSAPI &vsapi);
+    static void VS_CC create(const VSMap *in, VSMap *out, void *user_data_ptr,
+                      VSCore *core, const VSAPI *vsapi);
 
   private:
-    static void VS_CC init_filter(::VSMap *in, ::VSMap *out,
-                                  void **instanceData, ::VSNode *node,
-                                  ::VSCore *core, const ::VSAPI *vsapi);
-    static const ::VSFrameRef *VS_CC
+    static void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData,
+                                  VSNode *node, VSCore *core,
+                                  const VSAPI *vsapi);
+    static const VSFrameRef *VS_CC
         get_frame(int n, int activationReason, void **instanceData,
-                  void **frameData, ::VSFrameContext *frameCtx, ::VSCore *core,
-                  const ::VSAPI *vsapi);
+                  void **frameData, VSFrameContext *frameCtx, VSCore *core,
+                  const VSAPI *vsapi);
 
     static void VS_CC
-        free_filter(void *instanceData, ::VSCore *core, const ::VSAPI *vsapi);
+        free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi);
 
-    YUVPlugin() = delete;
-    virtual ~YUVPlugin() = delete;
+    YUVPlugin();
+    virtual ~YUVPlugin();
+
+  private:
+    int m_width;
+    int m_height;
 };
 
-static void VS_CC YUVPlugin::init_filter(::VSMap *in, ::VSMap *out,
-                                         void **instanceData, ::VSNode *node,
-                                         ::VSCore *core, const ::VSAPI *vsapi)
+void VS_CC YUVPlugin::init_filter(VSMap *in, VSMap *out, void **instanceData,
+                                  VSNode *node, VSCore *core,
+                                  const VSAPI *vsapi)
 {
-    return NULL;
+    return;
 }
 
-static const ::VSFrameRef *VS_CC
+const VSFrameRef *VS_CC
     YUVPlugin::get_frame(int n, int activationReason, void **instanceData,
-                         void **frameData, ::VSFrameContext *frameCtx,
-                         ::VSCore *core, const ::VSAPI *vsapi)
+                         void **frameData, VSFrameContext *frameCtx,
+                         VSCore *core, const VSAPI *vsapi)
 {
     return NULL;
 }
 
-static void VS_CC YUVPlugin::free_filter(void *instanceData, ::VSCore *core,
-                                         const ::VSAPI *vsapi)
+void VS_CC
+    YUVPlugin::free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi)
 {
-    return NULL;
+    return;
 }
 
-static void VS_CC YUVPlugin::create(const ::VSMap *in, ::VSMap *out,
-                                    void *userData, ::VSCore *core,
-                                    const ::VSAPI *vsapi)
+void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
+                             VSCore *core, const VSAPI *vsapi)
 {
     std::cout << "creating HDRConvertYUV Filter ..." << std::endl;
 
@@ -107,6 +113,11 @@ static void VS_CC YUVPlugin::create(const ::VSMap *in, ::VSMap *out,
     assert(out != NULL);
     assert(core != NULL);
     assert(vsapi != NULL);
+
+    int err;
+    int width = vsapi->propGetInt(in, "width", 0, &err);
+    int height = vsapi->propGetInt(in, "height", 0, &err);
+    std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
 
     /***********************************************************************/
     /* init plugin */
@@ -183,4 +194,28 @@ static void VS_CC YUVPlugin::create(const ::VSMap *in, ::VSMap *out,
     }
 
     std::cout << "Filter created successful" << std::endl;
+}
+
+/* static void VS_CC _create(const VSMap *in, VSMap *out, void *userData, */
+/*                              VSCore *core, const VSAPI *vsapi) */
+/* { */
+/*     YUVPlugin::create(in, out, userData, core, vsapi); */
+/* } */
+
+VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin config_fnc,
+                                            VSRegisterFunction register_fnc,
+                                            VSPlugin *plugin)
+{
+    config_fnc("hdrconv", "cn.edu.sjtu.medialab",
+               "Format converter, " "v0.0.1", VAPOURSYNTH_API_VERSION, 1,
+               plugin);
+
+    register_fnc("yuv",
+                 "clip:clip;"
+                 "width:int:opt;"
+                 "height:int:opt;",
+                 // &_create,
+                 &YUVPlugin::create,
+                 0,
+                 plugin);
 }
