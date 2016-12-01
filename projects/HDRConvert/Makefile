@@ -63,7 +63,7 @@ else
 endif
 CFLAGS +=  -D JM_PSNR -fno-strict-aliasing -fsigned-char -msse2 -mfpmath=sse  $(STATIC) -I$(LIBDIR)
 #CFLAGS +=  -D JM_PSNR -ffloat-store -fno-strict-aliasing -fsigned-char $(STATIC)
-FLAGS=  $(CFLAGS) -Wall -I$(INCDIR) -I$(ADDINCDIR) -D __USE_LARGEFILE64 -D _FILE_OFFSET_BITS=64 
+FLAGS=  $(CFLAGS) -fPIC -Wall -I$(INCDIR) -I$(ADDINCDIR) -D __USE_LARGEFILE64 -D _FILE_OFFSET_BITS=64 
 #FLAGS=  -ffloat-store -Wall -I$(INCDIR) -I$(ADDINCDIR) -D __USE_LARGEFILE64 -D _FILE_OFFSET_BITS=64
 
 OPT_FLAG = -O$(OPT)
@@ -87,6 +87,7 @@ FLAGS+=  $(AFLAGS) $(OPT_FLAG) -D USEMMX
 endif
 FLAGS+= $(OPT_FLAG) -fomit-frame-pointer
 endif
+
 
 OBJSUF= .o$(SUFFIX)
 

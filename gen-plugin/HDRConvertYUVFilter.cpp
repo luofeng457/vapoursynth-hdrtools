@@ -3,11 +3,10 @@
  * and contributor rights, including patent rights, and no such rights are
  * granted under this license.
  *
- * <OWNER> = Apple Inc.
- * <ORGANIZATION> = Apple Inc.
- * <YEAR> = 2014
+ * <OWNER> = Yanan Zhao <arthurchiao@hotmail.com>
+ * <YEAR> = 2016
  *
- * Copyright (c) 2014, Apple Inc.
+ * Copyright (c) 2016, Yanan Zhao
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,19 +33,6 @@
  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  * THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*!
- *************************************************************************************
- * \file HDRConvertYUV.cpp
- *
- * \brief
- *    HDRConvertYUV class source files for performing HDR (YUV) format
- *conversion
- *
- * \author
- *     - Alexis Michael Tourapis         <atourapis@apple.com>
- *************************************************************************************
  */
 
 #include <time.h>
@@ -122,7 +108,7 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     /***********************************************************************/
     /* init plugin */
     /***********************************************************************/
-    ProjectParameters *params = new ProjectParameters();
+    ProjectParameters *_params = new ProjectParameters();
     /* params->m_inputFile; */
     /* params->m_outputFile; */
     /* params->m_source; */
@@ -178,7 +164,7 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
 
     HDRConvertYUV *plugin = new HDRConvertYUV(
         /* parameters */
-        params);
+        _params);
     /***********************************************************************/
     /* init plugin finish */
     /***********************************************************************/
@@ -214,7 +200,6 @@ VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin config_fnc,
                  "clip:clip;"
                  "width:int:opt;"
                  "height:int:opt;",
-                 // &_create,
                  &YUVPlugin::create,
                  0,
                  plugin);
