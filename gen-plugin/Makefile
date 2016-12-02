@@ -5,8 +5,9 @@
 
 DIR := ${CURDIR}
 CFLAGS :=-I$(CURDIR)/../projects/HDRConvert/inc -I$(CURDIR)/../common/inc
+
 all:
-	# g++ -fPIC -Wall $(CFLAGS) -c ./HDRConvertYUVFilter.cpp -o ./HDRConvertYUVFilter.o
+	g++ -fPIC -Wall $(CFLAGS) -c ./HDRConvertYUVFilter.cpp -o ./HDRConvertYUVFilter.o
 	g++ -fPIC -Wall $(CFLAGS) -shared -o libhdrconv.so -Wl,--whole-archive \
 		../lib/HDRLib.a -Wl,--no-whole-archive \
 		../projects/HDRConvert/obj/ProjectParameters.o \

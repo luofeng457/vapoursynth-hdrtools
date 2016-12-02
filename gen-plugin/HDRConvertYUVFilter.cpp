@@ -73,6 +73,7 @@ void VS_CC YUVPlugin::init_filter(VSMap *in, VSMap *out, void **instanceData,
                                   VSNode *node, VSCore *core,
                                   const VSAPI *vsapi)
 {
+    std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
     return;
 }
 
@@ -81,6 +82,7 @@ const VSFrameRef *VS_CC
                          void **frameData, VSFrameContext *frameCtx,
                          VSCore *core, const VSAPI *vsapi)
 {
+    std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
     return NULL;
 }
 
@@ -93,6 +95,7 @@ void VS_CC
 void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
                              VSCore *core, const VSAPI *vsapi)
 {
+    std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
     std::cout << "creating HDRConvertYUV Filter ..." << std::endl;
 
     assert(in != NULL);
@@ -101,8 +104,8 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     assert(vsapi != NULL);
 
     int err;
-    int width = vsapi->propGetInt(in, "width", 0, &err);
-    int height = vsapi->propGetInt(in, "height", 0, &err);
+    int width = vsapi->propGetInt(in, "w", 0, &err);
+    int height = vsapi->propGetInt(in, "h", 0, &err);
     std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
 
     /***********************************************************************/
@@ -192,14 +195,14 @@ VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin config_fnc,
                                             VSRegisterFunction register_fnc,
                                             VSPlugin *plugin)
 {
-    config_fnc("hdrconv", "cn.edu.sjtu.medialab",
-               "Format converter, " "v0.0.1", VAPOURSYNTH_API_VERSION, 1,
+    config_fnc("hdrconv", "hdrc",
+               "HDR Converter, " "0.0.1", VAPOURSYNTH_API_VERSION, 1,
                plugin);
 
-    register_fnc("yuv",
+    register_fnc("YUVConverter",
                  "clip:clip;"
-                 "width:int:opt;"
-                 "height:int:opt;",
+                 "w:int:opt;"
+                 "h:int:opt;",
                  &YUVPlugin::create,
                  0,
                  plugin);
