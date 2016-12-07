@@ -44,57 +44,47 @@
 #include "VSHelper.h"
 #include "VSScript.h"
 
-class YUVPlugin
+struct Plugin
 {
-  public:
-    static void VS_CC create(const VSMap *in, VSMap *out, void *user_data_ptr,
-                      VSCore *core, const VSAPI *vsapi);
-
-  private:
-    static void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData,
-                                  VSNode *node, VSCore *core,
-                                  const VSAPI *vsapi);
-    static const VSFrameRef *VS_CC
-        get_frame(int n, int activationReason, void **instanceData,
-                  void **frameData, VSFrameContext *frameCtx, VSCore *core,
-                  const VSAPI *vsapi);
-
-    static void VS_CC
-        free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi);
-
-    YUVPlugin();
-    virtual ~YUVPlugin();
-
-  private:
-    int m_width;
-    int m_height;
+    int width;
+    int height;
 };
 
-void VS_CC YUVPlugin::init_filter(VSMap *in, VSMap *out, void **instanceData,
-                                  VSNode *node, VSCore *core,
-                                  const VSAPI *vsapi)
+void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
+                       VSCore *core, const VSAPI *vsapi)
 {
+    Plugin *plugin = (Plugin *)*instanceData;
+
     std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
+    std::cout << "width: " << plugin->width << ", height: " << plugin->height
+              << std::endl;
+
     return;
 }
 
-const VSFrameRef *VS_CC
-    YUVPlugin::get_frame(int n, int activationReason, void **instanceData,
-                         void **frameData, VSFrameContext *frameCtx,
-                         VSCore *core, const VSAPI *vsapi)
+const VSFrameRef *VS_CC get_frame(int n, int activationReason,
+                                  void **instanceData, void **frameData,
+                                  VSFrameContext *frameCtx, VSCore *core,
+                                  const VSAPI *vsapi)
 {
+    Plugin *plugin = (Plugin *)*instanceData;
+
     std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
+    std::cout << "width: " << plugin->width << ", height: " << plugin->height
+              << std::endl;
+
     return NULL;
 }
 
-void VS_CC
-    YUVPlugin::free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi)
+void VS_CC free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi)
 {
+    std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
+
     return;
 }
 
-void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
-                             VSCore *core, const VSAPI *vsapi)
+void VS_CC create(const VSMap *in, VSMap *out, void *userData, VSCore *core,
+                  const VSAPI *vsapi)
 {
     std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
     std::cout << "creating HDRConvertYUV Filter ..." << std::endl;
@@ -107,14 +97,13 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     int err;
     int width = vsapi->propGetInt(in, "w", 0, &err);
     int height = vsapi->propGetInt(in, "h", 0, &err);
-    std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
+    std::cout << "width: " << width << ", height: " << height << std::endl;
 
     /***********************************************************************/
     /* init plugin */
     /***********************************************************************/
-    ProjectParameters params;
+    /* ProjectParameters params; */
 
-    std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
     /* params->m_inputFile; */
     /* params->m_outputFile; */
     /* params->m_source; */
@@ -168,9 +157,12 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     /* params->m_tfParams; */
     /* params->m_ctParams; */
 
-    HDRConvertYUV *plugin = new HDRConvertYUV(&params);
+    /* HDRConvertYUV *plugin = new HDRConvertYUV(&params); */
 
-    std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
+    Plugin *plugin = new Plugin();
+    plugin->width = width;
+    plugin->height = height;
+
     /***********************************************************************/
     /* init plugin finish */
     /***********************************************************************/
@@ -188,25 +180,16 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     std::cout << "Filter created successful" << std::endl;
 }
 
-/* static void VS_CC _create(const VSMap *in, VSMap *out, void *userData, */
-/*                              VSCore *core, const VSAPI *vsapi) */
-/* { */
-/*     YUVPlugin::create(in, out, userData, core, vsapi); */
-/* } */
-
-VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin config_fnc,
-                                            VSRegisterFunction register_fnc,
-                                            VSPlugin *plugin)
+VS_EXTERNAL_API(void)
+VapourSynthPluginInit(VSConfigPlugin config_fnc,
+                      VSRegisterFunction register_fnc, VSPlugin *plugin)
 {
-    config_fnc("hdrconv", "hdrc",
-               "HDR Converter, " "0.0.1", VAPOURSYNTH_API_VERSION, 1,
-               plugin);
+    config_fnc("hdrconv", "hdrc", "HDR Converter, "
+                                  "0.0.1",
+               VAPOURSYNTH_API_VERSION, 1, plugin);
 
-    register_fnc("YUVConverter",
-                 "clip:clip;"
-                 "w:int:opt;"
-                 "h:int:opt;",
-                 &YUVPlugin::create,
-                 0,
-                 plugin);
+    register_fnc("YUVConverter", "clip:clip;"
+                                 "w:int:opt;"
+                                 "h:int:opt;",
+                 &create, 0, plugin);
 }
