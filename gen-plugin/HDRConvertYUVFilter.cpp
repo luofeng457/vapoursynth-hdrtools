@@ -46,8 +46,15 @@
 
 struct Plugin
 {
+    VSNodeRef *node;
+    const VSVideoInfo *vi;
+    int enabled;
+
     int width;
     int height;
+    const char *cfgfile; /* cfg file */
+
+    ProjectParameters params;
 };
 
 void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
@@ -78,7 +85,15 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
 
 void VS_CC free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi)
 {
+    Plugin *plugin = (Plugin *)instanceData;
+
     std::cout << "this is " << __FILE__ << ": " << __func__ << std::endl;
+
+    if (plugin) {
+        // TODO: delete node & others first
+
+        delete plugin;
+    }
 
     return;
 }
@@ -94,78 +109,27 @@ void VS_CC create(const VSMap *in, VSMap *out, void *userData, VSCore *core,
     assert(core != NULL);
     assert(vsapi != NULL);
 
-    int err;
-    int width = vsapi->propGetInt(in, "w", 0, &err);
-    int height = vsapi->propGetInt(in, "h", 0, &err);
-    std::cout << "width: " << width << ", height: " << height << std::endl;
-
-    /***********************************************************************/
-    /* init plugin */
-    /***********************************************************************/
-    /* ProjectParameters params; */
-
-    /* params->m_inputFile; */
-    /* params->m_outputFile; */
-    /* params->m_source; */
-    /* params->m_output; */
-    /* params->m_frameSkip;     //! Frame skipping for input */
-
-    /* params->m_srcNormalScale; */
-    /* params->m_outNormalScale; */
-    /* params->m_srcMinValue;               //!< Brightness range value (min) */
-    /* params->m_srcMaxValue;               //!< Brightness range value (max) */
-    /* params->m_outMinValue;               //!< Brightness range value (min) */
-    /* params->m_outMaxValue;               //!< Brightness range value (max) */
-
-    /* params->m_transformPrecision; */
-    /* params->m_useSingleTransferStep;     //!< Use single or multiple steps
-     * (for normalization) when applying PQ */
-    /* params->m_filterInFloat;             //!< Use floating precision for
-     * filtering */
-    /* params->m_enableTFunctionLUT;        //!< Use Transfer function LUT for
-     * some operations */
-    /* params->m_enableTFLUTs;              //!< Use Transfer function LUTs */
-    /* params->m_chromaDownsampleFilter;    //!< Chroma downsampling filter */
-    /* params->m_chromaUpsampleFilter;      //!< Chroma upsampling filter */
-    /* params->m_outputSinglePrecision;     //!< Set output, for OpenEXR files,
-     * to single instead of half precision */
-    /* params->m_useMinMax; */
-    /* params->m_useHighPrecisionTransform; //!< High precision transform for
-     * BT.2020 (proper inverse) */
-    /* params->m_addNoise;                  //! Add noise to the input signal */
-    /* params->m_noiseVariance;             //! Noise variance */
-    /* params->m_noiseMean;                 //! Noise Mean */
-    /* params->m_closedLoopConversion; */
-    /* params->m_closedLoopIterations; */
-    /* params->m_linearDownConversion; */
-    /* params->m_useAdaptiveUpsampling; */
-    /* params->m_useAdaptiveDownsampling; */
-    /* params->m_rgbDownConversion; */
-    /* params->m_bUseChromaDeblocking; */
-    /* params->m_bUseWienerFiltering; */
-    /* params->m_bUseNLMeansFiltering; */
-    /* params->m_bUse2DSepFiltering; */
-    /* params->m_b2DSepMode; */
-
-    /* params->m_cropOffsetLeft; */
-    /* params->m_cropOffsetTop; */
-    /* params->m_cropOffsetRight; */
-    /* params->m_cropOffsetBottom; */
-
-    /* params->m_toneMapping; */
-    /* params->m_tmParams; */
-    /* params->m_tfParams; */
-    /* params->m_ctParams; */
-
-    /* HDRConvertYUV *plugin = new HDRConvertYUV(&params); */
-
     Plugin *plugin = new Plugin();
-    plugin->width = width;
-    plugin->height = height;
 
-    /***********************************************************************/
-    /* init plugin finish */
-    /***********************************************************************/
+    int err;
+    plugin->width = vsapi->propGetInt(in, "w", 0, &err);
+    plugin->height = vsapi->propGetInt(in, "h", 0, &err);
+    std::cout << "width: " << plugin->width << ", height: " << plugin->height
+              << std::endl;
+
+    const int nbr_elt = vsapi->propNumElements(in, "cfgfile");
+    assert(nbr_elt > 0);
+    const char *cfgfile = vsapi->propGetData(in, "cfgfile", 0, &err);
+    std::cout << "cfgfile: " << cfgfile << std::endl;
+
+    plugin->node = vsapi->propGetNode(in, "clip", 0, 0);
+    plugin->vi = vsapi->getVideoInfo(plugin->node);
+    plugin->cfgfile = cfgfile;
+
+    plugin->params.refresh();
+    plugin->params.m_silentMode = FALSE;
+    plugin->params.readConfigFile((char *)cfgfile);
+    plugin->params.update();
 
     if (plugin) {
         vsapi->createFilter(
@@ -190,6 +154,7 @@ VapourSynthPluginInit(VSConfigPlugin config_fnc,
 
     register_fnc("YUVConverter", "clip:clip;"
                                  "w:int:opt;"
-                                 "h:int:opt;",
+                                 "h:int:opt;"
+                                 "cfgfile:data[]",
                  &create, 0, plugin);
 }
