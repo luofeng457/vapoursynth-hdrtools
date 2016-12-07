@@ -38,7 +38,8 @@
 #include <time.h>
 #include <string.h>
 #include <math.h>
-#include "../projects/HDRConvert/inc/HDRConvertYUV.H"
+#include "ProjectParameters.H"
+#include "HDRConvertYUV.H"
 #include "VapourSynth.h"
 #include "VSHelper.h"
 #include "VSScript.h"
@@ -111,7 +112,9 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     /***********************************************************************/
     /* init plugin */
     /***********************************************************************/
-    ProjectParameters *_params = new ProjectParameters();
+    ProjectParameters params;
+
+    std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
     /* params->m_inputFile; */
     /* params->m_outputFile; */
     /* params->m_source; */
@@ -165,9 +168,9 @@ void VS_CC YUVPlugin::create(const VSMap *in, VSMap *out, void *userData,
     /* params->m_tfParams; */
     /* params->m_ctParams; */
 
-    HDRConvertYUV *plugin = new HDRConvertYUV(
-        /* parameters */
-        _params);
+    HDRConvertYUV *plugin = new HDRConvertYUV(&params);
+
+    std::cout << "m_width: " << width << ", m_height: " << height << std::endl;
     /***********************************************************************/
     /* init plugin finish */
     /***********************************************************************/
