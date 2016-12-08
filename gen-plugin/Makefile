@@ -23,6 +23,10 @@ all:
 		-Wl,--whole-archive $(STATIC_LIB) -Wl,--no-whole-archive
 	@echo "done"
 
+fresh:
+	cd .. && make && cd gen-plugin
+	make all
+
 clean:
 	@rm -rf $(SRC).o
 	@rm -rf $(STATIC_LIB) $(SHARED_LIB)

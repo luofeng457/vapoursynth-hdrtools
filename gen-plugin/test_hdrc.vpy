@@ -8,11 +8,12 @@
 import vapoursynth as vs
 
 core = vs.get_core()
-core.std.LoadPlugin("/usr/lib/x86_64-linux-gnu/libffms2.so")
+# core.std.LoadPlugin("/usr/lib/x86_64-linux-gnu/libffms2.so")
 core.std.LoadPlugin("./libhdrconv.so")
 
-clip = core.ffms2.Source(source='/home/arthurchiao/cherry/video_files/in.mp4')
-clip = core.hdrc.YUVConverter(clip=clip, w=1920, h=1088, cfgfile="../bin/HDRConvertYCbCr420ToTiff.cfg")
+clip = core.ffms2.Source(source='/home/cloud/in.mp4')
+clip = core.hdrc.YUVConverter(clip=clip, w=1920, h=1088,
+                              cfgfile="yuv420_10bit_to_tiff.cfg")
 
 # from hdrc import hdrconv
 # print(core.hdrc)
