@@ -70,10 +70,14 @@ struct Plugin
 void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
                        VSCore *core, const VSAPI *vsapi)
 {
-    Plugin *plugin = (Plugin *)*instanceData;
-
     TRACE_LINE
 
+    Plugin *plugin = (Plugin *)*instanceData;
+
+    int numOfOutputs = 1;
+    vsapi->setVideoInfo(plugin->vi, numOfOutputs, node);
+
+    /* init hdr converter */
     plugin->params = &ccParams;
     plugin->params->refresh();
     plugin->params->m_silentMode = FALSE;
@@ -90,10 +94,8 @@ void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
 
     plugin->hdrProcess->init(plugin->params);
     plugin->hdrProcess->outputHeader(plugin->params);
-    plugin->hdrProcess->process(plugin->params);
-    plugin->hdrProcess->outputFooter(plugin->params);
 
-    return;
+    TRACE_LINE
 }
 
 const VSFrameRef *VS_CC get_frame(int n, int activationReason,
@@ -101,11 +103,74 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
                                   VSFrameContext *frameCtx, VSCore *core,
                                   const VSAPI *vsapi)
 {
-    Plugin *plugin = (Plugin *)*instanceData;
-
     TRACE_LINE
 
-    return NULL;
+    Plugin *plugin = (Plugin *)*instanceData;
+    /* plugin->hdrProcess->process(plugin->params); */
+    /* plugin->hdrProcess->outputFooter(plugin->params); */
+
+    // Request the source frame on the first call
+    if (activationReason == arInitial) {
+        std::cout << "activationReason: arInitial\n";
+
+        // n: The frame number. Negative values will cause an error.
+        vsapi->requestFrameFilter(n, plugin->node, frameCtx);
+        return NULL;
+    }
+
+    if (activationReason != arAllFramesReady) {
+        std::cout << "activationReason error: " << activationReason << "\n";
+        return NULL;
+    }
+
+    const VSFrameRef *src = vsapi->getFrameFilter(n, plugin->node, frameCtx);
+    // The reason we query this on a per frame basis is because we want our
+    // filter to accept clips with varying dimensions.
+    // If we reject such content using plugin->vi would be better.
+    const VSFormat *format = plugin->vi->format;
+    int height = vsapi->getFrameHeight(src, 0);
+    int width = vsapi->getFrameWidth(src, 0);
+
+    // When creating a new frame for output it is VERY EXTREMELY SUPER
+    // IMPORTANT to supply the "dominant" source frame to copy properties from.
+    // Frame props are an essential part of the filter chain and you should
+    // NEVER break it.
+    VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
+
+    // It's processing loop time!
+    // Loop over all the planes
+    for (int plane = 0; plane < format->numPlanes; plane++) {
+        const uint8_t *srcp = vsapi->getReadPtr(src, plane);
+        int src_stride = vsapi->getStride(src, plane);
+        uint8_t *dstp = vsapi->getWritePtr(dst, plane);
+        int dst_stride = vsapi->getStride(dst, plane);
+        // note that if a frame has the same dimensions and
+        // format, the stride is guaranteed to be the same.
+        // int dst_stride = src_stride would be fine too in this filter.
+        // Since planes may be subsampled you have to query the height of
+        // them individually
+
+        int h = vsapi->getFrameHeight(src, plane);
+        int y;
+        int w = vsapi->getFrameWidth(src, plane);
+        int x;
+
+        for (y = 0; y < h; y++) {
+            for (x = 0; x < w; x++)
+                dstp[x] = ~srcp[x];
+
+            dstp += dst_stride;
+            srcp += src_stride;
+        }
+    }
+
+    // Release the source frame
+    vsapi->freeFrame(src);
+
+    // A reference is consumed when it is returned, so saving the dst
+    // reference somewhere and reusing it is not allowed.
+    TRACE_LINE
+    return dst;
 }
 
 void VS_CC free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi)
