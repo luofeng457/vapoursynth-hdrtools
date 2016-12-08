@@ -64,6 +64,7 @@ struct Plugin
     const char *cfgfile; /* cfg file */
 
     ProjectParameters *params;
+    HDRConvert *hdrProcess;
 };
 
 void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
@@ -81,20 +82,16 @@ void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
     print_params(plugin->params);
 
     HDRConvert *hdrProcess = HDRConvert::create(plugin->params);
+    if (!hdrProcess) {
+        std::cout << "HDRConvert::create() failed\n";
+        return;
+    }
+    plugin->hdrProcess = hdrProcess;
 
-    int test = 0;
-    std::cout << "---------test" << test++ << std::endl;
-    hdrProcess->init(plugin->params);
-    std::cout << "---------test" << test++ << std::endl;
-    hdrProcess->outputHeader(plugin->params);
-    std::cout << "---------test" << test++ << std::endl;
-    hdrProcess->process(plugin->params);
-    std::cout << "---------test" << test++ << std::endl;
-    hdrProcess->outputFooter(plugin->params);
-    std::cout << "---------test" << test++ << std::endl;
-    hdrProcess->destroy();
-
-    delete hdrProcess;
+    plugin->hdrProcess->init(plugin->params);
+    plugin->hdrProcess->outputHeader(plugin->params);
+    plugin->hdrProcess->process(plugin->params);
+    plugin->hdrProcess->outputFooter(plugin->params);
 
     return;
 }
@@ -108,9 +105,6 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
 
     TRACE_LINE
 
-    std::cout << "width: " << plugin->width << ", height: " << plugin->height
-              << std::endl;
-
     return NULL;
 }
 
@@ -121,7 +115,10 @@ void VS_CC free_filter(void *instanceData, VSCore *core, const VSAPI *vsapi)
     TRACE_LINE
 
     if (plugin) {
-        // TODO: delete node & others first
+        vsapi->freeNode(plugin->node);
+
+        plugin->hdrProcess->destroy();
+        delete plugin->hdrProcess;
 
         delete plugin;
     }
@@ -142,12 +139,14 @@ void VS_CC create(const VSMap *in, VSMap *out, void *userData, VSCore *core,
     assert(vsapi != NULL);
 
     Plugin *plugin = new Plugin();
+    if (!plugin) {
+        std::cout << "create HDRConvert plugin failed\n";
+        return;
+    }
 
     int err;
     plugin->width = vsapi->propGetInt(in, "w", 0, &err);
     plugin->height = vsapi->propGetInt(in, "h", 0, &err);
-    std::cout << "width: " << plugin->width << ", height: " << plugin->height
-              << std::endl;
 
     const int nbr_elt = vsapi->propNumElements(in, "cfgfile");
     assert(nbr_elt > 0);
@@ -158,15 +157,12 @@ void VS_CC create(const VSMap *in, VSMap *out, void *userData, VSCore *core,
     plugin->vi = vsapi->getVideoInfo(plugin->node);
     plugin->cfgfile = cfgfile;
 
-    if (plugin) {
-        vsapi->createFilter(
-            in, out,
-            "HDRConvertYUVFilter", // plugin->filter_name.c_str(),
-            &init_filter, &get_frame, &free_filter,
-            0, // filter mode
-            0, // filter flags
-            plugin, core);
-    }
+    vsapi->createFilter(in, out,
+                        "HDRConvertYUVFilter", // plugin->filter_name.c_str(),
+                        &init_filter, &get_frame, &free_filter,
+                        0, // filter mode
+                        0, // filter flags
+                        plugin, core);
 
     std::cout << "Filter created successful" << std::endl;
 }
@@ -175,7 +171,7 @@ VS_EXTERNAL_API(void)
 VapourSynthPluginInit(VSConfigPlugin config_fnc,
                       VSRegisterFunction register_fnc, VSPlugin *plugin)
 {
-    config_fnc("hdrconv", "hdrc", "HDR Converter, ""0.0.1",
+    config_fnc("hdrconv", "hdrc", "HDR Converter 0.0.1",
                VAPOURSYNTH_API_VERSION, 1, plugin);
 
     register_fnc("YUVConverter", "clip:clip;"
