@@ -135,6 +135,25 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     // IMPORTANT to supply the "dominant" source frame to copy properties from.
     // Frame props are an essential part of the filter chain and you should
     // NEVER break it.
+    printf("fmt->name: %s\n", format->name);
+    printf("fmt->id: %d\n", format->id);
+    printf("fmt->colorFamily: %d\n", format->colorFamily);
+    printf("fmt->sampleType: %d\n", format->sampleType);
+    printf("fmt->bitsPerSample: %d\n", format->bitsPerSample);
+    printf("fmt->bytesPerSample: %d\n", format->bytesPerSample);
+    printf("fmt->subSamplingW: %d\n", format->subSamplingW);
+    printf("fmt->subSamplingH: %d\n", format->subSamplingH);
+    printf("fmt->numPlanes: %d\n", format->numPlanes);
+    if (0) {
+        ProjectParameters *params = plugin->params;
+        dst->colorFamily = params->m_output->m_colorSpace; /* TODO: HDR enum to VS enum */
+        dst->sampleType = ; /* one of int and float */
+        dst->bitsPerSample = params->m_output->m_bitDepthComp[Y_COMP];
+        dst->bytesPerSample = ;
+        dst->subSamplingW = ;
+        dst->subSamplingH = ;
+        dst->numPlanes = 3; /* TODO: always 3 ? */
+    }
     VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
 
     // It's processing loop time!

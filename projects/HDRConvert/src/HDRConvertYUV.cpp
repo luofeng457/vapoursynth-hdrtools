@@ -1012,3 +1012,175 @@ void HDRConvertYUV::outputFooter(ProjectParameters *inputParams)
 
     IOFunctions::closeFile(f);
 }
+
+void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
+{
+    // to be clarified
+    // - input YUV bitdepth?
+    // - input YUV representation, how many bits
+    // - need conversion? e.g. 12 -> 10
+    //
+    int iCurrFrame = 0;
+    float ratio =
+        inputParams->m_source.m_frameRate / inputParams->m_output.m_frameRate;
+    FrameFormat *srcFormat = &inputParams->m_source;
+
+    clock_t clk;
+    bool errorRead = FALSE;
+
+    Frame *currentFrame = NULL;
+
+    // Now process all frames
+    for (int iFrame = 0; iFrame < inputParams->m_numberOfFrames; iFrame++) {
+        clk = clock();
+        iCurrFrame = int(iFrame * ratio);
+
+        // read frames
+        m_iFrameStore->m_frameNo = iFrame;
+        if (m_inputFrame->readOneFrame(
+                    m_inputFile, // fd of input file
+                    iCurrFrame,  // current frame index
+                    m_inputFile->m_fileHeader, // num of bytes to skip
+                    m_startFrame // start position in file
+                    ) == TRUE) {
+            // Now copy input frame buffer to processing frame buffer for any
+            // subsequent processing
+            m_inputFrame->copyFrame(m_iFrameStore);
+        } else {
+            inputParams->m_numberOfFrames = iFrame;
+            errorRead = TRUE;
+            break;
+        }
+
+        if (errorRead == TRUE) {
+            break;
+        } else if (inputParams->m_silentMode == FALSE) {
+            // printf("%05d ", iFrame);
+        }
+
+        currentFrame = m_iFrameStore;
+        if (m_croppedFrameStore != NULL) {
+            m_croppedFrameStore->copy(
+                m_iFrameStore, m_cropOffsetLeft, m_cropOffsetTop,
+                m_iFrameStore->m_width[Y_COMP] + m_cropOffsetRight,
+                m_iFrameStore->m_height[Y_COMP] + m_cropOffsetBottom, 0, 0);
+
+            currentFrame = m_croppedFrameStore;
+        }
+
+        if (m_iFrameStore->m_chromaFormat != m_oFrameStore->m_chromaFormat ||
+            (m_iFrameStore->m_chromaFormat != CF_444 &&
+             m_iFrameStore->m_colorPrimaries !=
+                 m_oFrameStore->m_colorPrimaries)) {
+            // Convert chroma format if needed (note that given the current code
+            // we can always create m_cFrameStore if we want to and avoid the
+            // conditional,
+            // while being penalized with memory copy operations.
+            // An alternative could also be to set m_cFrameStore to be equal to
+            // m_iFrameStore
+            // and have a "true" null process that does nothing. That would save
+            // on both memory and memory copy operations. TBD
+
+            // The resolution of the below frame stores is actually at 4:4:4
+            // regardless if the data in it are 4:2:0. Code works as is, but
+            // should be fixed.
+            if (m_filterInFloat == TRUE) {
+                // Convert to different format if needed (integer to float)
+                m_convertIQuantize->process(m_pFrameStore[0], currentFrame);
+                if (m_bUseChromaDeblocking == TRUE) // Perform deblocking
+                    m_frameFilter->process(m_pFrameStore[0]);
+                // Chroma conversion
+                m_convertFormatIn->process(m_convertFrameStore,
+                                           m_pFrameStore[0]);
+            } else {
+                m_convertFormatIn->process(m_pFrameStore[0], currentFrame);
+                // Convert to different format if needed (integer to float)
+                m_convertIQuantize->process(m_convertFrameStore,
+                                            m_pFrameStore[0]);
+            }
+        } else {
+            // Convert to different format if needed (integer to float)
+            m_convertIQuantize->process(m_convertFrameStore, currentFrame);
+        }
+
+        // Add noise
+        m_addNoise->process(m_convertFrameStore);
+
+        if (m_bUseWienerFiltering == TRUE)
+            m_frameFilterNoise0->process(m_convertFrameStore);
+        if (m_bUse2DSepFiltering == TRUE)
+            m_frameFilterNoise1->process(m_convertFrameStore);
+        if (m_bUseNLMeansFiltering == TRUE)
+            m_frameFilterNoise2->process(m_convertFrameStore);
+
+        // Now perform a color format conversion
+        // Output to m_pFrameStore memory with appropriate color space
+        // conversion
+        // Note that the name of "forward" may be a bit of a misnomer.
+
+        if (!(srcFormat->m_iConstantLuminance != 0 &&
+              (srcFormat->m_colorSpace == CM_YCbCr ||
+               srcFormat->m_colorSpace == CM_ICtCp))) {
+            m_colorTransform->process(m_pFrameStore[2], m_convertFrameStore);
+            if (m_useSingleTransferStep == FALSE) {
+                m_inputTransferFunction->forward(m_pFrameStore[3],
+                                                 m_pFrameStore[2]);
+                m_srcDisplayGammaAdjust->forward(m_pFrameStore[3]);
+                m_normalizeFunction->forward(m_pFrameStore[1],
+                                             m_pFrameStore[3]);
+            } else {
+                m_inputTransferFunction->forward(m_pFrameStore[1],
+                                                 m_pFrameStore[2]);
+                m_srcDisplayGammaAdjust->forward(m_pFrameStore[1]);
+            }
+        } else {
+            m_colorTransform->process(m_pFrameStore[2], m_convertFrameStore);
+            m_normalizeFunction->forward(m_pFrameStore[1], m_pFrameStore[2]);
+        }
+
+        if (m_changeColorPrimaries == TRUE) {
+            m_colorSpaceConvert->process(m_colorSpaceFrame, m_pFrameStore[1]);
+            m_outDisplayGammaAdjust->inverse(m_colorSpaceFrame);
+            if (m_oFrameStore->m_colorSpace == CM_YCbCr ||
+                m_oFrameStore->m_colorSpace == CM_ICtCp) {
+                m_outputTransferFunction->inverse(m_pFrameStore[6],
+                                                  m_colorSpaceFrame);
+                m_colorSpaceConvertMC->process(m_pFrameStore[4],
+                                               m_pFrameStore[6]);
+            } else {
+                m_outputTransferFunction->inverse(m_pFrameStore[4],
+                                                  m_colorSpaceFrame);
+            }
+
+        } else {
+            // here we apply the output transfer function (to be fixed)
+            m_outDisplayGammaAdjust->inverse(m_pFrameStore[1]);
+            m_outputTransferFunction->inverse(m_pFrameStore[4],
+                                              m_pFrameStore[1]);
+        }
+
+        if (m_iFrameStore->m_chromaFormat != CF_444 &&
+            m_oFrameStore->m_chromaFormat != CF_444 &&
+            m_iFrameStore->m_colorPrimaries !=
+                m_oFrameStore->m_colorPrimaries) {
+            m_convertFormatOut->process(m_pFrameStore[5], m_pFrameStore[4]);
+            m_convertProcess->process(m_oFrameStore, m_pFrameStore[5]);
+        } else
+            m_convertProcess->process(m_oFrameStore, m_pFrameStore[4]);
+
+        // frame output
+        m_outputFrame->copyFrame(m_oFrameStore);
+        m_outputFrame->writeOneFrame(m_outputFile, iFrame,
+                                     m_outputFile->m_fileHeader, 0);
+
+        clk = clock() - clk;
+        /* if (inputParams->m_silentMode == FALSE) { */
+        /*     printf("%7.3f", 1.0 * clk / CLOCKS_PER_SEC); */
+        /*     printf("\n"); */
+        /*     fflush(stdout); */
+        /* } else { */
+        /*     printf("Processing Frame : %d\r", iFrame); */
+        /*     fflush(stdout); */
+        /* } */
+    } // end for iFrame
+}
