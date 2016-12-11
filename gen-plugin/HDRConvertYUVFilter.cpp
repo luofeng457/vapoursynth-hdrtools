@@ -98,6 +98,103 @@ void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
     TRACE_LINE
 }
 
+/**
+ * init the member variable m_inputFrame in HDRConvertYUV
+ */
+void init_input_frame(
+        Plugin *plugin,
+        int n,
+        VSFrameContext *frameCtx, VSCore *core,
+        const VSAPI *vsapi)
+{
+    assert(plugin != NULL);
+
+    // destination YUV frame in this func
+    HDRConvertYUV *converter = (HDRConvertYUV *)(plugin->converter);
+    Input *dst = converter->m_inputFrame;
+
+    // sizeof(one_Y_pixel) == sizeof(U) == sizeof(V)
+    int bytesPerSample = plugin->vi->format->bytesPerSample;
+    assert(bytesPerSample == 1 || bytesPerSample == 2);
+
+    int bitdepth = bytesPerSample == 1? 8 : 16;
+
+    // loop over Y/U/V or R/G/B or R/G/B/Alpha planes
+    const VSFrameRef *src = vsapi->getFrameFilter(n, plugin->node, frameCtx);
+    const VSFormat *format = plugin->vi->format;
+    for (int plane = 0; plane < format->numPlanes; plane++) {
+        const uint8_t *srcp = vsapi->getReadPtr(src, plane);
+        int src_stride = vsapi->getStride(src, plane);
+
+        // note that if a frame has the same dimensions and
+        // format, the stride is guaranteed to be the same.
+        // int dst_stride = src_stride would be fine too in this filter.
+        // Since planes may be subsampled you have to query the height of
+        // them individually
+        int h = vsapi->getFrameHeight(src, plane);
+        int w = vsapi->getFrameWidth(src, plane);
+
+        // re-init these fields, override the values parsed from cfg
+        dst->m_height[plane] = h;
+        dst->m_width [plane] = w;
+        dst->m_bitDepthComp[plane] = bitdepth;
+        dst->m_picUnitSizeOnDisk = bitdepth;
+        dst->m_picUnitSizeShift3 = dst->m_picUnitSizeOnDisk >> 3;
+
+        // should has been initialzed in constructor
+        assert(dst->m_comp[plane] != NULL);
+
+        // copy from VS (src) to HDR (dst = converter->m_inputFrame)
+        int dst_stride = src_stride;
+        vs_bitblt(
+                dst->m_comp[plane], dst_stride,  // dst
+                srcp, src_stride,   // src
+                w * bytesPerSample, // total bytes of each line
+                h                   // plane height
+                );
+#if 0
+        vs_bitblt(dstp, dst_stride, srcp, src_stride,
+                w * d->vi.format->bytesPerSample, // total bytes of each line
+                h                                 // plane height
+                );
+#endif
+    }
+
+    dst->m_isFloat = false;
+    dst->m_isInterleaved = false;
+    dst->m_isInterlaced = false;
+
+    // seems only DPX needs this, Yanan Zhao 2016-12-11 23:43:31
+    // dst->m_components;
+
+    dst->m_compSize[Y_COMP] = dst->m_height[Y_COMP] * dst->m_width[Y_COMP];
+    dst->m_compSize[U_COMP] = dst->m_height[U_COMP] * dst->m_width[U_COMP];
+    dst->m_compSize[V_COMP] = dst->m_height[V_COMP] * dst->m_width[V_COMP];
+    dst->m_size = dst->m_compSize[Y_COMP] + dst->m_compSize[U_COMP] +
+        dst->m_compSize[V_COMP];
+
+    // we do not need this currently - Yanan Zhao, 2016-12-11 23:43:10
+    // m_compSize[A_COMP] = ;
+    // m_height[A_COMP] = ;
+    // m_width [A_COMP] = ;
+
+    /* following fields should have been initialized by parsing cfg file
+     * before this stage */
+#if 0
+    m_colorSpace;                   //!< Color space
+    m_colorPrimaries;               //!< Color primaries
+    m_chromaFormat;                 //!< 0: 420, 1:422, 2:444
+    m_chromaLocation[FP_TOTAL];
+    //!< Note that we keep two elements for top and bottom fields.
+    m_sampleRange;                  //!< 0: standard, 1: full, 2: SDI
+    m_transferFunction;             //!< Supported transfer functions
+    m_pixelFormat;
+    m_systemGamma;
+    m_pixelType[4];                 //!< pixel type (for OpenEXR)
+    m_frameRate;
+#endif
+}
+
 const VSFrameRef *VS_CC get_frame(int n, int activationReason,
                                   void **instanceData, void **frameData,
                                   VSFrameContext *frameCtx, VSCore *core,
@@ -144,6 +241,7 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     printf("fmt->subSamplingW: %d\n", format->subSamplingW);
     printf("fmt->subSamplingH: %d\n", format->subSamplingH);
     printf("fmt->numPlanes: %d\n", format->numPlanes);
+#if 0 // TODO
     if (0) {
         ProjectParameters *params = plugin->params;
         dst->colorFamily = params->m_output->m_colorSpace; /* TODO: HDR enum to VS enum */
@@ -154,7 +252,10 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
         dst->subSamplingH = ;
         dst->numPlanes = 3; /* TODO: always 3 ? */
     }
+#endif
     VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
+
+    init_input_frame(plugin, n, frameCtx, core, vsapi);
 
     // It's processing loop time!
     // Loop over all the planes

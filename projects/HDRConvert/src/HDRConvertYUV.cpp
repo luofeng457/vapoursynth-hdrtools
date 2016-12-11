@@ -1013,8 +1013,29 @@ void HDRConvertYUV::outputFooter(ProjectParameters *inputParams)
     IOFunctions::closeFile(f);
 }
 
-void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
+
+#if 0
+void HDRConvertYUV::processOneFrame(
+        ProjectParameters *inputParams,
+        int w, int h,
+        uint8_t *srcY, int srcStrideY,
+        uint8_t *srcU, int srcStrideU,
+        uint8_t *srcV, int srcStrideV,
+        )
 {
+#define VS_PLUGIN 1
+
+    // input parameters
+    init_input_frame(plugin->converter->m_inputFrame, vsFrame);
+
+    if (srcBitDepth == 8) {
+        // copy to m_inputFrame->m_data and m_inputFrame->m_comp[4]
+    }
+    else {
+        // copy to m_inputFrame->m_ui16Data and
+        // m_inputFrame->m_ui16DataComp[4]
+    }
+
     // to be clarified
     // - input YUV bitdepth?
     // - input YUV representation, how many bits
@@ -1030,6 +1051,9 @@ void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
 
     Frame *currentFrame = NULL;
 
+    // should only one frame each time - Yanan Zhao
+    assert(inputParams->m_numberOfFrames == 1);
+
     // Now process all frames
     for (int iFrame = 0; iFrame < inputParams->m_numberOfFrames; iFrame++) {
         clk = clock();
@@ -1037,12 +1061,18 @@ void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
 
         // read frames
         m_iFrameStore->m_frameNo = iFrame;
-        if (m_inputFrame->readOneFrame(
+        if (
+                //copy yuv to input frame
+#if !VS_PLUGIN
+                m_inputFrame->readOneFrame(
                     m_inputFile, // fd of input file
                     iCurrFrame,  // current frame index
                     m_inputFile->m_fileHeader, // num of bytes to skip
                     m_startFrame // start position in file
-                    ) == TRUE) {
+                    ) == TRUE
+#else
+#endif
+                ) {
             // Now copy input frame buffer to processing frame buffer for any
             // subsequent processing
             m_inputFrame->copyFrame(m_iFrameStore);
@@ -1184,3 +1214,4 @@ void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
         /* } */
     } // end for iFrame
 }
+#endif
