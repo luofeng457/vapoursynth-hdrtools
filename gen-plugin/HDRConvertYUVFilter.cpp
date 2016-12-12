@@ -48,8 +48,8 @@
 #undef TRACE_LINE
 #endif
 #define TRACE_LINE                                                             \
-    /* std::cout << "@" << __FILE__ << ": " << __LINE__ << " " << __func__        \ */
-    /*           << std::endl; */
+/* std::cout << "@" << __FILE__ << ": " << __LINE__ << " " << __func__ \ */
+/*           << std::endl; */
 
 static void print_params(ProjectParameters *params);
 
@@ -101,11 +101,8 @@ void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
 /**
  * init the member variable m_inputFrame in HDRConvertYUV
  */
-void init_input_frame(
-        Plugin *plugin,
-        int n,
-        VSFrameContext *frameCtx, VSCore *core,
-        const VSAPI *vsapi)
+void init_input_frame(Plugin *plugin, int n, VSFrameContext *frameCtx,
+                      VSCore *core, const VSAPI *vsapi)
 {
     assert(plugin != NULL);
 
@@ -117,7 +114,7 @@ void init_input_frame(
     int bytesPerSample = plugin->vi->format->bytesPerSample;
     assert(bytesPerSample == 1 || bytesPerSample == 2);
 
-    int bitdepth = bytesPerSample == 1? 8 : 16;
+    int bitdepth = bytesPerSample == 1 ? 8 : 16;
 
     // loop over Y/U/V or R/G/B or R/G/B/Alpha planes
     const VSFrameRef *src = vsapi->getFrameFilter(n, plugin->node, frameCtx);
@@ -136,7 +133,7 @@ void init_input_frame(
 
         // re-init these fields, override the values parsed from cfg
         dst->m_height[plane] = h;
-        dst->m_width [plane] = w;
+        dst->m_width[plane] = w;
         dst->m_bitDepthComp[plane] = bitdepth;
         dst->m_picUnitSizeOnDisk = bitdepth;
         dst->m_picUnitSizeShift3 = dst->m_picUnitSizeOnDisk >> 3;
@@ -145,13 +142,13 @@ void init_input_frame(
         assert(dst->m_comp[plane] != NULL);
 
         // copy from VS (src) to HDR (dst = converter->m_inputFrame)
+        // TODO: dst use different buffers for 8 and 16 bits yuv
         int dst_stride = src_stride;
-        vs_bitblt(
-                dst->m_comp[plane], dst_stride,  // dst
-                srcp, src_stride,   // src
-                w * bytesPerSample, // total bytes of each line
-                h                   // plane height
-                );
+        vs_bitblt(dst->m_comp[plane], dst_stride, // dst
+                  srcp, src_stride,               // src
+                  w * bytesPerSample,             // total bytes of each line
+                  h                               // plane height
+                  );
 #if 0
         vs_bitblt(dstp, dst_stride, srcp, src_stride,
                 w * d->vi.format->bytesPerSample, // total bytes of each line
@@ -171,15 +168,15 @@ void init_input_frame(
     dst->m_compSize[U_COMP] = dst->m_height[U_COMP] * dst->m_width[U_COMP];
     dst->m_compSize[V_COMP] = dst->m_height[V_COMP] * dst->m_width[V_COMP];
     dst->m_size = dst->m_compSize[Y_COMP] + dst->m_compSize[U_COMP] +
-        dst->m_compSize[V_COMP];
+                  dst->m_compSize[V_COMP];
 
-    // we do not need this currently - Yanan Zhao, 2016-12-11 23:43:10
-    // m_compSize[A_COMP] = ;
-    // m_height[A_COMP] = ;
-    // m_width [A_COMP] = ;
+// we do not need this currently - Yanan Zhao, 2016-12-11 23:43:10
+// m_compSize[A_COMP] = ;
+// m_height[A_COMP] = ;
+// m_width [A_COMP] = ;
 
-    /* following fields should have been initialized by parsing cfg file
-     * before this stage */
+/* following fields should have been initialized by parsing cfg file
+ * before this stage */
 #if 0
     m_colorSpace;                   //!< Color space
     m_colorPrimaries;               //!< Color primaries
@@ -192,6 +189,74 @@ void init_input_frame(
     m_systemGamma;
     m_pixelType[4];                 //!< pixel type (for OpenEXR)
     m_frameRate;
+#endif
+}
+
+void copy_output_frame(Plugin *plugin, VSFrameRef *dstVsFrame,
+                       VSFrameContext *frameCtx, VSCore *core,
+                       const VSAPI *vsapi)
+{
+    assert(plugin != NULL);
+
+    // destination YUV frame in this func
+    HDRConvertYUV *converter = (HDRConvertYUV *)(plugin->converter);
+    Output *src = converter->m_outputFrame;
+
+    // sizeof(one_Y_pixel) == sizeof(U) == sizeof(V)
+    int bytesPerSample = plugin->vi->format->bytesPerSample;
+    assert(bytesPerSample == 1 || bytesPerSample == 2);
+
+    int bitdepth = bytesPerSample == 1 ? 8 : 16;
+    assert(bitdepth ==
+           16); // HDR should always > 8, Yanan Zhao, 2016-12-12 21:56:38
+
+    // loop over Y/U/V or R/G/B or R/G/B/Alpha planes
+    const VSFormat *format = plugin->vi->format;
+    for (int plane = 0; plane < format->numPlanes; plane++) {
+        uint8_t *dst = vsapi->getWritePtr(dstVsFrame, plane);
+        int dst_stride = vsapi->getStride(dstVsFrame, plane);
+
+        int h = vsapi->getFrameHeight(dstVsFrame, plane);
+        int w = vsapi->getFrameWidth(dstVsFrame, plane);
+
+        int src_stride = src->m_width[plane];
+        vs_bitblt(dst, dst_stride,                    // dst
+                  src->m_ui16Comp[plane], src_stride, // src
+                  w * bytesPerSample, // total bytes of each line
+                  h                   // plane height
+                  );
+    }
+
+#if 0
+    src->m_isFloat;
+    src->m_isInterleaved = false;
+    src->m_isInterlaced = false;
+    src->m_size;                         //!< number of samples
+    src->m_compSize[4];                  //!< number of samples in specific component
+    src->m_height[4];                    //!< height of a specific component in pixels
+    src->m_width [4];                    //!< width of a specific component in pixels
+    src->m_colorSpace;                   //!< Color Space
+    src->m_colorPrimaries;               //!< Color primaries
+    src->m_sampleRange;                  //!< Sample range
+    src->m_chromaFormat;                 //!< 0: 420, 1:422, 2:444
+    src->m_chromaLocation[FP_TOTAL];     //!< Chroma location type for subsampled ChromaFormats. 
+
+    src->m_transferFunction;             //!< output transfer function
+    src->m_pixelFormat;
+    src->m_systemGamma;
+    src->m_bitDepthComp[4];
+    src->m_pixelType[4];                 //!< pixel type (for OpenEXR)
+    src->m_frameRate;
+    src->m_picUnitSizeOnDisk;            //!< picture sample unit size on storage medium
+    src->m_picUnitSizeShift3;            //!< m_picUnitSizeOnDisk >> 3
+
+
+    // Sim2 parameters
+    // bool              m_cositedSampling;
+    // bool              m_improvedFilter;
+    
+    // EXR rounding
+    // bool              m_useFloatRound;
 #endif
 }
 
@@ -257,32 +322,9 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
 
     init_input_frame(plugin, n, frameCtx, core, vsapi);
 
-    // It's processing loop time!
-    // Loop over all the planes
-    for (int plane = 0; plane < format->numPlanes; plane++) {
-        const uint8_t *srcp = vsapi->getReadPtr(src, plane);
-        int src_stride = vsapi->getStride(src, plane);
-        uint8_t *dstp = vsapi->getWritePtr(dst, plane);
-        int dst_stride = vsapi->getStride(dst, plane);
-        // note that if a frame has the same dimensions and
-        // format, the stride is guaranteed to be the same.
-        // int dst_stride = src_stride would be fine too in this filter.
-        // Since planes may be subsampled you have to query the height of
-        // them individually
+    converter->processOneFrame();
 
-        int h = vsapi->getFrameHeight(src, plane);
-        int y;
-        int w = vsapi->getFrameWidth(src, plane);
-        int x;
-
-        for (y = 0; y < h; y++) {
-            for (x = 0; x < w; x++)
-                dstp[x] = ~srcp[x];
-
-            dstp += dst_stride;
-            srcp += src_stride;
-        }
-    }
+    copy_output_frame(plugin, dst, frameCtx, core, vsapi);
 
     // Release the source frame
     vsapi->freeFrame(src);

@@ -72,7 +72,6 @@ class HDRConvertYUV : public HDRConvert {
 private:
   int                 m_nFrameStores;
 
-  Output             *m_outputFrame;            // output frames
   Frame              *m_oFrameStore;            // picture storage for output frames
   Frame              *m_iFrameStore;            // picture storage for input frames
   Frame              *m_pFrameStore[7];         // picture storage for processing frames
@@ -126,6 +125,7 @@ private:
 
 public:
   Input              *m_inputFrame;             // input frames
+  Output             *m_outputFrame;            // output frames
 
   HDRConvertYUV(ProjectParameters *inputParams);
   //virtual ~HDRConvertYUV();

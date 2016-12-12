@@ -1014,44 +1014,19 @@ void HDRConvertYUV::outputFooter(ProjectParameters *inputParams)
 }
 
 
-#if 0
-void HDRConvertYUV::processOneFrame(
-        ProjectParameters *inputParams,
-        int w, int h,
-        uint8_t *srcY, int srcStrideY,
-        uint8_t *srcU, int srcStrideU,
-        uint8_t *srcV, int srcStrideV,
-        )
+#if 1
+void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
 {
-#define VS_PLUGIN 1
-
-    // input parameters
-    init_input_frame(plugin->converter->m_inputFrame, vsFrame);
-
-    if (srcBitDepth == 8) {
-        // copy to m_inputFrame->m_data and m_inputFrame->m_comp[4]
-    }
-    else {
-        // copy to m_inputFrame->m_ui16Data and
-        // m_inputFrame->m_ui16DataComp[4]
-    }
-
-    // to be clarified
-    // - input YUV bitdepth?
-    // - input YUV representation, how many bits
-    // - need conversion? e.g. 12 -> 10
-    //
     int iCurrFrame = 0;
     float ratio =
         inputParams->m_source.m_frameRate / inputParams->m_output.m_frameRate;
     FrameFormat *srcFormat = &inputParams->m_source;
 
     clock_t clk;
-    bool errorRead = FALSE;
 
     Frame *currentFrame = NULL;
 
-    // should only one frame each time - Yanan Zhao
+    // should only one frame each time - Yanan Zhao, 2016-12-12 21:28:21
     assert(inputParams->m_numberOfFrames == 1);
 
     // Now process all frames
@@ -1060,31 +1035,10 @@ void HDRConvertYUV::processOneFrame(
         iCurrFrame = int(iFrame * ratio);
 
         // read frames
+        m_inputFrame->copyFrame(m_iFrameStore);
         m_iFrameStore->m_frameNo = iFrame;
-        if (
-                //copy yuv to input frame
-#if !VS_PLUGIN
-                m_inputFrame->readOneFrame(
-                    m_inputFile, // fd of input file
-                    iCurrFrame,  // current frame index
-                    m_inputFile->m_fileHeader, // num of bytes to skip
-                    m_startFrame // start position in file
-                    ) == TRUE
-#else
-#endif
-                ) {
-            // Now copy input frame buffer to processing frame buffer for any
-            // subsequent processing
-            m_inputFrame->copyFrame(m_iFrameStore);
-        } else {
-            inputParams->m_numberOfFrames = iFrame;
-            errorRead = TRUE;
-            break;
-        }
 
-        if (errorRead == TRUE) {
-            break;
-        } else if (inputParams->m_silentMode == FALSE) {
+        if (inputParams->m_silentMode == FALSE) {
             // printf("%05d ", iFrame);
         }
 
@@ -1147,7 +1101,6 @@ void HDRConvertYUV::processOneFrame(
         // Output to m_pFrameStore memory with appropriate color space
         // conversion
         // Note that the name of "forward" may be a bit of a misnomer.
-
         if (!(srcFormat->m_iConstantLuminance != 0 &&
               (srcFormat->m_colorSpace == CM_YCbCr ||
                srcFormat->m_colorSpace == CM_ICtCp))) {
@@ -1200,8 +1153,8 @@ void HDRConvertYUV::processOneFrame(
 
         // frame output
         m_outputFrame->copyFrame(m_oFrameStore);
-        m_outputFrame->writeOneFrame(m_outputFile, iFrame,
-                                     m_outputFile->m_fileHeader, 0);
+        /* m_outputFrame->writeOneFrame(m_outputFile, iFrame, */
+        /*                              m_outputFile->m_fileHeader, 0); */
 
         clk = clock() - clk;
         /* if (inputParams->m_silentMode == FALSE) { */
