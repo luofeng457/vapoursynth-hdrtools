@@ -51,16 +51,15 @@
 /* std::cout << "@" << __FILE__ << ": " << __LINE__ << " " << __func__ \ */
 /*           << std::endl; */
 
+#ifdef PARAM_DEBUG
 static void print_params(ProjectParameters *params);
+#endif
 
 struct Plugin
 {
     VSNodeRef *node;
     const VSVideoInfo *vi;
-    int enabled;
 
-    int width;
-    int height;
     const char *cfgfile; /* cfg file */
 
     ProjectParameters *params;
@@ -83,7 +82,9 @@ void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
     plugin->params->m_silentMode = FALSE;
     plugin->params->readConfigFile((char *)plugin->cfgfile);
     plugin->params->update();
-    // print_params(plugin->params);
+#ifdef PARAM_DEBUG
+    print_params(plugin->params);
+#endif
 
     HDRConvert *converter = HDRConvert::create(plugin->params);
     if (!converter) {
@@ -91,9 +92,7 @@ void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
         return;
     }
     plugin->converter = converter;
-
     plugin->converter->init(plugin->params);
-    // plugin->converter->outputHeader(plugin->params);
 
     TRACE_LINE
 }
@@ -105,9 +104,9 @@ void init_input_frame(Plugin *plugin, int n, VSFrameContext *frameCtx,
                       VSCore *core, const VSAPI *vsapi)
 {
     assert(plugin != NULL);
+    HDRConvertYUV *converter = (HDRConvertYUV *)(plugin->converter);
 
     // destination YUV frame in this func
-    HDRConvertYUV *converter = (HDRConvertYUV *)(plugin->converter);
     Input *dst = converter->m_inputFrame;
 
     // sizeof(one_Y_pixel) == sizeof(U) == sizeof(V)
@@ -120,7 +119,7 @@ void init_input_frame(Plugin *plugin, int n, VSFrameContext *frameCtx,
     const VSFrameRef *src = vsapi->getFrameFilter(n, plugin->node, frameCtx);
     const VSFormat *format = plugin->vi->format;
     for (int plane = 0; plane < format->numPlanes; plane++) {
-        const uint8_t *srcp = vsapi->getReadPtr(src, plane);
+        const uint8_t *_src = vsapi->getReadPtr(src, plane);
         int src_stride = vsapi->getStride(src, plane);
 
         // note that if a frame has the same dimensions and
@@ -139,22 +138,17 @@ void init_input_frame(Plugin *plugin, int n, VSFrameContext *frameCtx,
         dst->m_picUnitSizeShift3 = dst->m_picUnitSizeOnDisk >> 3;
 
         // should has been initialzed in constructor
-        assert(dst->m_comp[plane] != NULL);
+        uint8_t *_dst = (bitdepth == 8 ? (uint8_t *)dst->m_comp[plane]
+                                       : (uint8_t *)dst->m_ui16Comp[plane]);
+        assert(_src != NULL && _dst != NULL);
 
         // copy from VS (src) to HDR (dst = converter->m_inputFrame)
-        // TODO: dst use different buffers for 8 and 16 bits yuv
         int dst_stride = src_stride;
-        vs_bitblt(dst->m_comp[plane], dst_stride, // dst
-                  srcp, src_stride,               // src
-                  w * bytesPerSample,             // total bytes of each line
-                  h                               // plane height
+        vs_bitblt(_dst, dst_stride,   // dst
+                  _src, src_stride,   // src
+                  w * bytesPerSample, // total bytes of each line
+                  h                   // plane height
                   );
-#if 0
-        vs_bitblt(dstp, dst_stride, srcp, src_stride,
-                w * d->vi.format->bytesPerSample, // total bytes of each line
-                h                                 // plane height
-                );
-#endif
     }
 
     dst->m_isFloat = false;
@@ -192,14 +186,14 @@ void init_input_frame(Plugin *plugin, int n, VSFrameContext *frameCtx,
 #endif
 }
 
-void copy_output_frame(Plugin *plugin, VSFrameRef *dstVsFrame,
+void copy_output_frame(Plugin *plugin, VSFrameRef *dst,
                        VSFrameContext *frameCtx, VSCore *core,
                        const VSAPI *vsapi)
 {
     assert(plugin != NULL);
-
-    // destination YUV frame in this func
     HDRConvertYUV *converter = (HDRConvertYUV *)(plugin->converter);
+
+    // source YUV frame in this func
     Output *src = converter->m_outputFrame;
 
     // sizeof(one_Y_pixel) == sizeof(U) == sizeof(V)
@@ -213,18 +207,28 @@ void copy_output_frame(Plugin *plugin, VSFrameRef *dstVsFrame,
     // loop over Y/U/V or R/G/B or R/G/B/Alpha planes
     const VSFormat *format = plugin->vi->format;
     for (int plane = 0; plane < format->numPlanes; plane++) {
-        uint8_t *dst = vsapi->getWritePtr(dstVsFrame, plane);
-        int dst_stride = vsapi->getStride(dstVsFrame, plane);
+        uint8_t *_dst = vsapi->getWritePtr(dst, plane);
+        int dst_stride = vsapi->getStride(dst, plane);
 
-        int h = vsapi->getFrameHeight(dstVsFrame, plane);
-        int w = vsapi->getFrameWidth(dstVsFrame, plane);
+        int h = vsapi->getFrameHeight(dst, plane);
+        int w = vsapi->getFrameWidth(dst, plane);
 
-        int src_stride = src->m_width[plane];
-        vs_bitblt(dst, dst_stride,                    // dst
-                  src->m_ui16Comp[plane], src_stride, // src
+        int src_stride = src->m_width[plane] * bytesPerSample;
+        uint8_t *_src = (uint8_t *)src->m_ui16Comp[plane];
+        assert(_src != NULL && _dst != NULL);
+#if 1
+        vs_bitblt(_dst, dst_stride,   // dst
+                  _src, src_stride,   // src
                   w * bytesPerSample, // total bytes of each line
                   h                   // plane height
                   );
+#else
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                _dst[y * dst_stride + x] = 0xFF; //_src[y * src_stride + x];
+            }
+        }
+#endif
     }
 
 #if 0
@@ -249,14 +253,6 @@ void copy_output_frame(Plugin *plugin, VSFrameRef *dstVsFrame,
     src->m_frameRate;
     src->m_picUnitSizeOnDisk;            //!< picture sample unit size on storage medium
     src->m_picUnitSizeShift3;            //!< m_picUnitSizeOnDisk >> 3
-
-
-    // Sim2 parameters
-    // bool              m_cositedSampling;
-    // bool              m_improvedFilter;
-    
-    // EXR rounding
-    // bool              m_useFloatRound;
 #endif
 }
 
@@ -268,8 +264,6 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     TRACE_LINE
 
     Plugin *plugin = (Plugin *)*instanceData;
-    /* plugin->converter->process(plugin->params); */
-    /* plugin->converter->outputFooter(plugin->params); */
 
     // Request the source frame on the first call
     if (activationReason == arInitial) {
@@ -293,10 +287,11 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     int height = vsapi->getFrameHeight(src, 0);
     int width = vsapi->getFrameWidth(src, 0);
 
-    // When creating a new frame for output it is VERY EXTREMELY SUPER
-    // IMPORTANT to supply the "dominant" source frame to copy properties from.
-    // Frame props are an essential part of the filter chain and you should
-    // NEVER break it.
+// When creating a new frame for output it is VERY EXTREMELY SUPER
+// IMPORTANT to supply the "dominant" source frame to copy properties from.
+// Frame props are an essential part of the filter chain and you should
+// NEVER break it.
+#if 0
     printf("fmt->name: %s\n", format->name);
     printf("fmt->id: %d\n", format->id);
     printf("fmt->colorFamily: %d\n", format->colorFamily);
@@ -306,6 +301,7 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     printf("fmt->subSamplingW: %d\n", format->subSamplingW);
     printf("fmt->subSamplingH: %d\n", format->subSamplingH);
     printf("fmt->numPlanes: %d\n", format->numPlanes);
+#endif
 #if 0 // TODO
     if (0) {
         ProjectParameters *params = plugin->params;
@@ -318,12 +314,12 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
         dst->numPlanes = 3; /* TODO: always 3 ? */
     }
 #endif
-    VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
-
     init_input_frame(plugin, n, frameCtx, core, vsapi);
 
-    converter->processOneFrame();
+    HDRConvertYUV *converter = (HDRConvertYUV *)plugin->converter;
+    converter->processOneFrame(plugin->params);
 
+    VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
     copy_output_frame(plugin, dst, frameCtx, core, vsapi);
 
     // Release the source frame
@@ -408,6 +404,7 @@ VapourSynthPluginInit(VSConfigPlugin config_fnc,
 /*************************************************************************/
 /*                  internal funtions                                    */
 /*************************************************************************/
+#ifdef PARAM_DEBUG
 extern IntegerParameter intParameterList[];
 extern DoubleParameter doubleParameterList[];
 extern FloatParameter floatParameterList[];
@@ -506,3 +503,4 @@ static void print_params(ProjectParameters *params)
 
     printf("m_toneMapping          : %d\n", p->m_toneMapping);
 }
+#endif

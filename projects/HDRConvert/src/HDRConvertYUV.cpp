@@ -1013,26 +1013,23 @@ void HDRConvertYUV::outputFooter(ProjectParameters *inputParams)
     IOFunctions::closeFile(f);
 }
 
-
-#if 1
+/**
+ * Process one frame
+ * VS input frame --> HDRConvert --> VS output frame
+ */
 void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
 {
-    int iCurrFrame = 0;
-    float ratio =
-        inputParams->m_source.m_frameRate / inputParams->m_output.m_frameRate;
     FrameFormat *srcFormat = &inputParams->m_source;
+    Frame *currentFrame = NULL;
 
     clock_t clk;
 
-    Frame *currentFrame = NULL;
-
     // should only one frame each time - Yanan Zhao, 2016-12-12 21:28:21
-    assert(inputParams->m_numberOfFrames == 1);
+    // assert(inputParams->m_numberOfFrames == 1);
 
     // Now process all frames
     for (int iFrame = 0; iFrame < inputParams->m_numberOfFrames; iFrame++) {
         clk = clock();
-        iCurrFrame = int(iFrame * ratio);
 
         // read frames
         m_inputFrame->copyFrame(m_iFrameStore);
@@ -1151,10 +1148,7 @@ void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
         } else
             m_convertProcess->process(m_oFrameStore, m_pFrameStore[4]);
 
-        // frame output
         m_outputFrame->copyFrame(m_oFrameStore);
-        /* m_outputFrame->writeOneFrame(m_outputFile, iFrame, */
-        /*                              m_outputFile->m_fileHeader, 0); */
 
         clk = clock() - clk;
         /* if (inputParams->m_silentMode == FALSE) { */
@@ -1167,4 +1161,3 @@ void HDRConvertYUV::processOneFrame(ProjectParameters *inputParams)
         /* } */
     } // end for iFrame
 }
-#endif

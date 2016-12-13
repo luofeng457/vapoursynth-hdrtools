@@ -134,6 +134,7 @@ public:
   virtual void outputFooter (ProjectParameters *inputParams);
   virtual void init         (ProjectParameters *inputParams);
   virtual void process      (ProjectParameters *inputParams);
+  virtual void processOneFrame(ProjectParameters *inputParams);
   virtual void destroy();
 };
 
