@@ -130,6 +130,7 @@ public:
   HDRConvertYUV(ProjectParameters *inputParams);
   //virtual ~HDRConvertYUV();
   
+  Frame* getiFrameStore() {return m_iFrameStore;};
   virtual void outputHeader (ProjectParameters *inputParams);
   virtual void outputFooter (ProjectParameters *inputParams);
   virtual void init         (ProjectParameters *inputParams);

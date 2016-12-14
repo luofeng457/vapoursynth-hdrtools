@@ -38,7 +38,7 @@ HDRTools as a vapoursynth plugin.
   import vapoursynth as vs
 
   core = vs.get_core()
-  core.std.LoadPlugin("/home/arthurchiao/libhdrconv.so")
+  core.std.LoadPlugin("libhdrconv.so")
 
   print(core.list_functions())
   ```
@@ -56,12 +56,21 @@ HDRTools as a vapoursynth plugin.
   identifier: hdrconv
   ```
 
+# Usage
+
+  `test_hdrc.vpy` is a simple example, run it with:
+
+  ```shell
+  $ vspipe --y4m --start 1 --end 10 test_hdrc.vpy - | ffmpeg -i pipe: out.mkv
+  ```
+
 # Docker Image
 
-**TODO**
+==**TODO**==: I will provide a docker image which ships with ffmpeg,
+vapoursynth, and many plugins which include hdrconv.
 
 # License
-**I'm not sure if this is ok, write to me if I'm infringing**
+**I'm not sure if this is ok, contact me if there are problems**
 
 1. **HDRTools**: same license as HDRTools (BSD)
 

@@ -113,7 +113,7 @@ void init_input_frame(Plugin *plugin, int n, VSFrameContext *frameCtx,
     int bytesPerSample = plugin->vi->format->bytesPerSample;
     assert(bytesPerSample == 1 || bytesPerSample == 2);
 
-    int bitdepth = bytesPerSample == 1 ? 8 : 16;
+    int bitdepth = plugin->vi->format->bitsPerSample;
 
     // loop over Y/U/V or R/G/B or R/G/B/Alpha planes
     const VSFrameRef *src = vsapi->getFrameFilter(n, plugin->node, frameCtx);
@@ -195,14 +195,14 @@ void copy_output_frame(Plugin *plugin, VSFrameRef *dst,
 
     // source YUV frame in this func
     Output *src = converter->m_outputFrame;
+#if 0 // debug
+    // Input *src = converter->m_inputFrame;
+    // Frame *src = converter->getiFrameStore();
+#endif
 
     // sizeof(one_Y_pixel) == sizeof(U) == sizeof(V)
     int bytesPerSample = plugin->vi->format->bytesPerSample;
     assert(bytesPerSample == 1 || bytesPerSample == 2);
-
-    int bitdepth = bytesPerSample == 1 ? 8 : 16;
-    assert(bitdepth ==
-           16); // HDR should always > 8, Yanan Zhao, 2016-12-12 21:56:38
 
     // loop over Y/U/V or R/G/B or R/G/B/Alpha planes
     const VSFormat *format = plugin->vi->format;
@@ -216,19 +216,13 @@ void copy_output_frame(Plugin *plugin, VSFrameRef *dst,
         int src_stride = src->m_width[plane] * bytesPerSample;
         uint8_t *_src = (uint8_t *)src->m_ui16Comp[plane];
         assert(_src != NULL && _dst != NULL);
-#if 1
+
+        // copy to vs output frame
         vs_bitblt(_dst, dst_stride,   // dst
                   _src, src_stride,   // src
                   w * bytesPerSample, // total bytes of each line
                   h                   // plane height
                   );
-#else
-        for (int y = 0; y < h; y++) {
-            for (int x = 0; x < w; x++) {
-                _dst[y * dst_stride + x] = 0xFF; //_src[y * src_stride + x];
-            }
-        }
-#endif
     }
 
 #if 0
@@ -287,10 +281,6 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     int height = vsapi->getFrameHeight(src, 0);
     int width = vsapi->getFrameWidth(src, 0);
 
-// When creating a new frame for output it is VERY EXTREMELY SUPER
-// IMPORTANT to supply the "dominant" source frame to copy properties from.
-// Frame props are an essential part of the filter chain and you should
-// NEVER break it.
 #if 0
     printf("fmt->name: %s\n", format->name);
     printf("fmt->id: %d\n", format->id);
@@ -319,6 +309,10 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     HDRConvertYUV *converter = (HDRConvertYUV *)plugin->converter;
     converter->processOneFrame(plugin->params);
 
+    // When creating a new frame for output it is VERY EXTREMELY SUPER
+    // IMPORTANT to supply the "dominant" source frame to copy properties from.
+    // Frame props are an essential part of the filter chain and you should
+    // NEVER break it.
     VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
     copy_output_frame(plugin, dst, frameCtx, core, vsapi);
 
