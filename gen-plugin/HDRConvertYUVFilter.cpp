@@ -64,6 +64,11 @@ struct Plugin
 
     ProjectParameters *params;
     HDRConvert *converter;
+
+#define HDRCONV_PLUGIN_NAME "hdrconv"
+#define HDRCONV_PLUGIN_NAMESPACE "hdrc"
+#define HDRCONV_PLUGIN_VERSION "0.0.1"
+#define HDRCONV_YUV_FILTER_NAME "YUVConverter"
 };
 
 void VS_CC init_filter(VSMap *in, VSMap *out, void **instanceData, VSNode *node,
@@ -316,11 +321,8 @@ const VSFrameRef *VS_CC get_frame(int n, int activationReason,
     VSFrameRef *dst = vsapi->newVideoFrame(format, width, height, src, core);
     copy_output_frame(plugin, dst, frameCtx, core, vsapi);
 
-    // Release the source frame
     vsapi->freeFrame(src);
 
-    // A reference is consumed when it is returned, so saving the dst
-    // reference somewhere and reusing it is not allowed.
     TRACE_LINE
     return dst;
 }
@@ -371,9 +373,8 @@ void VS_CC create(const VSMap *in, VSMap *out, void *userData, VSCore *core,
     plugin->vi = vsapi->getVideoInfo(plugin->node);
     plugin->cfgfile = cfgfile;
 
-    vsapi->createFilter(in, out,
-                        "YUVConverter", // plugin->filter_name.c_str(),
-                        &init_filter, &get_frame, &free_filter,
+    vsapi->createFilter(in, out, HDRCONV_YUV_FILTER_NAME, &init_filter,
+                        &get_frame, &free_filter,
                         0, // filter mode
                         0, // filter flags
                         plugin, core);
@@ -385,13 +386,19 @@ VS_EXTERNAL_API(void)
 VapourSynthPluginInit(VSConfigPlugin config_fnc,
                       VSRegisterFunction register_fnc, VSPlugin *plugin)
 {
-    config_fnc("hdrconv", "hdrc", "HDR Converter 0.0.1",
-               VAPOURSYNTH_API_VERSION, 1, plugin);
+    config_fnc(HDRCONV_PLUGIN_NAME,                      // identifier
+               HDRCONV_PLUGIN_NAMESPACE,                 // default namespace
+               "HDR Converter, " HDRCONV_PLUGIN_VERSION, // name
+               VAPOURSYNTH_API_VERSION,                  // api version
+               1,                                        // readonly flag
+               plugin                                    // VSPlugin
+               );
 
-    register_fnc("YUVConverter", "clip:clip;"
-                                 "w:int:opt;"
-                                 "h:int:opt;"
-                                 "cfgfile:data[]",
+    // input to HDR converter should be YUV (at least currently)
+    register_fnc(HDRCONV_YUV_FILTER_NAME, "clip:clip;"
+                                          "w:int:opt;"
+                                          "h:int:opt;"
+                                          "cfgfile:data[]",
                  &create, 0, plugin);
 }
 
